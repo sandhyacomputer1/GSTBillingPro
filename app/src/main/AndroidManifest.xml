@@ -12,19 +12,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GSTBIllingPro">
         <activity
+            android:name=".custmore.AddCustomerActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".Activity.NewProductActivity"
-            android:exported="true"/>
-
+            android:exported="true" />
         <activity
             android:name=".Registration.LoginActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".Registration.RegistrationActivity"
-            android:exported="true"/>
-
+            android:exported="true" />
         <activity
             android:name=".Registration.SplashActivity"
             android:exported="true">

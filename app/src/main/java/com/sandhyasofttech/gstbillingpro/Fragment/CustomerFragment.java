@@ -1,66 +1,142 @@
 package com.sandhyasofttech.gstbillingpro.Fragment;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttech.gstbillingpro.R;
+import com.sandhyasofttech.gstbillingpro.custmore.AddCustomerActivity;
+import com.sandhyasofttech.gstbillingpro.custmore.Customer;
+import com.sandhyasofttech.gstbillingpro.custmore.CustomerAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CustomerFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CustomerFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private RecyclerView recyclerView;
+    private FloatingActionButton fabAddCustomer;
+    private SearchView searchView;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private CustomerAdapter adapter;
+    private final List<Customer> customersList = new ArrayList<>();
 
-    public CustomerFragment() {
-        // Required empty public constructor
-    }
+    private DatabaseReference customersRef;
+    private String userMobile;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CustomerFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CustomerFragment newInstance(String param1, String param2) {
-        CustomerFragment fragment = new CustomerFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public CustomerFragment() { }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_customer, container, false);
+
+        recyclerView = view.findViewById(R.id.recyclerViewCustomers);
+        fabAddCustomer = view.findViewById(R.id.fabAddCustomer);
+        searchView = view.findViewById(R.id.searchViewCustomer);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        SharedPreferences prefs = requireContext().getSharedPreferences("APP_PREFS", requireContext().MODE_PRIVATE);
+        userMobile = prefs.getString("USER_MOBILE", null);
+
+        if (userMobile == null) {
+            Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+            return view;
         }
+
+        customersRef = FirebaseDatabase.getInstance().getReference("users").child(userMobile).child("customers");
+
+        adapter = new CustomerAdapter(requireContext(), customersList, new CustomerAdapter.OnCustomerClickListener() {
+            @Override
+            public void onEditClicked(Customer customer) {
+                Intent intent = new Intent(getActivity(), AddCustomerActivity.class);
+                intent.putExtra(AddCustomerActivity.EXTRA_IS_EDIT, true);
+                intent.putExtra(AddCustomerActivity.EXTRA_CUSTOMER_ID, customer.phone);
+                intent.putExtra(AddCustomerActivity.EXTRA_CUSTOMER_NAME, customer.name);
+                intent.putExtra(AddCustomerActivity.EXTRA_CUSTOMER_PHONE, customer.phone);
+                intent.putExtra(AddCustomerActivity.EXTRA_CUSTOMER_EMAIL, customer.email);
+                intent.putExtra(AddCustomerActivity.EXTRA_CUSTOMER_GSTIN, customer.gstin);
+                intent.putExtra(AddCustomerActivity.EXTRA_CUSTOMER_ADDRESS, customer.address);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onDeleteClicked(Customer customer) {
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Delete Customer")
+                        .setMessage("Are you sure you want to delete " + customer.name + "?")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            customersRef.child(customer.phone).removeValue()
+                                    .addOnSuccessListener(aVoid ->
+                                            Toast.makeText(getContext(), "Customer deleted", Toast.LENGTH_SHORT).show())
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(getContext(), "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
+
+        fabAddCustomer.setOnClickListener(v -> startActivity(new Intent(getActivity(), AddCustomerActivity.class)));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.getFilter().filter(query);
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+        loadCustomers();
+
+        return view;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_customer, container, false);
+    private void loadCustomers() {
+        customersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Customer> tempList = new ArrayList<>();
+                for (DataSnapshot snap : snapshot.getChildren()) {
+                    Customer customer = snap.getValue(Customer.class);
+                    if (customer != null) {
+                        if (customer.phone == null || customer.phone.isEmpty()) {
+                            customer.phone = snap.getKey();
+                        }
+                        tempList.add(customer);
+                    }
+                }
+                adapter.updateData(tempList);  // Use updateData to update full list for filtering
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Failed to load customers: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 }
