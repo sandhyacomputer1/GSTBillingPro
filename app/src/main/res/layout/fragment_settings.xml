@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- User Profile Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/imgUserProfile"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/ic_profile"
+                android:contentDescription="Profile Picture"
+                android:scaleType="centerCrop"
+                android:background="@drawable/circle_background" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp">
+
+                <TextView
+                    android:id="@+id/tvOwnerName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Owner Name"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="email@example.com"
+                    android:textSize="14sp"
+                    android:textColor="#666" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Business Info Section -->
+        <TextView
+            android:layout_marginTop="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Business Information"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvBusinessName"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Business Name: "
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvBusinessType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Business Type: "
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvGstin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="GSTIN: "
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Address: "
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvPin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PIN: "
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvMobile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mobile: "
+            android:textSize="14sp" />
+
+        <!-- Logout Button -->
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Logout"
+            android:layout_marginTop="32dp"
+            android:backgroundTint="@color/design_default_color_primary"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+</ScrollView>
