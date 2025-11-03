@@ -5,102 +5,107 @@
     android:padding="16dp">
 
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <!-- User Profile Section -->
+        <!-- Profile Section -->
         <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="16dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp">
 
             <ImageView
                 android:id="@+id/imgUserProfile"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
                 android:src="@drawable/ic_profile"
                 android:contentDescription="Profile Picture"
                 android:scaleType="centerCrop"
                 android:background="@drawable/circle_background" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginStart="16dp">
+                android:layout_marginStart="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/tvOwnerName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="Owner Name"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/tvEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="email@example.com"
                     android:textSize="14sp"
-                    android:textColor="#666" />
+                    android:textColor="#757575"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Business Info Section -->
+        <!-- Business Information -->
         <TextView
-            android:layout_marginTop="24dp"
+            android:text="Business Information"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Business Information"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:paddingBottom="8dp" />
 
         <TextView
             android:id="@+id/tvBusinessName"
-            android:layout_marginTop="8dp"
+            android:text="Business Name: "
+            android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Business Name: "
-            android:textSize="14sp" />
+            android:paddingBottom="4dp" />
 
         <TextView
             android:id="@+id/tvBusinessType"
+            android:text="Business Type: "
+            android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Business Type: "
-            android:textSize="14sp" />
+            android:paddingBottom="4dp" />
 
         <TextView
             android:id="@+id/tvGstin"
+            android:text="GSTIN: "
+            android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="GSTIN: "
-            android:textSize="14sp" />
+            android:paddingBottom="4dp" />
 
         <TextView
             android:id="@+id/tvAddress"
+            android:text="Address: "
+            android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Address: "
-            android:textSize="14sp" />
+            android:paddingBottom="4dp" />
 
         <TextView
             android:id="@+id/tvPin"
+            android:text="PIN: "
+            android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="PIN: "
-            android:textSize="14sp" />
+            android:paddingBottom="4dp" />
 
         <TextView
             android:id="@+id/tvMobile"
+            android:text="Mobile: "
+            android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Mobile: "
-            android:textSize="14sp" />
+            android:paddingBottom="24dp" />
 
         <!-- Logout Button -->
         <Button
@@ -108,9 +113,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Logout"
-            android:layout_marginTop="32dp"
-            android:backgroundTint="@color/design_default_color_primary"
+            android:backgroundTint="?attr/colorPrimary"
             android:textColor="@android:color/white" />
-
     </LinearLayout>
 </ScrollView>
