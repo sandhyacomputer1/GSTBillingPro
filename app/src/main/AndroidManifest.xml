@@ -15,11 +15,16 @@
             android:name=".MainActivity"
             android:exported="true"/>
         <activity
+            android:name=".Activity.NewProductActivity"
+            android:exported="true"/>
+
+        <activity
             android:name=".Registration.LoginActivity"
             android:exported="true"/>
         <activity
             android:name=".Registration.RegistrationActivity"
             android:exported="true"/>
+
         <activity
             android:name=".Registration.SplashActivity"
             android:exported="true">

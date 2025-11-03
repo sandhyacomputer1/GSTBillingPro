@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/tvProductName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Product Name"
+        android:textStyle="bold"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/tvProductDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="HSN: 1234 | Price: ₹1000 | GST: 18% | Stock: 10"
+        android:textSize="14sp"
+        android:textColor="#666"/>
+</LinearLayout>

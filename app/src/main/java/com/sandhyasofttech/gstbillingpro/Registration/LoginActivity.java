@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,14 +53,18 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            usersRef.child(mobile).addListenerForSingleValueEvent(new ValueEventListener() {
+            // Read from Firebase under mobile / info / pin
+            usersRef.child(mobile).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         String storedPin = snapshot.child("pin").getValue(String.class);
                         if (storedPin != null && storedPin.equals(pin)) {
                             SharedPreferences prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE);
-                            prefs.edit().putBoolean("IS_LOGGED_IN", true).putString("USER_MOBILE", mobile).apply();
+                            prefs.edit()
+                                    .putBoolean("IS_LOGGED_IN", true)
+                                    .putString("USER_MOBILE", mobile)
+                                    .apply();
 
                             Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -82,10 +85,9 @@ public class LoginActivity extends AppCompatActivity {
             });
         });
 
-        // 👇 Open RegistrationActivity when clicking the text link
+        // Link to open registration screen
         registrationLink.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
         });
     }
 }

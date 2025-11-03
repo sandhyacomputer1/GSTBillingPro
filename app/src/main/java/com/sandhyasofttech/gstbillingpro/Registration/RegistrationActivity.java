@@ -1,6 +1,5 @@
 package com.sandhyasofttech.gstbillingpro.Registration;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -34,7 +33,6 @@ public class RegistrationActivity extends AppCompatActivity {
         pin = findViewById(R.id.pin);
         registerBtn = findViewById(R.id.registerBtn);
 
-        // Initialize Realtime Database reference
         databaseUsers = FirebaseDatabase.getInstance().getReference("users");
 
         registerBtn.setOnClickListener(v -> {
@@ -47,7 +45,8 @@ public class RegistrationActivity extends AppCompatActivity {
             String addr = address.getText().toString().trim();
             String p = pin.getText().toString().trim();
 
-            if (bName.isEmpty() || bType.isEmpty() || oName.isEmpty() || gst.isEmpty() || mob.isEmpty() || mail.isEmpty() || addr.isEmpty() || p.isEmpty()) {
+            if (bName.isEmpty() || bType.isEmpty() || oName.isEmpty() || gst.isEmpty() || mob.isEmpty()
+                    || mail.isEmpty() || addr.isEmpty() || p.isEmpty()) {
                 Toast.makeText(RegistrationActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -62,11 +61,10 @@ public class RegistrationActivity extends AppCompatActivity {
                 return;
             }
 
-            // Create a user object to store in database
             User user = new User(bName, bType, oName, gst, mob, mail, addr, p);
 
-            // Save user data to Realtime Database with mobile number as key
-            databaseUsers.child(mob).setValue(user)
+            // Save user data under mobile/info node
+            databaseUsers.child(mob).child("info").setValue(user)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(RegistrationActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));
@@ -78,14 +76,13 @@ public class RegistrationActivity extends AppCompatActivity {
         });
     }
 
-    // User class to map data for Realtime DB
-    // User class to map data for Realtime DB
+    // User data model with public fields for Firebase mapping
     public static class User {
         public String businessName, businessType, ownerName, gstin;
         public String mobile, email, address, pin;
 
         public User() {
-            // Default constructor required for calls to DataSnapshot.getValue(User.class)
+            // Empty constructor needed by Firebase
         }
 
         public User(String businessName, String businessType, String ownerName, String gstin,
