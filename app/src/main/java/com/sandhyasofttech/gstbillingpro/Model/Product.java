@@ -1,6 +1,8 @@
 package com.sandhyasofttech.gstbillingpro.Model;
 
-public class Product {
+import java.io.Serializable;
+
+public class Product implements Serializable {
     private String productId;
     private String name;
     private String hsnCode;

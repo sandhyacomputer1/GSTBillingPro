@@ -1,130 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <!-- Toolbar with back button and title -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue"
+        app:title="Registration"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationContentDescription="Back"
+        android:elevation="4dp" />
 
-        <androidx.cardview.widget.CardView
+    <!-- ScrollView for the form -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:background="#F5F5F5"
+        android:padding="16dp"
+        android:fillViewport="true">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            card_view:cardCornerRadius="16dp"
-            card_view:cardElevation="6dp"
-            android:backgroundTint="#FFFFFF">
+            android:padding="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="25dp"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <EditText
+                android:id="@+id/businessName"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/edittext_bg"
+                android:hint="Business Name"
+                android:textColorHint="@color/black1"
+                android:padding="10dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Business Registration"
-                    android:textColor="#222222"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:paddingBottom="16dp" />
+            <EditText
+                android:id="@+id/businessType"
+                android:hint="Business Type"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:textColorHint="@color/black1"
+                android:background="@drawable/edittext_bg"
+                android:padding="10dp"
+                android:layout_marginBottom="12dp" />
 
-                <EditText
-                    android:id="@+id/businessName"
-                    android:hint="Business Name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/edit_text"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp" />
+            <EditText
+                android:id="@+id/ownerName"
+                android:hint="Owner Name"
+                android:layout_width="match_parent"
+                android:layout_marginTop="5dp"
+                android:textColorHint="@color/black1"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_bg"
+                android:padding="10dp"
+                android:layout_marginBottom="12dp" />
 
-                <EditText
-                    android:id="@+id/businessType"
-                    android:hint="Business Type"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/edit_text"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp" />
+            <EditText
+                android:id="@+id/gstin"
+                android:hint="GSTIN"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:textColorHint="@color/black1"
+                android:background="@drawable/edittext_bg"
+                android:padding="10dp"
+                android:layout_marginBottom="12dp" />
 
-                <EditText
-                    android:id="@+id/ownerName"
-                    android:hint="Owner Name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/edit_text"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp" />
+            <EditText
+                android:id="@+id/mobile"
+                android:hint="Mobile No"
+                android:inputType="phone"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:textColorHint="@color/black1"
+                android:background="@drawable/edittext_bg"
+                android:padding="10dp"
+                android:layout_marginBottom="12dp" />
 
-                <EditText
-                    android:id="@+id/gstin"
-                    android:hint="GSTIN"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/edit_text"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp" />
+            <EditText
+                android:id="@+id/email"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:textColorHint="@color/black1"
+                android:background="@drawable/edittext_bg"
+                android:padding="10dp"
+                android:layout_marginBottom="12dp" />
 
-                <EditText
-                    android:id="@+id/mobile"
-                    android:hint="Mobile No"
-                    android:inputType="phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/edit_text"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp" />
+            <EditText
+                android:id="@+id/address"
+                android:hint="Business Address"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:textColorHint="@color/black1"
 
-                <EditText
-                    android:id="@+id/email"
-                    android:hint="Email"
-                    android:inputType="textEmailAddress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/edit_text"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp" />
+                android:background="@drawable/edittext_bg"
+                android:padding="10dp"
+                android:layout_marginBottom="12dp" />
 
-                <EditText
-                    android:id="@+id/address"
-                    android:hint="Business Address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/edit_text"
-                    android:padding="10dp"
-                    android:layout_marginBottom="10dp" />
+            <EditText
+                android:id="@+id/pin"
+                android:hint="Set PIN"
+                android:inputType="numberPassword"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="5dp"
+                android:textColorHint="@color/black1"
 
-                <EditText
-                    android:id="@+id/pin"
-                    android:hint="Set PIN"
-                    android:inputType="numberPassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/edit_text"
-                    android:padding="10dp"
-                    android:layout_marginBottom="16dp" />
+                android:background="@drawable/edittext_bg"
+                android:padding="10dp"
+                android:layout_marginBottom="12dp" />
 
-                <Button
-                    android:id="@+id/registerBtn"
-                    android:text="Register"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:backgroundTint="#3F51B5"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:padding="12dp" />
+        </LinearLayout>
+    </ScrollView>
 
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-    </LinearLayout>
-</ScrollView>
+    <!-- Fixed Register Button at bottom -->
+    <Button
+        android:id="@+id/registerBtn"
+        android:layout_width="350dp"
+        android:layout_height="56dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/blue"
+        android:text="Register"
+        android:textSize="18dp"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"/>
+</LinearLayout>

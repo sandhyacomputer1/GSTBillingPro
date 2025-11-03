@@ -11,13 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Toolbar with primary color -->
+        <!-- Toolbar with primary color and white title -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:titleTextColor="@android:color/white"
+            android:background="@color/blue"
+            app:titleTextColor="@color/white"
             app:title="GST Pro Bill" />
 
         <!-- Fragment container fills below Toolbar and above Bottom Navigation -->

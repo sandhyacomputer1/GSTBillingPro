@@ -3,6 +3,7 @@ package com.sandhyasofttech.gstbillingpro.Adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,31 +14,37 @@ import com.sandhyasofttech.gstbillingpro.R;
 
 import java.util.ArrayList;
 
-public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHolder> {
+public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ProductViewHolder> {
 
-    private final ArrayList<Product> products;
+    private ArrayList<Product> products;
+    private OnProductActionListener listener;
 
-    public ProductsAdapter(ArrayList<Product> products) {
+    public interface OnProductActionListener {
+        void onEditProduct(Product product, int position);
+        void onDeleteProduct(Product product, int position);
+    }
+
+    public ProductsAdapter(ArrayList<Product> products, OnProductActionListener listener) {
         this.products = products;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
-    public ProductsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
-        return new ViewHolder(view);
+        return new ProductViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductsAdapter.ViewHolder holder, int position) {
-        Product p = products.get(position);
-        holder.tvName.setText(p.getName());
-        holder.tvDetails.setText(
-                "HSN: " + p.getHsnCode()
-                + " | Price: ₹" + p.getPrice()
-                + " | GST: " + p.getGstRate() + "%"
-                + " | Stock: " + p.getStockQuantity()
-        );
+    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
+        Product product = products.get(position);
+        holder.tvName.setText(product.getName());
+        holder.tvPrice.setText(" ₹" + product.getPrice());
+        holder.tvQuantity.setText(" " + product.getStockQuantity());
+
+        holder.ivEdit.setOnClickListener(v -> listener.onEditProduct(product, position));
+        holder.ivDelete.setOnClickListener(v -> listener.onDeleteProduct(product, position));
     }
 
     @Override
@@ -45,13 +52,17 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         return products.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvDetails;
+    static class ProductViewHolder extends RecyclerView.ViewHolder {
+        TextView tvName, tvPrice, tvQuantity;
+        ImageView ivEdit, ivDelete;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvProductName);
-            tvDetails = itemView.findViewById(R.id.tvProductDetails);
+            tvPrice = itemView.findViewById(R.id.tvPrice);
+            tvQuantity = itemView.findViewById(R.id.tvQuantity);
+            ivEdit = itemView.findViewById(R.id.btnEdit);
+            ivDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 }

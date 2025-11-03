@@ -5,22 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/white"
+    android:background="#F5F8FB"
     android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:dividerPadding="8dp">
 
-        <!-- Quick Stats Card -->
+        <!-- 🔹 Quick Stats Card -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardQuickStats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardElevation="6dp"
-            app:cardCornerRadius="12dp">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:strokeColor="#2196F3"
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="#E3F2FD">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -29,181 +32,186 @@
                 android:padding="16dp"
                 android:weightSum="4">
 
+                <!-- Today’s Sales -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
                         android:id="@+id/tvTodaysSales"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="₹0"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                        android:textColor="@color/black"/>
+                        android:textColor="#0D47A1"
+                        android:textStyle="bold"
+                        android:textSize="20sp" />
 
                     <TextView
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="Today's Sales"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                        android:textColor="@color/gray_700"/>
+                        android:textColor="#424242"
+                        android:textSize="13sp" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="@color/gray_300" />
+                    android:background="#BBDEFB" />
 
+                <!-- Month Sales -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
                     android:gravity="center"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp">
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
                         android:id="@+id/tvMonthSales"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="₹0"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                        android:textColor="@color/black"/>
+                        android:textColor="#0D47A1"
+                        android:textStyle="bold"
+                        android:textSize="20sp" />
 
                     <TextView
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="This Month"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                        android:textColor="@color/gray_700"/>
+                        android:textColor="#424242"
+                        android:textSize="13sp" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="@color/gray_300" />
+                    android:background="#BBDEFB" />
 
+                <!-- Outstanding -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
                     android:gravity="center"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp">
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
                         android:id="@+id/tvOutstanding"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="₹0"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                        android:textColor="@color/black"/>
+                        android:textColor="#0D47A1"
+                        android:textStyle="bold"
+                        android:textSize="20sp" />
 
                     <TextView
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="Outstanding"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                        android:textColor="@color/gray_700"/>
+                        android:textColor="#424242"
+                        android:textSize="13sp" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="@color/gray_300" />
+                    android:background="#BBDEFB" />
 
+                <!-- GST Due -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
                     android:gravity="center"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp">
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
                         android:id="@+id/tvGstDue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="₹0"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                        android:textColor="@color/black"/>
+                        android:textColor="#0D47A1"
+                        android:textStyle="bold"
+                        android:textSize="20sp" />
 
                     <TextView
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="GST Due"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                        android:textColor="@color/gray_700"/>
+                        android:textColor="#424242"
+                        android:textSize="13sp" />
                 </LinearLayout>
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Shortcuts Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardShortcuts"
+        <!-- 🔹 Quick Actions -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quick Actions"
+            android:textColor="#0D47A1"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardElevation="6dp"
-            app:cardCornerRadius="12dp">
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="3"
+            android:layout_marginBottom="16dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNewInvoice"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp"
-                android:gravity="center"
-                android:weightSum="3">
+                android:layout_weight="1"
+                android:backgroundTint="#2196F3"
+                android:textColor="@android:color/white"
+                android:text="New Invoice"
+                android:icon="@drawable/ic_invoice"
+                android:iconTint="@android:color/white" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnNewInvoice"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="New Invoice"
-                    android:icon="@drawable/ic_invoice"
-                    />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddCustomer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="#64B5F6"
+                android:textColor="@android:color/white"
+                android:text="Add Customer"
+                android:icon="@drawable/ic_customer"
+                android:iconTint="@android:color/white" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAddCustomer"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Add Customer"
-                    android:icon="@drawable/ic_customer"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnShareExport"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#1976D2"
+                android:textColor="@android:color/white"
+                android:text="Share / Export"
+                android:icon="@drawable/ic_share"
+                android:iconTint="@android:color/white" />
+        </LinearLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnShareExport"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Share / Export"
-                    android:icon="@drawable/ic_share"
-                   />
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Recent Activity -->
+        <!-- 🔹 Recent Activity -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Recent Activity"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            android:layout_marginBottom="8dp"/>
+            android:textColor="#0D47A1"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRecentActivity"
@@ -211,19 +219,21 @@
             android:layout_height="200dp"
             android:clipToPadding="false"
             android:scrollbars="vertical"
-            android:background="@color/white"
-            android:elevation="2dp"
-            android:padding="4dp"
-            android:layout_marginBottom="16dp"/>
+            android:background="@android:color/white"
+            android:elevation="3dp"
+            android:padding="6dp"
+            android:layout_marginBottom="16dp"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="1dp" />
 
-        <!-- Alerts Card -->
+        <!-- 🔹 Alerts -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardAlerts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:cardElevation="6dp"
-            app:cardCornerRadius="12dp">
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="#E3F2FD">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -235,34 +245,34 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Alerts"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                    android:layout_marginBottom="8dp"/>
+                    android:textColor="#0D47A1"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_marginBottom="8dp" />
 
                 <TextView
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
                     android:id="@+id/tvLowStock"
-                    android:text="Low stock: None"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                    android:layout_marginBottom="4dp"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Low Stock: None"
+                    android:textColor="#212121"
+                    android:layout_marginBottom="4dp" />
 
                 <TextView
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
                     android:id="@+id/tvPaymentDue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="Payment Due: None"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                    android:layout_marginBottom="4dp"/>
+                    android:textColor="#212121"
+                    android:layout_marginBottom="4dp" />
 
                 <TextView
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
                     android:id="@+id/tvSystemUpdates"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="System Updates: No new updates"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
-
+                    android:textColor="#212121" />
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>

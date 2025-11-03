@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -17,11 +18,21 @@ public class RegistrationActivity extends AppCompatActivity {
     private EditText businessName, businessType, ownerName, gstin, mobile, email, address, pin;
     private Button registerBtn;
     private DatabaseReference databaseUsers;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+
+        // Toolbar setup for back navigation
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Registration");
+        }
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         businessName = findViewById(R.id.businessName);
         businessType = findViewById(R.id.businessType);
@@ -76,13 +87,12 @@ public class RegistrationActivity extends AppCompatActivity {
         });
     }
 
-    // User data model with public fields for Firebase mapping
     public static class User {
         public String businessName, businessType, ownerName, gstin;
         public String mobile, email, address, pin;
 
         public User() {
-            // Empty constructor needed by Firebase
+            // Empty constructor needed for Firebase
         }
 
         public User(String businessName, String businessType, String ownerName, String gstin,
