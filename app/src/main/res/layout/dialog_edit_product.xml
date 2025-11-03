@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fillViewport="true"
+    android:orientation="vertical"
+    android:padding="0dp"
     android:background="@android:color/transparent">
 
+    <!-- Top Fixed Title Layout -->
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
-        android:elevation="8dp">
+        android:background="@color/blue"
+        android:padding="16dp"
+        android:orientation="vertical">
 
-        <!-- Top Title -->
         <TextView
             android:id="@+id/tvEditTitle"
             android:layout_width="match_parent"
@@ -20,118 +21,135 @@
             android:text="Edit Product"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:gravity="center"
-            android:paddingBottom="20dp"/>
-
-        <!-- Product Name -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Product Name"
-            android:textSize="14sp"
-            android:textColor="#333333"
-            android:paddingBottom="4dp"/>
-        <EditText
-            android:id="@+id/etProductName"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_bg"
-            android:padding="12dp"
-            android:hint="Enter Product Name"
-            android:inputType="textPersonName"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
-
-        <!-- HSN Code -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="HSN Code"
-            android:textSize="14sp"
-            android:textColor="#333333"
-            android:paddingTop="12dp"
-            android:paddingBottom="4dp"/>
-        <EditText
-            android:id="@+id/etHsn"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_bg"
-            android:padding="12dp"
-            android:hint="Enter HSN Code"
-            android:inputType="text"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
-
-        <!-- Price -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Price"
-            android:textSize="14sp"
-            android:textColor="#333333"
-            android:paddingTop="12dp"
-            android:paddingBottom="4dp"/>
-        <EditText
-            android:id="@+id/etPrice"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_bg"
-            android:padding="12dp"
-            android:hint="Enter Price"
-            android:inputType="numberDecimal"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
-
-        <!-- GST -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="GST %"
-            android:textSize="14sp"
-            android:textColor="#333333"
-            android:paddingTop="12dp"
-            android:paddingBottom="4dp"/>
-        <EditText
-            android:id="@+id/etGst"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_bg"
-            android:padding="12dp"
-            android:hint="Enter GST %"
-            android:inputType="numberDecimal"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
-
-        <!-- Quantity -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Quantity"
-            android:textSize="14sp"
-            android:textColor="#333333"
-            android:paddingTop="12dp"
-            android:paddingBottom="4dp"/>
-        <EditText
-            android:id="@+id/etQuantity"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_bg"
-            android:padding="12dp"
-            android:hint="Enter Quantity"
-            android:inputType="number"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
-
-        <!-- Update Button -->
-        <Button
-            android:id="@+id/btnUpdate"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="Update"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:layout_marginTop="24dp"
-           />
+            android:gravity="center"/>
     </LinearLayout>
-</ScrollView>
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:background="@android:color/transparent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="24dp"
+            android:elevation="4dp"
+            >
+
+            <!-- Product Name -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Product Name"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:paddingBottom="4dp"/>
+            <EditText
+                android:id="@+id/etProductName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_bg"
+                android:padding="12dp"
+                android:hint="Enter Product Name"
+                android:inputType="textPersonName"
+                android:textColor="#000000"
+                android:textSize="16sp"/>
+
+            <!-- HSN Code -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="HSN Code"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp"/>
+            <EditText
+                android:id="@+id/etHsn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_bg"
+                android:padding="12dp"
+                android:hint="Enter HSN Code"
+                android:inputType="text"
+                android:textColor="#000000"
+                android:textSize="16sp"/>
+
+            <!-- Price -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Price"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp"/>
+            <EditText
+                android:id="@+id/etPrice"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_bg"
+                android:padding="12dp"
+                android:hint="Enter Price"
+                android:inputType="numberDecimal"
+                android:textColor="#000000"
+                android:textSize="16sp"/>
+
+            <!-- GST -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GST %"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp"/>
+            <EditText
+                android:id="@+id/etGst"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_bg"
+                android:padding="12dp"
+                android:hint="Enter GST %"
+                android:inputType="numberDecimal"
+                android:textColor="#000000"
+                android:textSize="16sp"/>
+
+            <!-- Quantity -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Quantity"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp"/>
+            <EditText
+                android:id="@+id/etQuantity"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_bg"
+                android:padding="12dp"
+                android:hint="Enter Quantity"
+                android:inputType="number"
+                android:textColor="#000000"
+                android:textSize="16sp"/>
+
+            <!-- Update Button -->
+            <Button
+                android:id="@+id/btnUpdate"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Update"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:layout_marginTop="30dp"
+                android:backgroundTint="#3F51B5"/>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
