@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F8FB">
+
+    <!-- 🔹 Toolbar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/blue"
+        android:paddingHorizontal="12dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_back"
+            android:tint="@android:color/white"
+            android:contentDescription="Back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Invoices"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- 🔹 Search Field -->
+    <EditText
+        android:id="@+id/etSearchInvoice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search by Customer or Invoice No"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:background="@drawable/bg_searchview_rounded"
+        android:padding="10dp"
+        android:textColor="#000"
+        android:textSize="14sp"
+        android:layout_margin="12dp" />
+
+    <!-- 🔹 RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAllInvoices"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:padding="5dp"
+        android:paddingHorizontal="8dp"
+        android:paddingBottom="10dp" />
+
+</LinearLayout>

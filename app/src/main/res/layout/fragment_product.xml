@@ -2,20 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="8dp">
 
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/edittext_bg"
         android:queryHint="Search Products" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvProducts"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/searchView"
-        android:layout_marginTop="8dp" />
+        />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddProduct"
@@ -25,6 +29,9 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
+        app:backgroundTint="@color/blue"
+        android:tint="@color/white"
         android:contentDescription="Add Product" />
+
 
 </RelativeLayout>

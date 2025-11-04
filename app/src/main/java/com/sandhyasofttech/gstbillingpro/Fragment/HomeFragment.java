@@ -1,6 +1,7 @@
 package com.sandhyasofttech.gstbillingpro.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,15 +22,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sandhyasofttech.gstbillingpro.Activity.AllInvoicesActivity;
+import com.sandhyasofttech.gstbillingpro.Adapter.RecentInvoiceAdapter;
 import com.sandhyasofttech.gstbillingpro.MainActivity;
+import com.sandhyasofttech.gstbillingpro.Model.RecentInvoiceItem;
 import com.sandhyasofttech.gstbillingpro.R;
 
+
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class HomeFragment extends Fragment {
 
     private TextView tvTodaysSales, tvMonthSales, tvOutstanding, tvGstDue;
-    private MaterialButton btnNewInvoice, btnAddCustomer, btnShareExport;
+    private MaterialButton btnNewInvoice, btnAddCustomer, btnShareExport, btnViewAllInvoices;
     private RecyclerView rvRecentActivity;
     private TextView tvLowStock, tvPaymentDue, tvSystemUpdates;
 
@@ -47,6 +53,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // 🔹 Initialize UI components
         tvTodaysSales = view.findViewById(R.id.tvTodaysSales);
         tvMonthSales = view.findViewById(R.id.tvMonthSales);
         tvOutstanding = view.findViewById(R.id.tvOutstanding);
@@ -54,11 +61,13 @@ public class HomeFragment extends Fragment {
         btnNewInvoice = view.findViewById(R.id.btnNewInvoice);
         btnAddCustomer = view.findViewById(R.id.btnAddCustomer);
         btnShareExport = view.findViewById(R.id.btnShareExport);
+        btnViewAllInvoices = view.findViewById(R.id.btnViewAllInvoices);
         rvRecentActivity = view.findViewById(R.id.rvRecentActivity);
         tvLowStock = view.findViewById(R.id.tvLowStock);
         tvPaymentDue = view.findViewById(R.id.tvPaymentDue);
         tvSystemUpdates = view.findViewById(R.id.tvSystemUpdates);
 
+        // 🔹 Get current user mobile from SharedPreferences
         SharedPreferences prefs = requireActivity().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE);
         userMobile = prefs.getString("USER_MOBILE", null);
         if (userMobile == null) {
@@ -68,11 +77,12 @@ public class HomeFragment extends Fragment {
 
         userRef = FirebaseDatabase.getInstance().getReference("users").child(userMobile);
 
+        // 🔹 Load data
         loadQuickStats();
-        loadRecentActivity();
+        loadRecentInvoices();
         loadAlerts();
 
-        // ✅ Navigate to Invoice fragment
+        // 🔹 Button actions
         btnNewInvoice.setOnClickListener(v -> {
             ((MainActivity) requireActivity()).syncNavigationSelection(R.id.nav_invoice);
             requireActivity().getSupportFragmentManager()
@@ -83,7 +93,6 @@ public class HomeFragment extends Fragment {
                     .commit();
         });
 
-        // ✅ Navigate to Customer fragment
         btnAddCustomer.setOnClickListener(v -> {
             ((MainActivity) requireActivity()).syncNavigationSelection(R.id.nav_customer);
             requireActivity().getSupportFragmentManager()
@@ -96,8 +105,15 @@ public class HomeFragment extends Fragment {
 
         btnShareExport.setOnClickListener(v ->
                 Toast.makeText(getContext(), "Share/Export feature coming soon!", Toast.LENGTH_SHORT).show());
+
+        // ✅ View All button → open AllInvoicesActivity
+        btnViewAllInvoices.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), AllInvoicesActivity.class);
+            startActivity(intent);
+        });
     }
 
+    // 🔹 Fetch summary values
     private void loadQuickStats() {
         DatabaseReference statsRef = userRef.child("stats");
         statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -125,27 +141,40 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void loadRecentActivity() {
-        DatabaseReference activityRef = userRef.child("activities");
-        activityRef.limitToLast(5).addListenerForSingleValueEvent(new ValueEventListener() {
+    // 🔹 Fetch recent 10 invoices
+    private void loadRecentInvoices() {
+        DatabaseReference invoicesRef = userRef.child("invoices");
+
+        invoicesRef.limitToLast(10).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<String> activities = new ArrayList<>();
+                ArrayList<RecentInvoiceItem> invoiceList = new ArrayList<>();
+
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    String activity = ds.getValue(String.class);
-                    if (activity != null) activities.add(activity);
+                    String invoiceNo = ds.child("invoiceNumber").getValue(String.class);
+                    String customerId = ds.child("customerId").getValue(String.class);
+                    String customerName = ds.child("customerName").getValue(String.class);
+                    Double grandTotal = ds.child("grandTotal").getValue(Double.class);
+                    String date = ds.child("invoiceDate").getValue(String.class);
+
+                    if (invoiceNo != null && customerId != null && customerName != null && grandTotal != null && date != null) {
+                        invoiceList.add(new RecentInvoiceItem(invoiceNo, customerId, customerName, grandTotal, date));
+                    }
                 }
+
+                Collections.reverse(invoiceList); // Show newest first
                 rvRecentActivity.setLayoutManager(new LinearLayoutManager(getContext()));
-                rvRecentActivity.setAdapter(new RecentActivityAdapter(activities));
+                rvRecentActivity.setAdapter(new RecentInvoiceAdapter(invoiceList));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Could not load recent activities", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Could not load recent invoices", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    // 🔹 Fetch system alerts
     private void loadAlerts() {
         DatabaseReference alertsRef = userRef.child("alerts");
         alertsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -169,39 +198,5 @@ public class HomeFragment extends Fragment {
 
     private String formatCurrency(long amount) {
         return "₹" + String.format("%,d", amount);
-    }
-
-    private static class RecentActivityAdapter extends RecyclerView.Adapter<RecentActivityAdapter.ViewHolder> {
-        private final ArrayList<String> activities;
-
-        public RecentActivityAdapter(ArrayList<String> activities) {
-            this.activities = activities;
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(android.R.layout.simple_list_item_1, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.tvActivity.setText(activities.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return activities.size();
-        }
-
-        static class ViewHolder extends RecyclerView.ViewHolder {
-            TextView tvActivity;
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-                tvActivity = itemView.findViewById(android.R.id.text1);
-            }
-        }
     }
 }

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="5dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="#E0E0E0"
+    app:cardBackgroundColor="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <!-- 🔹 Row 1: Invoice Number and Date -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:id="@+id/tvInvoiceNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Invoice #INV-20251103-29AC5E"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@color/blue" />
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2025-11-03"
+                android:textSize="13sp"
+                android:textColor="#757575" />
+        </LinearLayout>
+
+        <!-- 🔹 Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="8dp"
+            android:background="#E0E0E0" />
+
+        <!-- 🔹 Row 2: Customer Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_customer"
+                    android:visibility="gone"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Customer Icon"
+                    app:tint="#616161" />
+
+                <TextView
+                    android:id="@+id/tvCustomerName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sagar Patil"
+                    android:textSize="15sp"
+                    android:textColor="#212121"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvCustomerId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="ID: +918605042158"
+                android:textSize="13sp"
+                android:textColor="#0B0B0B" />
+        </LinearLayout>
+
+        <!-- 🔹 Row 3: Total Amount -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+           >
+
+            <TextView
+                android:text="Total: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#424242" />
+
+            <TextView
+                android:id="@+id/tvTotalAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₹8.64"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/blue"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+
+        <!-- 🔹 Optional Footer Row: View / Share -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tvViewDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View Details"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:textColor="@color/blue"
+                android:padding="6dp" />
+
+            <TextView
+                android:id="@+id/tvShare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Share"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:textColor="@color/blue"
+                android:padding="6dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

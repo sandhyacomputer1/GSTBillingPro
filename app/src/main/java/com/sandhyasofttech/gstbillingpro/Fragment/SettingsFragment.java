@@ -25,7 +25,8 @@ import com.sandhyasofttech.gstbillingpro.Registration.LoginActivity;
 public class SettingsFragment extends Fragment {
 
     private ImageView imgUserProfile;
-    private TextView tvOwnerName, tvEmail, tvBusinessName, tvBusinessType, tvGstin, tvAddress, tvPin, tvMobile;
+    private TextView tvOwnerName, tvEmail, tvBusinessName, tvBusinessType, tvGstin, tvAddress, tvMobile;
+    private ImageView btnEditBusinessName, btnEditBusinessType, btnEditGstin, btnEditAddress, btnEditMobile;
     private Button btnLogout;
 
     private DatabaseReference userInfoRef;
@@ -41,7 +42,7 @@ public class SettingsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        // Initialize Views
+        // Initialize views
         imgUserProfile = view.findViewById(R.id.imgUserProfile);
         tvOwnerName = view.findViewById(R.id.tvOwnerName);
         tvEmail = view.findViewById(R.id.tvEmail);
@@ -49,8 +50,14 @@ public class SettingsFragment extends Fragment {
         tvBusinessType = view.findViewById(R.id.tvBusinessType);
         tvGstin = view.findViewById(R.id.tvGstin);
         tvAddress = view.findViewById(R.id.tvAddress);
-        tvPin = view.findViewById(R.id.tvPin);
         tvMobile = view.findViewById(R.id.tvMobile);
+
+        btnEditBusinessName = view.findViewById(R.id.btnEditBusinessName);
+        btnEditBusinessType = view.findViewById(R.id.btnEditBusinessType);
+        btnEditGstin = view.findViewById(R.id.btnEditGstin);
+        btnEditAddress = view.findViewById(R.id.btnEditAddress);
+        btnEditMobile = view.findViewById(R.id.btnEditMobile);
+
         btnLogout = view.findViewById(R.id.btnLogout);
 
         // Get logged-in user's mobile number from SharedPreferences
@@ -59,20 +66,26 @@ public class SettingsFragment extends Fragment {
 
         if (userMobile == null) {
             Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
-            // Optionally redirect to login
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
             return view;
         }
 
-        // Firebase reference to user's info node
+        // Firebase reference
         userInfoRef = FirebaseDatabase.getInstance().getReference("users").child(userMobile).child("info");
 
-        // Fetch and display user data
+        // Load user data
         fetchUserData();
 
-        // Logout button listener clears session and navigates to login
+        // Logout
         btnLogout.setOnClickListener(v -> logoutUser());
+
+        // Optional: handle edit buttons clicks
+        btnEditBusinessName.setOnClickListener(v -> Toast.makeText(getContext(), "Edit Business Name", Toast.LENGTH_SHORT).show());
+        btnEditBusinessType.setOnClickListener(v -> Toast.makeText(getContext(), "Edit Business Type", Toast.LENGTH_SHORT).show());
+        btnEditGstin.setOnClickListener(v -> Toast.makeText(getContext(), "Edit GSTIN", Toast.LENGTH_SHORT).show());
+        btnEditAddress.setOnClickListener(v -> Toast.makeText(getContext(), "Edit Address", Toast.LENGTH_SHORT).show());
+        btnEditMobile.setOnClickListener(v -> Toast.makeText(getContext(), "Edit Mobile", Toast.LENGTH_SHORT).show());
 
         return view;
     }
@@ -82,25 +95,13 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    String ownerName = snapshot.child("ownerName").getValue(String.class);
-                    String email = snapshot.child("email").getValue(String.class);
-                    String businessName = snapshot.child("businessName").getValue(String.class);
-                    String businessType = snapshot.child("businessType").getValue(String.class);
-                    String gstin = snapshot.child("gstin").getValue(String.class);
-                    String address = snapshot.child("address").getValue(String.class);
-                    String pin = snapshot.child("pin").getValue(String.class);
-                    String mobile = snapshot.child("mobile").getValue(String.class);
-
-                    tvOwnerName.setText(ownerName != null ? ownerName : "N/A");
-                    tvEmail.setText(email != null ? email : "N/A");
-                    tvBusinessName.setText("Business Name: " + (businessName != null ? businessName : "N/A"));
-                    tvBusinessType.setText("Business Type: " + (businessType != null ? businessType : "N/A"));
-                    tvGstin.setText("GSTIN: " + (gstin != null ? gstin : "N/A"));
-                    tvAddress.setText("Address: " + (address != null ? address : "N/A"));
-                    tvPin.setText("PIN: " + (pin != null ? pin : "N/A"));
-                    tvMobile.setText("Mobile: " + (mobile != null ? mobile : "N/A"));
-
-                    // You can load profile image here if available with a library like Glide or Picasso
+                    tvOwnerName.setText(snapshot.child("ownerName").getValue(String.class));
+                    tvEmail.setText(snapshot.child("email").getValue(String.class));
+                    tvBusinessName.setText(snapshot.child("businessName").getValue(String.class));
+                    tvBusinessType.setText(snapshot.child("businessType").getValue(String.class));
+                    tvGstin.setText(snapshot.child("gstin").getValue(String.class));
+                    tvAddress.setText(snapshot.child("address").getValue(String.class));
+                    tvMobile.setText(snapshot.child("mobile").getValue(String.class));
                 } else {
                     Toast.makeText(getContext(), "User info not found", Toast.LENGTH_SHORT).show();
                 }
@@ -114,11 +115,9 @@ public class SettingsFragment extends Fragment {
     }
 
     private void logoutUser() {
-        // Clear login status and user info in SharedPreferences
         SharedPreferences prefs = requireContext().getSharedPreferences("APP_PREFS", getContext().MODE_PRIVATE);
         prefs.edit().clear().apply();
 
-        // Navigate to login activity and clear back stack
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

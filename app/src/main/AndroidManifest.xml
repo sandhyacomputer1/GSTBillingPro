@@ -26,6 +26,9 @@
             android:name=".custmore.AddCustomerActivity"
             android:exported="false" />
         <activity
+            android:name=".Activity.AllInvoicesActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true" />
         <activity

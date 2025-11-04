@@ -1,119 +1,259 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="#F5F5F5"
+    android:fillViewport="true">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Profile Section -->
-        <LinearLayout
-            android:orientation="horizontal"
+        <!-- Header Banner -->
+
+        <!-- Owner Info -->
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingBottom="16dp">
+            android:background="@drawable/gradiant"
+
+            android:layout_height="180dp">
 
             <ImageView
                 android:id="@+id/imgUserProfile"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:src="@drawable/ic_profile"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="20dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/circle_background"
                 android:contentDescription="Profile Picture"
+                android:elevation="8dp"
                 android:scaleType="centerCrop"
-                android:background="@drawable/circle_background" />
+                android:src="@drawable/ic_profile" />
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_marginStart="16dp"
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:background="@android:color/white"
+            android:elevation="4dp"
+            android:layout_marginTop="-50dp"
+            android:layout_marginBottom="16dp"
+            android:paddingTop="64dp"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/tvOwnerName"
+                android:text="Owner Name"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content" />
 
-                <TextView
-                    android:id="@+id/tvOwnerName"
-                    android:text="Owner Name"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/tvEmail"
-                    android:text="email@example.com"
-                    android:textSize="14sp"
-                    android:textColor="#757575"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/tvEmail"
+                android:text="email@example.com"
+                android:textSize="14sp"
+                android:textColor="#757575"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
 
-        <!-- Business Information -->
-        <TextView
-            android:text="Business Information"
-            android:textSize="18sp"
-            android:textStyle="bold"
+        <!-- Business Info Card -->
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp" />
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvBusinessName"
-            android:text="Business Name: "
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="4dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:text="Business Information"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginBottom="8dp" />
 
-        <TextView
-            android:id="@+id/tvBusinessType"
-            android:text="Business Type: "
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="4dp" />
+            <!-- Each business info as a card-like layout with edit icon -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/tvGstin"
-            android:text="GSTIN: "
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="4dp" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_business"
+                    app:tint="#2196F3" />
 
-        <TextView
-            android:id="@+id/tvAddress"
-            android:text="Address: "
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="4dp" />
+                <TextView
+                    android:id="@+id/tvBusinessName"
+                    android:text="Business Name"
+                    android:textSize="16sp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="12dp" />
 
-        <TextView
-            android:id="@+id/tvPin"
-            android:text="PIN: "
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="4dp" />
+                <ImageView
+                    android:id="@+id/btnEditBusinessName"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_edit"
+                    app:tint="#FF9800" />
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvMobile"
-            android:text="Mobile: "
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="24dp" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_type"
+                    app:tint="#4CAF50" />
+
+                <TextView
+                    android:id="@+id/tvBusinessType"
+                    android:text="Business Type"
+                    android:textSize="16sp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="12dp" />
+
+                <ImageView
+                    android:id="@+id/btnEditBusinessType"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_edit"
+                    app:tint="#FF9800" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_gstin"
+                    app:tint="#E91E63" />
+
+                <TextView
+                    android:id="@+id/tvGstin"
+                    android:text="GSTIN"
+                    android:textSize="16sp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="12dp" />
+
+                <ImageView
+                    android:id="@+id/btnEditGstin"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_edit"
+                    app:tint="#FF9800" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_location"
+                    app:tint="#3F51B5" />
+
+                <TextView
+                    android:id="@+id/tvAddress"
+                    android:text="Address"
+                    android:textSize="16sp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="12dp" />
+
+                <ImageView
+                    android:id="@+id/btnEditAddress"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_edit"
+                    app:tint="#FF9800" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_phone"
+                    app:tint="#009688" />
+
+                <TextView
+                    android:id="@+id/tvMobile"
+                    android:text="Mobile Number"
+                    android:textSize="16sp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="12dp" />
+
+                <ImageView
+                    android:id="@+id/btnEditMobile"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_edit"
+                    app:tint="#FF9800" />
+            </LinearLayout>
+
+        </LinearLayout>
 
         <!-- Logout Button -->
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            android:layout_margin="16dp"
             android:text="Logout"
-            android:backgroundTint="?attr/colorPrimary"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:backgroundTint="#3F51B5"
+            android:elevation="4dp"/>
     </LinearLayout>
 </ScrollView>
