@@ -2,38 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="#F5F8FB"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F5F8FB">
+    android:layout_height="match_parent">
 
-    <!-- 🔹 Toolbar -->
-    <LinearLayout
+    <!-- 🔹 Blue toolbar with back button -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarAllInvoices"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:layout_height="?attr/actionBarSize"
         android:background="@color/blue"
-        android:paddingHorizontal="12dp">
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:title="All Invoices"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="@drawable/ic_arrow_back" />
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_arrow_back"
-            android:tint="@android:color/white"
-            android:contentDescription="Back" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="All Invoices"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_marginStart="12dp" />
-    </LinearLayout>
-
-    <!-- 🔹 Search Field -->
+    <!-- Keep your existing EditText and RecyclerView below -->
     <EditText
         android:id="@+id/etSearchInvoice"
         android:layout_width="match_parent"
@@ -44,16 +29,14 @@
         android:padding="10dp"
         android:textColor="#000"
         android:textSize="14sp"
-        android:layout_margin="12dp" />
+        android:layout_marginBottom="8dp"
+        android:layout_margin="10dp" />
 
-    <!-- 🔹 RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAllInvoices"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:padding="5dp"
-        android:paddingHorizontal="8dp"
         android:paddingBottom="10dp" />
 
 </LinearLayout>

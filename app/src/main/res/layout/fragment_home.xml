@@ -90,10 +90,7 @@
                         android:textSize="13sp" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="#BBDEFB" />
+
 
                 <!-- 🔸 Outstanding -->
                 <LinearLayout
@@ -121,10 +118,7 @@
                         android:textSize="13sp" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="#BBDEFB" />
+
 
                 <!-- 🔸 GST Due -->
                 <LinearLayout
@@ -217,7 +211,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Recent Activity"
@@ -228,13 +222,19 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnViewAllInvoices"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/transparent"
-                android:paddingHorizontal="10dp"
+                android:layout_height="40dp"
                 android:text="View All"
                 android:textAllCaps="false"
-                android:textColor="@color/blue"
-                android:textSize="14sp" />
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                app:cornerRadius="20dp"
+                app:backgroundTint="@color/blue"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="6dp"
+                android:layout_marginStart="8dp"
+                android:layout_gravity="end"
+                app:iconGravity="textStart" />
+
         </LinearLayout>
 
         <!-- 🔹 RecyclerView (Recent Invoices) -->

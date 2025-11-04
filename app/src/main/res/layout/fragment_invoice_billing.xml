@@ -10,7 +10,8 @@
     <Spinner
         android:id="@+id/spCustomer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:background="@color/white"
         android:spinnerMode="dropdown"
         android:prompt="@string/select_customer" />
 
@@ -27,6 +28,7 @@
     <Button
         android:id="@+id/btnAddProduct"
         android:layout_width="match_parent"
+        android:backgroundTint="@color/blue"
         android:layout_height="wrap_content"
         android:text="Add Product" />
 
@@ -69,6 +71,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:backgroundTint="@color/blue"
+
         android:text="Save Invoice"/>
 
 </LinearLayout>
