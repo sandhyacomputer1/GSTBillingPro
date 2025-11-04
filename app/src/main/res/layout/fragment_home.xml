@@ -28,6 +28,7 @@
             app:strokeWidth="1dp">
 
             <LinearLayout
+                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -36,9 +37,8 @@
 
                 <!-- 🔸 Today’s Sales -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -55,6 +55,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Today's Sales"
+                        android:layout_marginTop="5dp"
                         android:textColor="#424242"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -66,9 +67,8 @@
 
                 <!-- 🔸 Month Sales -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -86,6 +86,7 @@
                         android:layout_height="wrap_content"
                         android:text="This Month"
                         android:textColor="#424242"
+                        android:layout_marginTop="5dp"
                         android:textSize="13sp" />
                 </LinearLayout>
 
@@ -96,6 +97,7 @@
 
                 <!-- 🔸 Outstanding -->
                 <LinearLayout
+                    android:visibility="gone"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -126,6 +128,7 @@
 
                 <!-- 🔸 GST Due -->
                 <LinearLayout
+                    android:visibility="gone"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -255,6 +258,7 @@
             app:cardElevation="8dp">
 
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
