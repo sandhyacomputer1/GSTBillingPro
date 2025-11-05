@@ -185,28 +185,36 @@ public class InvoiceBillingFragment extends Fragment {
 
         builder.setPositiveButton("Add", (dialog, which) -> {
             int pos = spProducts.getSelectedItemPosition();
-            if(pos < 0 || pos >= products.size()) {
+            if (pos < 0 || pos >= products.size()) {
                 Toast.makeText(getContext(), "Select a product", Toast.LENGTH_SHORT).show();
                 return;
             }
             String qtyStr = etQuantity.getText().toString().trim();
-            if(TextUtils.isEmpty(qtyStr)) {
+            if (TextUtils.isEmpty(qtyStr)) {
                 Toast.makeText(getContext(), "Enter quantity", Toast.LENGTH_SHORT).show();
                 return;
             }
             double qty;
             try {
                 qty = Double.parseDouble(qtyStr);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 Toast.makeText(getContext(), "Invalid quantity", Toast.LENGTH_SHORT).show();
                 return;
             }
             Product p = products.get(pos);
+
+            // Check for available stock here
+            if (qty > p.getStockQuantity()) {
+                Toast.makeText(getContext(), "Only " + p.getStockQuantity() + " items available in stock.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             InvoiceItem item = new InvoiceItem(p.getProductId(), p.getName(), qty, p.getPrice(), p.getGstRate());
             invoiceItems.add(item);
             itemAdapter.notifyDataSetChanged();
             recalculateTotals();
         });
+
 
         builder.setNegativeButton("Cancel", null);
         builder.show();
@@ -255,8 +263,13 @@ public class InvoiceBillingFragment extends Fragment {
                 businessName, businessAddress);
 
         invoicesRef.child(invoiceNumber).setValue(invoice).addOnSuccessListener(aVoid -> {
+
             Toast.makeText(getContext(), "Invoice saved", Toast.LENGTH_SHORT).show();
 
+            // Update product stock in database for each sold item
+            updateProductStocksAfterSale(invoice.items);
+
+            // Clear current invoice items
             invoiceItems.clear();
             itemAdapter.notifyDataSetChanged();
             recalculateTotals();
@@ -267,6 +280,30 @@ public class InvoiceBillingFragment extends Fragment {
             sharePdfToWhatsapp(pdfFile, customer.phone);
 
         }).addOnFailureListener(e -> Toast.makeText(getContext(), "Error saving invoice: "+ e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void updateProductStocksAfterSale(List<InvoiceItem> soldItems) {
+        for (InvoiceItem item : soldItems) {
+            DatabaseReference productRef = usersRef.child("products").child(item.productId);
+            productRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Product product = snapshot.getValue(Product.class);
+                    if (product != null) {
+                        int currentStock = product.getStockQuantity();
+                        int newStock = currentStock - (int)item.quantity;
+                        if (newStock < 0) newStock = 0; // safety check
+
+                        productRef.child("stockQuantity").setValue(newStock)
+                                .addOnSuccessListener(aVoid -> loadProductsFromFirebase()) // refresh product list after update
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getContext(), "Failed to update stock for " + product.getName(), Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                }
+                @Override public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+        }
     }
 
     private String generateInvoiceNumber() {
@@ -408,5 +445,4 @@ public class InvoiceBillingFragment extends Fragment {
             e.printStackTrace();
         }
     }
-
 }

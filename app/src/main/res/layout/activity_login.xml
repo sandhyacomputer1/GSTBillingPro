@@ -63,9 +63,9 @@
         android:layout_marginBottom="26dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/pinInput"
-            android:hint="6-digit PIN"
+            android:hint="4-digit PIN"
             android:inputType="numberPassword"
-            android:maxLength="6"
+            android:maxLength="4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>

@@ -35,10 +35,13 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_gravity="bottom"
-            android:background="@color/white"
+            android:background="@color/background"
             app:itemIconTint="@color/bottom_nav_item_color"
             app:itemTextColor="@color/bottom_nav_item_color"
-            app:menu="@menu/bottom_nav_menu" />
+            app:menu="@menu/bottom_nav_menu"
+            app:labelVisibilityMode="selected"
+        app:itemTextAppearanceActive="@style/BottomNavTextSelected"
+        app:itemTextAppearanceInactive="@style/BottomNavTextNormal" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

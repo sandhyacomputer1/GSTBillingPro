@@ -39,9 +39,19 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = products.get(position);
+
         holder.tvName.setText(product.getName());
-        holder.tvPrice.setText(" ₹" + product.getPrice());
+
+        holder.tvPrice.setText(" ₹" + String.format("%.2f", product.getPrice()));
+
         holder.tvQuantity.setText(" " + product.getStockQuantity());
+
+        holder.tvHsn.setText(product.getHsnCode());
+
+        holder.tvGst.setText(String.format("%.2f%%", product.getGstRate()));
+
+        double amount = product.getPrice() * product.getStockQuantity() * (1 + product.getGstRate() / 100.0);
+        holder.tvAmount.setText(" ₹" + String.format("%.2f", amount));
 
         holder.ivEdit.setOnClickListener(v -> listener.onEditProduct(product, position));
         holder.ivDelete.setOnClickListener(v -> listener.onDeleteProduct(product, position));
@@ -53,7 +63,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
     }
 
     static class ProductViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvPrice, tvQuantity;
+        TextView tvName, tvPrice, tvQuantity, tvHsn, tvGst, tvAmount;
         ImageView ivEdit, ivDelete;
 
         public ProductViewHolder(@NonNull View itemView) {
@@ -61,6 +71,9 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
             tvName = itemView.findViewById(R.id.tvProductName);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvQuantity = itemView.findViewById(R.id.tvQuantity);
+            tvHsn = itemView.findViewById(R.id.tvHsn);
+            tvGst = itemView.findViewById(R.id.tvGst);
+            tvAmount = itemView.findViewById(R.id.tvAmount);
             ivEdit = itemView.findViewById(R.id.btnEdit);
             ivDelete = itemView.findViewById(R.id.btnDelete);
         }
