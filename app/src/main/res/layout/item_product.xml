@@ -1,202 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:background="@android:color/white"
-    android:elevation="2dp"
     android:layout_margin="8dp"
-    android:layout_marginBottom="4dp">
+    app:cardElevation="6dp"
+    app:cardCornerRadius="12dp"
+    android:background="#FFFFFF">
 
-    <!-- Product Header with Edit/Delete icons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        android:gravity="center_vertical">
-
-        <TextView
-            android:id="@+id/tvProductName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Product Name"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:paddingBottom="4dp" />
-
-        <!-- Edit Icon -->
-        <ImageView
-            android:id="@+id/btnEdit"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_edit"
-            android:contentDescription="Edit"
-            android:padding="4dp"
-            app:tint="@color/black" />
-
-        <!-- Delete Icon -->
-        <ImageView
-            android:id="@+id/btnDelete"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_delete"
-            android:contentDescription="Delete"
-            android:padding="4dp"
-            android:layout_marginStart="8dp"
-            app:tint="@color/black" />
-    </LinearLayout>
-
-    <!-- Horizontal Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#DDDDDD"
-        android:layout_marginBottom="6dp" />
-
-    <!-- Product Details Row -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="5"
-        android:paddingVertical="4dp">
-
-        <!-- HSN -->
+        <!-- Top row: Item Name + Edit/Delete icons -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/tvProductName"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="HSN"
-                android:textSize="12sp"
-                android:textColor="#777777" />
-
-            <TextView
-                android:id="@+id/tvHsn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1234"
+                android:text="Product Name"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="#333333" />
+                android:textColor="#1976D2"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <ImageView
+                android:id="@+id/btnEdit"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:contentDescription="Edit"
+                android:padding="4dp"
+                android:src="@drawable/ic_edit"
+                android:layout_marginStart="12dp"
+                app:tint="#0D0D0D" />
+
+            <ImageView
+                android:id="@+id/btnDelete"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:contentDescription="Delete"
+                android:padding="4dp"
+                android:src="@drawable/ic_delete"
+                android:layout_marginStart="12dp"
+                app:tint="#090909" />
         </LinearLayout>
 
-        <!-- Price -->
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:background="#E0E0E0" />
+
+        <!-- Two-column structured info -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:orientation="horizontal"
+            android:weightSum="4">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Left column -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Price"
-                android:textSize="12sp"
-                android:textColor="#777777" />
+                android:layout_weight="2"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvPrice"
-                android:layout_width="wrap_content"
+                <!-- HSN -->
+                <TextView
+                    android:id="@+id/labelHsn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HSN No."
+                    android:textColor="#757575"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvHsn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1234"
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- GST -->
+                <TextView
+                    android:id="@+id/labelGst"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GST (%)"
+                    android:textColor="#757575"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvGst"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="18%"
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Vertical Divider -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#E0E0E0"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp" />
+
+            <!-- Right column -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="₹1000"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="#333333" />
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <!-- Price -->
+                <TextView
+                    android:id="@+id/labelPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Price (₹)"
+                    android:textColor="#757575"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1000"
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Quantity -->
+                <TextView
+                    android:id="@+id/labelQuantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quantity"
+                    android:textColor="#757575"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvQuantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2"
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- GST -->
+        <!-- Divider between details and amount -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Amount row -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:orientation="horizontal"
+            >
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="GST (%)"
-                android:textSize="12sp"
-                android:textColor="#777777" />
-
-            <TextView
-                android:id="@+id/tvGst"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="18%"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="#333333" />
-        </LinearLayout>
-
-        <!-- Quantity -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Qty"
-                android:textSize="12sp"
-                android:textColor="#777777" />
-
-            <TextView
-                android:id="@+id/tvQuantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="#333333" />
-        </LinearLayout>
-
-        <!-- Amount -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
+                android:id="@+id/labelAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Amount"
-                android:textSize="12sp"
-                android:textColor="#777777" />
+                android:textColor="#757575"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="₹1180"
+                android:text="₹2360"
+                android:layout_marginStart="10dp"
+                android:textColor="#212121"
                 android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="#333333" />
+                android:textSize="18sp" />
         </LinearLayout>
+
     </LinearLayout>
-
-    <!-- Bottom Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#E0E0E0"
-        android:layout_marginTop="6dp" />
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>

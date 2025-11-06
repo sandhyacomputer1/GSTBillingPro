@@ -1,17 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/nav_home" android:title="Home" android:icon="@drawable/ic_home"/>
-    <item android:id="@+id/nav_invoice" android:title="Invoice" android:icon="@drawable/ic_invoice"/>
-    <item android:id="@+id/nav_customer" android:title="Customer" android:icon="@drawable/ic_customer"/>
-    <item
-        android:id="@+id/nav_product"
-        android:title="Product"
-        android:icon="@drawable/ic_product_icon" />
-    <item android:id="@+id/nav_settings" android:title="Settings" android:icon="@drawable/ic_settings"/>
 
-    <item android:id="@+id/nav_soldproduct" android:title="Sold Product" android:icon="@drawable/ic_settings"/>
-    <item
-        android:id="@+id/nav_logout"
-        android:icon="@drawable/ic_logout"
-        android:title="Logout" />
+    <!-- Section 1: Main -->
+    <group android:id="@+id/group_main" android:title="Main">
+        <item android:id="@+id/nav_home" android:title="Home" android:icon="@drawable/ic_home" />
+        <item android:id="@+id/nav_invoice" android:title="Invoice" android:icon="@drawable/ic_invoice" />
+    </group>
+
+    <!-- Section 2: Management -->
+    <group android:id="@+id/group_management" android:title="Management">
+        <item android:id="@+id/nav_customer" android:title="Customer" android:icon="@drawable/ic_customer" />
+        <item android:id="@+id/nav_product" android:title="Product" android:icon="@drawable/img" />
+        <item android:id="@+id/nav_soldproduct" android:title="Sold Products" android:icon="@drawable/img_1" />
+    </group>
+
+    <!-- Section 3: Settings -->
+    <group android:id="@+id/group_settings" android:title="Settings">
+        <item android:id="@+id/nav_settings" android:title="Settings" android:icon="@drawable/ic_settings" />
+        <item android:id="@+id/nav_logout" android:title="Logout" android:icon="@drawable/ic_logout" />
+    </group>
+
 </menu>

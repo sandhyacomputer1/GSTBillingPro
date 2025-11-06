@@ -11,7 +11,7 @@
         android:id="@+id/toolbarAllInvoices"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/blue"
+        android:background="@drawable/bg_header_gradient"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:title="All Invoices"
@@ -19,24 +19,27 @@
         app:navigationIcon="@drawable/ic_arrow_back" />
 
     <!-- Keep your existing EditText and RecyclerView below -->
-    <EditText
+    <!-- Correct androidx.appcompat.widget.SearchView -->
+    <androidx.appcompat.widget.SearchView
         android:id="@+id/etSearchInvoice"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Search by Customer or Invoice No"
-        android:drawableStart="@android:drawable/ic_menu_search"
-        android:background="@drawable/bg_searchview_rounded"
+        android:layout_height="40dp"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search by Customer or Invoice No"
+        android:background="@drawable/edittext_bg"
         android:padding="10dp"
         android:textColor="#000"
         android:textSize="14sp"
         android:layout_marginBottom="8dp"
         android:layout_margin="10dp" />
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAllInvoices"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="10dp"
         android:clipToPadding="false"
-        android:paddingBottom="10dp" />
+         />
 
 </LinearLayout>

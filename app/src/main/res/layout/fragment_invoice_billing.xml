@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FAFAFA">
 
     <!-- Customer Selector -->
     <Spinner
         android:id="@+id/spCustomer"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/white"
+        android:layout_height="48dp"
         android:spinnerMode="dropdown"
-        android:prompt="@string/select_customer" />
-
+        android:prompt="@string/select_customer"
+        android:paddingHorizontal="12dp"
+        android:popupBackground="@android:color/white" />
 
     <!-- Invoice Items List -->
     <androidx.recyclerview.widget.RecyclerView
@@ -22,22 +23,31 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingTop="8dp" />
+        android:paddingTop="12dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
 
     <!-- Add Product Button -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAddProduct"
         android:layout_width="match_parent"
-        android:backgroundTint="@color/blue"
         android:layout_height="wrap_content"
-        android:text="Add Product" />
+        android:layout_marginTop="12dp"
+        android:text="Add Product"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        app:backgroundTint="@color/blue" />
 
-    <!-- Totals -->
+    <!-- Totals Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="12dp">
+        android:background="@android:color/white"
+        android:elevation="2dp"
+        android:padding="16dp"
+        android:layout_marginTop="20dp">
 
         <TextView
             android:id="@+id/tvTaxableTotal"
@@ -45,15 +55,17 @@
             android:layout_height="wrap_content"
             android:text="Taxable Value: ₹0.00"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="#212121" />
 
         <TextView
             android:id="@+id/tvTaxTotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="CGST: ₹0.00, SGST: ₹0.00, IGST: ₹0.00"
-            android:textSize="16sp"
-            android:paddingTop="4dp" />
+            android:textSize="15sp"
+            android:textColor="#616161"
+            android:layout_marginTop="6dp" />
 
         <TextView
             android:id="@+id/tvGrandTotal"
@@ -62,17 +74,20 @@
             android:text="Grand Total: ₹0.00"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:paddingTop="6dp" />
+            android:textColor="@color/blue"
+            android:layout_marginTop="12dp" />
     </LinearLayout>
 
     <!-- Save Invoice Button -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSaveInvoice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/blue"
-
-        android:text="Save Invoice"/>
+        android:layout_marginTop="24dp"
+        android:text="Save Invoice"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        app:backgroundTint="@color/blue" />
 
 </LinearLayout>

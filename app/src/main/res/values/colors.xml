@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
 
-    <color name="black1">#6B6A6A</color>
+    <color name="black1">#1B1B1B</color>
     <color name="white">#FFFFFFFF</color>
 
     <!-- res/values/colors.xml -->

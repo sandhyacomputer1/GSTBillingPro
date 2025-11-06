@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/customer_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-   >
+    android:orientation="vertical">
 
-    <!-- 🟦 Header / Title Bar -->
+    <!-- Header / Title Bar (hidden as in original) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,49 +25,44 @@
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_gravity="center_vertical"/>
+            android:layout_gravity="center_vertical" />
     </LinearLayout>
 
-    <!-- 📋 Main Content -->
-    <LinearLayout
-        android:orientation="vertical"
+    <!-- Search View -->
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchViewCustomer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="64dp"
-        android:padding="12dp">
+        android:layout_height="40dp"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search customers by name or phone"
+        android:background="@drawable/edittext_bg"
+        android:layout_margin="12dp" />
 
-        <!-- 🔍 Search View -->
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchViewCustomer"
-            android:layout_width="match_parent"
+    <!-- Recycler View filling remaining space -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewCustomers"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="12dp"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp" />
+
+    <!-- Floating Action Button aligned bottom-right -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddCustomer"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:iconifiedByDefault="false"
-            android:queryHint="Search customers by name or phone"
-            android:background="@drawable/bg_searchview_rounded"
-            android:layout_marginBottom="12dp" />
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add"
+            app:backgroundTint="@color/blue"
+            app:tint="@android:color/white"
+            android:layout_gravity="end"
+            />
+    </FrameLayout>
 
-        <!-- 📄 Recycler View -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewCustomers"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:paddingBottom="80dp"
-             />
-    </LinearLayout>
-
-    <!-- ➕ Floating Action Button -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddCustomer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:contentDescription="Add Customer"
-        android:src="@android:drawable/ic_input_add"
-        android:tint="@android:color/white"
-        app:backgroundTint="@color/blue"
-        app:elevation="8dp" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

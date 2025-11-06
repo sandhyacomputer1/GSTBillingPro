@@ -16,7 +16,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/blue"
+            android:background="@drawable/bg_header_gradient"
             app:titleTextColor="@color/white"
             app:title="GST Pro Bill" />
 
@@ -48,11 +48,12 @@
     <!-- Navigation drawer menu -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
-        android:layout_width="280dp"
+        android:layout_width="250dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@drawable/bgside"
         app:menu="@menu/drawer_menu"
-        app:itemIconTint="@color/bottom_nav_item_color"
-        app:itemTextColor="@color/bottom_nav_item_color" />
+         />
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

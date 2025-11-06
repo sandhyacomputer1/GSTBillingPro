@@ -4,48 +4,55 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="3dp"
+    android:layout_marginVertical="8dp"
+    android:layout_marginHorizontal="12dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="4dp"
     app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="20dp">
 
+        <!-- Invoice Number -->
         <TextView
             android:id="@+id/tvInvoiceNo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="INV-20251103-29AC5E"
             android:textStyle="bold"
-            android:textColor="@color/blue"
-            android:textSize="14sp" />
+            android:textColor="@color/black"
+            android:textSize="16sp" />
 
+        <!-- Customer Name -->
         <TextView
             android:id="@+id/tvCustomerName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Sagar Patil"
-            android:textSize="13sp"
-            android:textColor="#212121" />
+            android:textSize="16sp"
+            android:textColor="#222222"
+            android:layout_marginTop="6dp" />
 
+        <!-- Invoice Date -->
         <TextView
             android:id="@+id/tvDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="2025-11-03"
-            android:textSize="12sp"
-            android:textColor="#757575" />
+            android:textSize="14sp"
+            android:textColor="#757575"
+            android:layout_marginTop="2dp" />
 
+        <!-- Footer: Total Amount and Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="end|center_vertical"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="14dp">
 
             <TextView
                 android:id="@+id/tvTotalAmount"
@@ -53,26 +60,28 @@
                 android:layout_height="wrap_content"
                 android:text="₹0.00"
                 android:textStyle="bold"
+
                 android:textColor="@color/blue"
-                android:textSize="15sp"
-                android:layout_marginEnd="8dp"/>
+                android:textSize="17sp"
+                android:layout_marginEnd="12dp"/>
 
             <ImageButton
                 android:id="@+id/btnEdit"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_edit"
-                android:tint="@color/blue"
-                android:contentDescription="Edit" />
+                android:tint="@color/black"
+                android:contentDescription="Edit"
+                android:layout_marginEnd="12dp" />
 
             <ImageButton
                 android:id="@+id/btnDelete"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_delete"
-                android:tint="@android:color/holo_red_dark"
+                android:tint="@android:color/black"
                 android:contentDescription="Delete" />
         </LinearLayout>
     </LinearLayout>
