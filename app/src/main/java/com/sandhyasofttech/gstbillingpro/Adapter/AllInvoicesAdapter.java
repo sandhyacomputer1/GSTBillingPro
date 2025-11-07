@@ -15,13 +15,31 @@ import com.google.firebase.database.DatabaseReference;
 import com.sandhyasofttech.gstbillingpro.Model.RecentInvoiceItem;
 import com.sandhyasofttech.gstbillingpro.R;
 
-
 import java.util.ArrayList;
 
 public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.ViewHolder> {
 
     private final ArrayList<RecentInvoiceItem> invoices;
     private final DatabaseReference userRef;
+
+    // Interfaces for separate click events
+    public interface OnItemClickListener {
+        void onItemClick(String invoiceNumber);
+    }
+    public interface OnEditClickListener {
+        void onEditClick(String invoiceNumber);
+    }
+
+    private OnItemClickListener itemClickListener;
+    private OnEditClickListener editClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.itemClickListener = listener;
+    }
+
+    public void setOnEditClickListener(OnEditClickListener listener) {
+        this.editClickListener = listener;
+    }
 
     public AllInvoicesAdapter(ArrayList<RecentInvoiceItem> invoices, DatabaseReference userRef) {
         this.invoices = invoices;
@@ -45,9 +63,11 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
         holder.tvTotal.setText("₹" + String.format("%.2f", item.grandTotal));
         holder.tvDate.setText(item.date);
 
-        holder.btnEdit.setOnClickListener(v ->
-                Toast.makeText(v.getContext(), "Edit invoice " + item.invoiceNo, Toast.LENGTH_SHORT).show()
-        );
+        holder.btnEdit.setOnClickListener(v -> {
+            if (editClickListener != null && position != RecyclerView.NO_POSITION) {
+                editClickListener.onEditClick(item.invoiceNo);
+            }
+        });
 
         holder.btnDelete.setOnClickListener(v -> {
             new AlertDialog.Builder(v.getContext())
@@ -73,7 +93,7 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
         return invoices.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvInvoiceNo, tvCustomerName, tvTotal, tvDate;
         ImageButton btnEdit, btnDelete;
 
@@ -85,7 +105,14 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
             tvDate = itemView.findViewById(R.id.tvDate);
             btnEdit = itemView.findViewById(R.id.btnEdit);
             btnDelete = itemView.findViewById(R.id.btnDelete);
+
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (itemClickListener != null && position != RecyclerView.NO_POSITION) {
+                    RecentInvoiceItem clickedInvoice = invoices.get(position);
+                    itemClickListener.onItemClick(clickedInvoice.invoiceNo);
+                }
+            });
         }
     }
 }
-

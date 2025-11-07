@@ -4,13 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.IdRes;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.sandhyasofttech.gstbillingpro.Fragment.CustomerFragment;
@@ -29,22 +31,26 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private boolean isUpdating = false;
     private final Map<Integer, String> titleMap = new HashMap<>();
+    private int previousFragmentId = R.id.nav_home; // Track previous
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Title Map
+        // Title map
         titleMap.put(R.id.nav_home, "Home");
         titleMap.put(R.id.nav_invoice, "Invoice");
         titleMap.put(R.id.nav_customer, "Customer");
         titleMap.put(R.id.nav_product, "Product");
         titleMap.put(R.id.nav_settings, "Settings");
         titleMap.put(R.id.nav_soldproduct, "Sold Products");
-        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        // Toolbar
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Drawer
         drawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
@@ -55,24 +61,24 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navView = findViewById(R.id.navigation_view);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
-        // Drawer Click
+        // FORCE LABELS TO SHOW (NO STYLES)
+        bottomNav.setLabelVisibilityMode(BottomNavigationView.LABEL_VISIBILITY_LABELED);
+        bottomNav.setItemIconTintList(null);
+
+        // Drawer listener
         navView.setNavigationItemSelectedListener(item -> {
             if (isUpdating) return false;
             int id = item.getItemId();
-
-
-            // Handle Logout with Confirmation
             if (id == R.id.nav_logout) {
                 showLogoutDialog();
                 return true;
             }
-
             selectFragment(id);
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
 
-        // Bottom Nav Click
+        // Bottom listener
         bottomNav.setOnItemSelectedListener(item -> {
             if (isUpdating) return false;
             selectFragment(item.getItemId());
@@ -82,71 +88,90 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             selectFragment(R.id.nav_home);
         }
-
     }
+
     private void showLogoutDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
+        new AlertDialog.Builder(this)
                 .setTitle("Logout")
                 .setMessage("Are you sure you want to logout?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    // Clear session
+                .setPositiveButton("Yes", (d, w) -> {
                     getSharedPreferences("APP_PREFS", MODE_PRIVATE)
                             .edit()
                             .clear()
                             .apply();
-
-                    // Go to Login
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    startActivity(new Intent(this, LoginActivity.class));
                     finish();
                 })
                 .setNegativeButton("No", null)
                 .setCancelable(true)
                 .show();
     }
-    private void selectFragment(@IdRes int itemId) {
 
+    // SLIDE ANIMATION + FRAGMENT SWITCH
+    private void selectFragment(@IdRes int itemId) {
         if (itemId == R.id.nav_soldproduct) {
-            // Launch SoldProductsActivity
             startActivity(new Intent(this, SoldProductsActivity.class));
             drawerLayout.closeDrawer(GravityCompat.START);
-            return; // no fragment transaction
+            return;
         }
+
         Fragment fragment = getFragment(itemId);
         if (fragment == null) return;
 
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
 
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(R.id.fragment_container, fragment)
-                .addToBackStack(itemId != R.id.nav_home ? null : null)
-                .commit();
-
-        // Wait for transaction to complete
-        getSupportFragmentManager().executePendingTransactions();
-
-        // NOW sync
-        syncNavigation(itemId);
-    }
-    // Java 11 Compatible
-    private Fragment getFragment(int id) {
-        if (id == R.id.nav_home) {
-            return new HomeFragment();
-        } else if (id == R.id.nav_invoice) {
-            return new InvoiceBillingFragment();
-        } else if (id == R.id.nav_customer) {
-            return new CustomerFragment();
-        } else if (id == R.id.nav_product) {
-            return new ProductFragment();
-        } else if (id == R.id.nav_settings) {
-            return new SettingsFragment();
-        } else {
-            return null;
+        // Animation: Forward or Backward
+        if (itemId != previousFragmentId) {
+            if (isForwardNavigation(itemId)) {
+                transaction.setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left
+                );
+            } else {
+                transaction.setCustomAnimations(
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                );
+            }
         }
+
+        transaction.replace(R.id.fragment_container, fragment);
+        if (itemId != R.id.nav_home) {
+            transaction.addToBackStack(null);
+        }
+        transaction.commit();
+
+        fm.executePendingTransactions();
+        syncNavigation(itemId);
+
+        previousFragmentId = itemId;
     }
 
-    // PUBLIC METHOD – Fragments can call this
+    private Fragment getFragment(int id) {
+        if (id == R.id.nav_home) return new HomeFragment();
+        else if (id == R.id.nav_invoice) return new InvoiceBillingFragment();
+        else if (id == R.id.nav_customer) return new CustomerFragment();
+        else if (id == R.id.nav_product) return new ProductFragment();
+        else if (id == R.id.nav_settings) return new SettingsFragment();
+        else return null;
+    }
+
+    // Check if moving forward in menu order
+    private boolean isForwardNavigation(int newId) {
+        return getMenuIndex(newId) > getMenuIndex(previousFragmentId);
+    }
+
+    private int getMenuIndex(int id) {
+        if (id == R.id.nav_home) return 0;
+        else if (id == R.id.nav_invoice) return 1;
+        else if (id == R.id.nav_customer) return 2;
+        else if (id == R.id.nav_product) return 3;
+        else if (id == R.id.nav_settings) return 4;
+        else return 0;
+    }
+
+    // SYNC NAVIGATION
     public void syncNavigation(int itemId) {
         if (isUpdating) return;
         isUpdating = true;
@@ -154,10 +179,11 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         NavigationView navView = findViewById(R.id.navigation_view);
 
-        // Use post() to ensure UI is ready
         bottomNav.post(() -> {
-            if (bottomNav.getSelectedItemId() != itemId) {
-                bottomNav.setSelectedItemId(itemId);
+            if (isBottomNavItem(itemId)) {
+                if (bottomNav.getSelectedItemId() != itemId) {
+                    bottomNav.setSelectedItemId(itemId);
+                }
             }
 
             if (navView.getCheckedItem() == null || navView.getCheckedItem().getItemId() != itemId) {
@@ -173,12 +199,29 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private boolean isBottomNavItem(int id) {
+        return id == R.id.nav_home || id == R.id.nav_invoice ||
+                id == R.id.nav_customer || id == R.id.nav_product ||
+                id == R.id.nav_settings;
+    }
+
+    // BACK BUTTON WITH SLIDE ANIMATION
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack();
+
+            // Animate backward
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction transaction = fm.beginTransaction();
+            transaction.setCustomAnimations(
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+            );
+            transaction.commit();
+
             int topId = getCurrentNavId();
             syncNavigation(topId);
         } else {
@@ -186,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Java 11 Compatible
     private int getCurrentNavId() {
         FragmentManager fm = getSupportFragmentManager();
         if (fm.getFragments().isEmpty()) return R.id.nav_home;
@@ -194,18 +236,11 @@ public class MainActivity extends AppCompatActivity {
         Fragment top = fm.getFragments().get(fm.getFragments().size() - 1);
         String tag = top.getClass().getSimpleName();
 
-        if ("HomeFragment".equals(tag)) {
-            return R.id.nav_home;
-        } else if ("InvoiceBillingFragment".equals(tag)) {
-            return R.id.nav_invoice;
-        } else if ("CustomerFragment".equals(tag)) {
-            return R.id.nav_customer;
-        } else if ("ProductFragment".equals(tag)) {
-            return R.id.nav_product;
-        } else if ("SettingsFragment".equals(tag)) {
-            return R.id.nav_settings;
-        } else {
-            return R.id.nav_home;
-        }
+        if ("HomeFragment".equals(tag)) return R.id.nav_home;
+        else if ("InvoiceBillingFragment".equals(tag)) return R.id.nav_invoice;
+        else if ("CustomerFragment".equals(tag)) return R.id.nav_customer;
+        else if ("ProductFragment".equals(tag)) return R.id.nav_product;
+        else if ("SettingsFragment".equals(tag)) return R.id.nav_settings;
+        else return R.id.nav_home;
     }
 }

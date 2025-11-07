@@ -2,5 +2,8 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-files-path
         name="gst_pdfs"
-        path="GSTBillingPDFs/" />
+        path="GSTBillingPDFs" />
+    <files-path
+        name="invoices"
+        path="Invoices" />
 </paths>

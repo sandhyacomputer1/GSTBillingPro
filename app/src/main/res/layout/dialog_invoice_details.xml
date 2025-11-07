@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvInvoiceHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Invoice Details"
+            android:textColor="#1976D2"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:paddingBottom="10dp" />
+
+        <TextView
+            android:id="@+id/tvInvoiceNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#212121"
+            android:paddingTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tvInvoiceDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#212121"
+            android:paddingTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tvCustomerId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#212121"
+            android:paddingTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tvCustomerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#212121"
+            android:paddingTop="4dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D0D0D0"
+            android:layout_marginVertical="12dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#F5F5F5"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:text="Product"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#000"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Qty"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#000"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="Rate"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#000"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Tax%"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#000"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="Taxable"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#000"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="Tax Amt"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#000"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/containerInvoiceItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D0D0D0"
+            android:layout_marginVertical="12dp"/>
+
+        <TextView
+            android:id="@+id/tvTotalTaxableValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#212121"
+            android:paddingTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tvTotalCGST"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#212121"
+            android:paddingTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tvTotalSGST"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#212121"
+            android:paddingTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tvTotalIGST"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#212121"
+            android:paddingTop="4dp"/>
+
+        <TextView
+            android:id="@+id/tvGrandTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#1976D2"
+            android:paddingTop="8dp"/>
+
+    </LinearLayout>
+
+</ScrollView>

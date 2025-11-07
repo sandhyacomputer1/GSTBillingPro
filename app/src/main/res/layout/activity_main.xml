@@ -33,15 +33,13 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="75dp"
             android:layout_gravity="bottom"
-            android:background="@color/background"
-            app:itemIconTint="@color/bottom_nav_item_color"
-            app:itemTextColor="@color/bottom_nav_item_color"
             app:menu="@menu/bottom_nav_menu"
-            app:labelVisibilityMode="selected"
-        app:itemTextAppearanceActive="@style/BottomNavTextSelected"
-        app:itemTextAppearanceInactive="@style/BottomNavTextNormal" />
+            android:background="@drawable/bg_header_gradient"
+            app:itemTextColor="@color/white"
+            app:labelVisibilityMode="labeled" />
+
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -53,7 +51,6 @@
         android:layout_gravity="start"
         android:background="@drawable/bgside"
         app:menu="@menu/drawer_menu"
+        app:headerLayout="@layout/nav_header"
          />
-
-
 </androidx.drawerlayout.widget.DrawerLayout>

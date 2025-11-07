@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Blue Glass Blur Base -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:endColor="#63B1F0"
+                android:startColor="#1E56AF"/>
+
+            <corners android:radius="12dp" />
+            <stroke android:width="1.5dp" android:color="#401565C0" />
+        </shape>
+    </item>
+
+    <!-- Vector + Text (Text INSIDE vector) -->
+    <item>
+        <vector
+            android:width="120dp"
+            android:height="100dp"
+            android:viewportWidth="190"
+            android:viewportHeight="140">
+
+            <!-- Invoice Icon (Blue) -->
+            <path
+                android:fillColor="#2753B9"
+                android:pathData="M70,15 L35,15 C32,15 30,17 30,20 L30,80 C30,83 32,85 35,85 L85,85 C88,85 90,83 90,80 L90,35 L70,15 Z M80,75 L40,75 L40,70 L80,70 L80,75 Z M80,60 L40,60 L40,55 L80,55 L80,60 Z M65,30 L65,20 L75,30 Z" />
+
+
+        </vector>
+    </item>
+
+    <!-- Ripple -->
+</layer-list>

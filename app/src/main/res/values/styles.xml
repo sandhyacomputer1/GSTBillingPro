@@ -8,4 +8,16 @@
     <style name="BottomNavTextNormal" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">10sp</item>
     </style>
+    <!-- Bottom navigation text when selected -->
+    <style name="BottomNav.Text.Selected" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <!-- Bottom navigation text when not selected -->
+    <style name="BottomNav.Text.Normal" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
+    </style>
 </resources>

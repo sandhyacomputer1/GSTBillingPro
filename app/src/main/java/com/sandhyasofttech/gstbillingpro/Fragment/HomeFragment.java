@@ -29,19 +29,31 @@ import com.sandhyasofttech.gstbillingpro.MainActivity;
 import com.sandhyasofttech.gstbillingpro.Model.RecentInvoiceItem;
 import com.sandhyasofttech.gstbillingpro.R;
 
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 public class HomeFragment extends Fragment {
 
-    private TextView tvTodaysSales, tvMonthSales, tvOutstanding, tvGstDue;
+    // UI
+    private TextView tvTodaysSales, tvMonthSales;
     private MaterialButton btnNewInvoice, btnAddCustomer, btnShareExport, btnViewAllInvoices;
     private RecyclerView rvRecentActivity;
-    private TextView tvLowStock, tvPaymentDue, tvSystemUpdates;
+
+    // Business Summary
+    private TextView tvTotalCustomers, tvTotalProducts, tvLastBackup;
 
     private String userMobile;
-    private DatabaseReference userRef;
+    private DatabaseReference userRef, productsRef, invoicesRef;
+
+    // For dynamic calculation
+    private final SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private final SimpleDateFormat monthFmt = new SimpleDateFormat("yyyy-MM", Locale.US);
+    private final Set<String> uniqueProductIds = new HashSet<>();
 
     @Nullable
     @Override
@@ -54,21 +66,20 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 🔹 Initialize UI components
+        // Initialize UI
         tvTodaysSales = view.findViewById(R.id.tvTodaysSales);
         tvMonthSales = view.findViewById(R.id.tvMonthSales);
-        tvOutstanding = view.findViewById(R.id.tvOutstanding);
-        tvGstDue = view.findViewById(R.id.tvGstDue);
         btnNewInvoice = view.findViewById(R.id.btnNewInvoice);
         btnAddCustomer = view.findViewById(R.id.btnAddCustomer);
         btnShareExport = view.findViewById(R.id.btnShareExport);
         btnViewAllInvoices = view.findViewById(R.id.btnViewAllInvoices);
         rvRecentActivity = view.findViewById(R.id.rvRecentActivity);
-        tvLowStock = view.findViewById(R.id.tvLowStock);
-        tvPaymentDue = view.findViewById(R.id.tvPaymentDue);
-        tvSystemUpdates = view.findViewById(R.id.tvSystemUpdates);
 
-        // 🔹 Get current user mobile from SharedPreferences
+        tvTotalCustomers = view.findViewById(R.id.tvTotalCustomers);
+        tvTotalProducts = view.findViewById(R.id.tvTotalProducts);
+        tvLastBackup = view.findViewById(R.id.tvLastBackup);
+
+        // Get user mobile
         SharedPreferences prefs = requireActivity().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE);
         userMobile = prefs.getString("USER_MOBILE", null);
         if (userMobile == null) {
@@ -76,14 +87,19 @@ public class HomeFragment extends Fragment {
             return;
         }
 
+        // Firebase refs
         userRef = FirebaseDatabase.getInstance().getReference("users").child(userMobile);
+        productsRef = FirebaseDatabase.getInstance().getReference("products");
+        invoicesRef = userRef.child("invoices");
 
-        // 🔹 Load data
-        loadQuickStats();
+        // Load all data
+        loadDynamicSalesAndProducts();   // <-- NEW: Replaces old stats node
         loadRecentInvoices();
-        loadAlerts();
+        listenToCustomerCount();
+        listenToProductCount();
+        loadLastBackup();
 
-        // 🔹 Button actions
+        // Button Actions
         btnNewInvoice.setOnClickListener(v -> {
             ((MainActivity) requireActivity()).syncNavigation(R.id.nav_invoice);
             requireActivity().getSupportFragmentManager()
@@ -104,103 +120,165 @@ public class HomeFragment extends Fragment {
                     .commit();
         });
 
-
-
-        btnShareExport.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), ShareExportActivity.class);
-            startActivity(intent);
-        });
-
-        // ✅ View All button → open AllInvoicesActivity
-        btnViewAllInvoices.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), AllInvoicesActivity.class);
-            startActivity(intent);
-        });
+        btnShareExport.setOnClickListener(v -> startActivity(new Intent(getContext(), ShareExportActivity.class)));
+        btnViewAllInvoices.setOnClickListener(v -> startActivity(new Intent(getContext(), AllInvoicesActivity.class)));
     }
 
-    // 🔹 Fetch summary values
-    private void loadQuickStats() {
-        DatabaseReference statsRef = userRef.child("stats");
-        statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    // NEW: Dynamic Sales + Unique Products (Live)
+    private void loadDynamicSalesAndProducts() {
+        String today = dateFmt.format(new Date());
+        String currentMonth = monthFmt.format(new Date());
+
+        invoicesRef.addValueEventListener(new ValueEventListener() {
+            double todaySale = 0.0;
+            double monthSale = 0.0;
+
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                long todaysSales = snapshot.child("todaysSales").getValue(Long.class) != null
-                        ? snapshot.child("todaysSales").getValue(Long.class) : 0L;
-                long monthSales = snapshot.child("monthSales").getValue(Long.class) != null
-                        ? snapshot.child("monthSales").getValue(Long.class) : 0L;
-                long outstanding = snapshot.child("outstanding").getValue(Long.class) != null
-                        ? snapshot.child("outstanding").getValue(Long.class) : 0L;
-                long gstDue = snapshot.child("gstDue").getValue(Long.class) != null
-                        ? snapshot.child("gstDue").getValue(Long.class) : 0L;
+                todaySale = 0.0;
+                monthSale = 0.0;
+                uniqueProductIds.clear();
 
-                tvTodaysSales.setText(formatCurrency(todaysSales));
-                tvMonthSales.setText(formatCurrency(monthSales));
-                tvOutstanding.setText(formatCurrency(outstanding));
-                tvGstDue.setText(formatCurrency(gstDue));
+                for (DataSnapshot invSnap : snapshot.getChildren()) {
+                    String invDate = invSnap.child("invoiceDate").getValue(String.class);
+                    Double grandTotal = invSnap.child("grandTotal").getValue(Double.class);
+
+                    if (invDate == null || grandTotal == null) continue;
+
+                    // Sales
+                    if (invDate.equals(today)) {
+                        todaySale += grandTotal;
+                    }
+                    if (invDate.startsWith(currentMonth)) {
+                        monthSale += grandTotal;
+                    }
+
+                    // Unique Products
+                    DataSnapshot items = invSnap.child("items");
+                    for (DataSnapshot item : items.getChildren()) {
+                        String productId = item.child("productId").getValue(String.class);
+                        if (productId != null && !productId.isEmpty()) {
+                            uniqueProductIds.add(productId);
+                        }
+                    }
+                }
+
+                // Update UI
+                tvTodaysSales.setText(formatCurrency((long) todaySale));
+                tvMonthSales.setText(formatCurrency((long) monthSale));
+                tvTotalProducts.setText("Total Products: " + uniqueProductIds.size());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Could not load quick stats", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Sales Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // 🔹 Fetch recent 10 invoices
+    // Recent Invoices (Last 10)
     private void loadRecentInvoices() {
-        DatabaseReference invoicesRef = userRef.child("invoices");
-
         invoicesRef.limitToLast(10).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<RecentInvoiceItem> invoiceList = new ArrayList<>();
-
+                ArrayList<RecentInvoiceItem> list = new ArrayList<>();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     String invoiceNo = ds.child("invoiceNumber").getValue(String.class);
-                    String customerId = ds.child("customerId").getValue(String.class);
                     String customerName = ds.child("customerName").getValue(String.class);
                     Double grandTotal = ds.child("grandTotal").getValue(Double.class);
                     String date = ds.child("invoiceDate").getValue(String.class);
 
-                    if (invoiceNo != null && customerId != null && customerName != null && grandTotal != null && date != null) {
-                        invoiceList.add(new RecentInvoiceItem(invoiceNo, customerId, customerName, grandTotal, date));
+                    if (invoiceNo != null && customerName != null && grandTotal != null && date != null) {
+                        list.add(new RecentInvoiceItem(invoiceNo, null, customerName, grandTotal, date));
                     }
                 }
-
-                Collections.reverse(invoiceList); // Show newest first
+                Collections.reverse(list);
                 rvRecentActivity.setLayoutManager(new LinearLayoutManager(getContext()));
-                rvRecentActivity.setAdapter(new RecentInvoiceAdapter(invoiceList));
+                rvRecentActivity.setAdapter(new RecentInvoiceAdapter(list));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Could not load recent invoices", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load recent invoices", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // 🔹 Fetch system alerts
-    private void loadAlerts() {
-        DatabaseReference alertsRef = userRef.child("alerts");
-        alertsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    // REAL-TIME CUSTOMER COUNT
+    private void listenToCustomerCount() {
+        userRef.child("customers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String lowStock = snapshot.child("lowStock").getValue(String.class);
-                String paymentDue = snapshot.child("paymentDue").getValue(String.class);
-                String systemUpdates = snapshot.child("systemUpdates").getValue(String.class);
-
-                tvLowStock.setText("Low stock: " + (lowStock == null ? "None" : lowStock));
-                tvPaymentDue.setText("Payment Due: " + (paymentDue == null ? "None" : paymentDue));
-                tvSystemUpdates.setText("System Updates: " + (systemUpdates == null ? "No new updates" : systemUpdates));
+                long count = snapshot.getChildrenCount();
+                tvTotalCustomers.setText("Total Customers: " + count);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Could not load alerts", Toast.LENGTH_SHORT).show();
+                tvTotalCustomers.setText("Total Customers: Error");
             }
         });
     }
 
+    // REAL-TIME PRODUCT COUNT (from /products node)
+    private void listenToProductCount() {
+        productsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long count = snapshot.getChildrenCount();
+                // This is fallback; dynamic count from invoices is used above
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Ignore
+            }
+        });
+    }
+
+    // LAST BACKUP
+    private void loadLastBackup() {
+        userRef.child("summary").child("lastBackup").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Long timestamp = snapshot.getValue(Long.class);
+                String text = (timestamp == null || timestamp == 0)
+                        ? "Last Backup: Never"
+                        : "Last Backup: " + formatBackupTime(timestamp);
+                tvLastBackup.setText(text);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                tvLastBackup.setText("Last Backup: Error");
+            }
+        });
+    }
+
+    // Format backup time
+    private String formatBackupTime(long timestamp) {
+        long now = System.currentTimeMillis();
+        long diff = now - timestamp;
+
+        long minute = 60 * 1000;
+        long hour = 60 * minute;
+        long day = 24 * hour;
+
+        if (diff < hour) {
+            long mins = diff / minute;
+            return mins <= 1 ? "Just now" : mins + " mins ago";
+        } else if (diff < day) {
+            long hours = diff / hour;
+            return hours == 1 ? "1 hour ago" : hours + " hours ago";
+        } else if (diff < 2 * day) {
+            return "Yesterday";
+        } else {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+            return sdf.format(new Date(timestamp));
+        }
+    }
+
+    // Format currency
     private String formatCurrency(long amount) {
         return "₹" + String.format("%,d", amount);
     }

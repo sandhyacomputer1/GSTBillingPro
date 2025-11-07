@@ -10,10 +10,10 @@ public class Product implements Serializable {
     private double gstRate;
     private int stockQuantity;
 
-    public Product() {
-        // Required empty constructor for Firebase
-    }
+    // Default constructor (required for Firebase)
+    public Product() { }
 
+    // Parameterized constructor
     public Product(String productId, String name, String hsnCode, double price, double gstRate, int stockQuantity) {
         this.productId = productId;
         this.name = name;
@@ -24,18 +24,52 @@ public class Product implements Serializable {
     }
 
     // Getters
-    public String getProductId() { return productId; }
-    public String getName() { return name; }
-    public String getHsnCode() { return hsnCode; }
-    public double getPrice() { return price; }
-    public double getGstRate() { return gstRate; }
-    public int getStockQuantity() { return stockQuantity; }
+    public String getProductId() {
+        return productId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getHsnCode() {
+        return hsnCode;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public double getGstRate() {
+        return gstRate;
+    }
+
+    public int getStockQuantity() {
+        return stockQuantity;
+    }
 
     // Setters
-    public void setProductId(String productId) { this.productId = productId; }
-    public void setName(String name) { this.name = name; }
-    public void setHsnCode(String hsnCode) { this.hsnCode = hsnCode; }
-    public void setPrice(double price) { this.price = price; }
-    public void setGstRate(double gstRate) { this.gstRate = gstRate; }
-    public void setStockQuantity(int stockQuantity) { this.stockQuantity = stockQuantity; }
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setHsnCode(String hsnCode) {
+        this.hsnCode = hsnCode;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setGstRate(double gstRate) {
+        this.gstRate = gstRate;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
 }

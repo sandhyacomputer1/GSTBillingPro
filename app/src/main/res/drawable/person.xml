@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="100dp"
+    android:viewportWidth="120"
+    android:viewportHeight="100">
+
+    <!-- Customer Icon (Blue) -->
+    <path
+        android:fillColor="#2753B9"
+        android:pathData="M60,35
+                         C70,35 78,27 78,17
+                         C78,7 70,-1 60,-1
+                         C50,-1 42,7 42,17
+                         C42,27 50,35 60,35
+                         Z
+                         M30,45
+                         C20,45 10,55 10,65
+                         L10,80
+                         L110,80
+                         L110,65
+                         C110,55 100,45 90,45
+                         C80,45 70,50 60,50
+                         C50,50 40,45 30,45
+                         Z" />
+
+</vector>

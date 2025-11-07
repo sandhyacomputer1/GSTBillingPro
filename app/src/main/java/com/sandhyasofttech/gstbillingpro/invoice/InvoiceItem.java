@@ -1,11 +1,17 @@
-// InvoiceItem.java
 package com.sandhyasofttech.gstbillingpro.invoice;
 
-public class InvoiceItem {
-    public String productId, productName;
-    public double quantity, rate, taxPercent;
+import com.google.firebase.database.IgnoreExtraProperties;
 
-    public InvoiceItem() { }
+@IgnoreExtraProperties
+public class InvoiceItem {
+    public String productId;
+    public String productName;
+    public double quantity;
+    public double rate;
+    public double taxPercent;
+
+    public InvoiceItem() {}
+
     public InvoiceItem(String productId, String productName, double quantity, double rate, double taxPercent) {
         this.productId = productId;
         this.productName = productName;
@@ -14,7 +20,12 @@ public class InvoiceItem {
         this.taxPercent = taxPercent;
     }
 
+    public void setProductId(String productId) { this.productId = productId; }
+    public void setProductName(String productName) { this.productName = productName; }
+    public void setQuantity(double quantity) { this.quantity = quantity; }
+    public void setRate(double rate) { this.rate = rate; }
+    public void setTaxPercent(double taxPercent) { this.taxPercent = taxPercent; }
+
     public double getTaxableValue() { return quantity * rate; }
     public double getTaxAmount() { return getTaxableValue() * taxPercent / 100; }
 }
-

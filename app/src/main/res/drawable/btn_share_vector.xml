@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:endColor="#63B1F0"
+                android:startColor="#1E56AF"/>
+            <corners android:radius="12dp" />
+            <stroke android:width="1.5dp" android:color="#401565C0" />
+        </shape>
+    </item>
+
+    <item>
+        <vector
+            android:width="120dp"
+            android:height="100dp"
+            android:viewportWidth="190"
+            android:viewportHeight="140">
+
+            <!-- Share Icon (Blue) -->
+            <path
+                android:fillColor="#2753B9"
+                android:pathData="M85,70 C80,70 76,72 74,75 L45,58 C45.2,57.5 45.3,57 45.3,56.5 C45.3,56 45.2,55.5 45,55 L74,38 C76,41 80,43 85,43 C93,43 99,37 99,29 C99,21 93,15 85,15 C77,15 71,21 71,29 C71,29.5 71.1,30 71.2,30.5 L42,47.5 C40,45 36,43 31,43 C23,43 17,49 17,57 C17,65 23,71 31,71 C36,71 40,69 42,66 L71.2,83 C71.1,83.5 71,84 71,84.5 C71,92.5 77,98.5 85,98.5 C93,98.5 99,92.5 99,84.5 C99,76.5 93,70.5 85,70.5 Z" />
+
+            <!-- Glowing Text - INSIDE -->
+        </vector>
+    </item>
+
+</layer-list>

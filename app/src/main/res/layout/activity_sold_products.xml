@@ -1,39 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:orientation="vertical"
     android:background="?android:attr/windowBackground">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabDateFilter"
+    <!-- Toolbar with Back Arrow -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/bg_header_gradient"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="Sold Product"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="?android:attr/homeAsUpIndicator" />
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/searchSoldProducts"
+    <!-- Main Content -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:queryHint="Search by product, customer, date"
-        android:iconifiedByDefault="false" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSoldProducts"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="8dp"/>
+        <!-- Date Filter Tabs -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabDateFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabTextColor="@android:color/darker_gray"
+            app:tabSelectedTextColor="?attr/colorPrimary"
+            app:tabIndicatorColor="?attr/colorPrimary" />
 
-    <TextView
-        android:id="@+id/tvEmpty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="No sold products found."
-        android:textAlignment="center"
-        android:textColor="@android:color/darker_gray"
-        android:padding="24dp"
-        android:visibility="gone"
-        android:textSize="16sp" />
+        <!-- Search View -->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchSoldProducts"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/edittext_bg"
+            android:queryHint="Search by product, customer, date"
+             />
+
+        <!-- RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSoldProducts"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="12dp"
+            android:clipToPadding="false" />
+
+        <!-- Empty State -->
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No sold products found."
+            android:textAlignment="center"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="16sp"
+            android:padding="32dp"
+            android:visibility="gone"
+            android:gravity="center" />
+    </LinearLayout>
 </LinearLayout>
