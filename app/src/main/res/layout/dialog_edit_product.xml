@@ -141,6 +141,7 @@
             <EditText
                 android:id="@+id/etProductUnit"
                 android:layout_width="match_parent"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="Unit (e.g., pcs, kg, ltr)"
