@@ -7,5 +7,17 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="select_customer">Select Customer</string>
 
+        <string name="import_instructions">
+            <b>How to Import:</b>\n
+            Your file (PDF, Excel, CSV) must have columns in this exact order:\n
+            <b>1. Product Name</b>\n
+            <b>2. HSN Code</b>\n
+            <b>3. Price</b> (e.g., 150.00)\n
+            <b>4. GST Rate %</b> (e.g., 18)\n
+            <b>5. Stock Quantity</b> (e.g., 50)\n
+            <b>6. Unit</b> (e.g., pcs, kg, ltr)
+        </string>
+
+
 
 </resources>

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -13,6 +14,12 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.GSTBIllingPro">
+        <activity
+            android:name=".custmore.InvoiceDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".custmore.CustomerDetailsActivity"
+            android:exported="false" />
         <activity
             android:name=".soldproduct.SoldProductsActivity"
             android:exported="false" />

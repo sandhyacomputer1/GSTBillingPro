@@ -138,6 +138,13 @@
                 android:inputType="number"
                 android:textColor="#000000"
                 android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/etProductUnit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Unit (e.g., pcs, kg, ltr)"
+                android:inputType="text" />
 
             <!-- Update Button -->
             <Button
@@ -149,6 +156,7 @@
                 android:textSize="16sp"
                 android:layout_marginTop="30dp"
                 android:backgroundTint="#3F51B5"/>
+
 
         </LinearLayout>
     </ScrollView>

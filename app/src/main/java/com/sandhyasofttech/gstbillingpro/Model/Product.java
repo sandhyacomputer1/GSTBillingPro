@@ -9,6 +9,7 @@ public class Product implements Serializable {
     private double price;
     private double gstRate;
     private int stockQuantity;
+    private String unit; // <-- ADD THIS
 
     // Default constructor (required for Firebase)
     public Product() { }
@@ -21,6 +22,7 @@ public class Product implements Serializable {
         this.price = price;
         this.gstRate = gstRate;
         this.stockQuantity = stockQuantity;
+        this.unit=unit;
     }
 
     // Getters
@@ -71,5 +73,13 @@ public class Product implements Serializable {
 
     public void setStockQuantity(int stockQuantity) {
         this.stockQuantity = stockQuantity;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }

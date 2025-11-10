@@ -6,4 +6,5 @@
     <files-path
         name="invoices"
         path="Invoices" />
+    <external-files-path name="documents" path="Documents/" />
 </paths>

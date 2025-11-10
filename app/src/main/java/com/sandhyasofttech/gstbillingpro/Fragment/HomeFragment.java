@@ -76,7 +76,7 @@ public class HomeFragment extends Fragment {
         rvRecentActivity = view.findViewById(R.id.rvRecentActivity);
 
         tvTotalCustomers = view.findViewById(R.id.tvTotalCustomers);
-        tvTotalProducts = view.findViewById(R.id.tvTotalProducts);
+        tvTotalProducts = view.findViewById(R.id.tvTotalProducts); // Now shows invoice count
         tvLastBackup = view.findViewById(R.id.tvLastBackup);
 
         // Get user mobile
@@ -93,10 +93,10 @@ public class HomeFragment extends Fragment {
         invoicesRef = userRef.child("invoices");
 
         // Load all data
-        loadDynamicSalesAndProducts();   // <-- NEW: Replaces old stats node
+        loadDynamicSalesAndProducts();   // <-- Still calculates sales + unique products (used for sales logic)
         loadRecentInvoices();
         listenToCustomerCount();
-        listenToProductCount();
+        listenToInvoiceCount();          // <-- NEW: Replaces product count
         loadLastBackup();
 
         // Button Actions
@@ -153,7 +153,7 @@ public class HomeFragment extends Fragment {
                         monthSale += grandTotal;
                     }
 
-                    // Unique Products
+                    // Unique Products (still used for internal logic if needed)
                     DataSnapshot items = invSnap.child("items");
                     for (DataSnapshot item : items.getChildren()) {
                         String productId = item.child("productId").getValue(String.class);
@@ -166,7 +166,7 @@ public class HomeFragment extends Fragment {
                 // Update UI
                 tvTodaysSales.setText(formatCurrency((long) todaySale));
                 tvMonthSales.setText(formatCurrency((long) monthSale));
-                tvTotalProducts.setText("Total Products: " + uniqueProductIds.size());
+                // tvTotalProducts is now handled by listenToInvoiceCount()
             }
 
             @Override
@@ -210,28 +210,28 @@ public class HomeFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long count = snapshot.getChildrenCount();
-                tvTotalCustomers.setText("Total Customers: " + count);
+                tvTotalCustomers.setText(" " + count);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                tvTotalCustomers.setText("Total Customers: Error");
+                tvTotalCustomers.setText("Total Customers : Error");
             }
         });
     }
 
-    // REAL-TIME PRODUCT COUNT (from /products node)
-    private void listenToProductCount() {
-        productsRef.addValueEventListener(new ValueEventListener() {
+    // NEW: REAL-TIME INVOICE COUNT (Replaces product count)
+    private void listenToInvoiceCount() {
+        invoicesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long count = snapshot.getChildrenCount();
-                // This is fallback; dynamic count from invoices is used above
+                tvTotalProducts.setText(" " + count); // Now shows invoice count
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Ignore
+                tvTotalProducts.setText("Total Invoices : Error");
             }
         });
     }

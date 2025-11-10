@@ -13,10 +13,11 @@ import com.sandhyasofttech.gstbillingpro.Model.Product;
 import com.sandhyasofttech.gstbillingpro.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ProductViewHolder> {
 
-    private ArrayList<Product> products;
+    private List<Product> productList; // <--- Change here//...
     private OnProductActionListener listener;
 
     public interface OnProductActionListener {
@@ -24,8 +25,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         void onDeleteProduct(Product product, int position);
     }
 
-    public ProductsAdapter(ArrayList<Product> products, OnProductActionListener listener) {
-        this.products = products;
+    public ProductsAdapter(List<Product> productList, OnProductActionListener listener) { // <--- And change here
+        this.productList = productList;
         this.listener = listener;
     }
 
@@ -38,7 +39,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        Product product = products.get(position);
+        Product product = productList.get(position);
 
         holder.tvName.setText(product.getName());
 
@@ -59,7 +60,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
 
     @Override
     public int getItemCount() {
-        return products.size();
+        return productList.size();
     }
 
     static class ProductViewHolder extends RecyclerView.ViewHolder {

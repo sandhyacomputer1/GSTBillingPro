@@ -41,7 +41,6 @@
                 android:contentDescription="Edit"
                 android:padding="4dp"
                 android:src="@drawable/ic_edit"
-                android:layout_marginStart="12dp"
                 app:tint="#0D0D0D" />
 
             <ImageView
@@ -51,7 +50,7 @@
                 android:contentDescription="Delete"
                 android:padding="4dp"
                 android:src="@drawable/ic_delete"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="10dp"
                 app:tint="#090909" />
         </LinearLayout>
 
