@@ -1,6 +1,8 @@
 package com.sandhyasofttech.gstbillingpro.Model;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Product implements Serializable {
     private String productId;
@@ -9,13 +11,14 @@ public class Product implements Serializable {
     private double price;
     private double gstRate;
     private int stockQuantity;
-    private String unit; // <-- ADD THIS
+    private String unit;
+    private Map<String, String> customFields; // <-- ADD THIS
 
     // Default constructor (required for Firebase)
     public Product() { }
 
     // Parameterized constructor
-    public Product(String productId, String name, String hsnCode, double price, double gstRate, int stockQuantity) {
+    public Product(String productId, String name, String hsnCode, double price, double gstRate, int stockQuantity, String unit) {
         this.productId = productId;
         this.name = name;
         this.hsnCode = hsnCode;
@@ -23,6 +26,7 @@ public class Product implements Serializable {
         this.gstRate = gstRate;
         this.stockQuantity = stockQuantity;
         this.unit=unit;
+        this.customFields = new HashMap<>(); // <-- ADD THIS
     }
 
     // Getters
@@ -50,6 +54,14 @@ public class Product implements Serializable {
         return stockQuantity;
     }
 
+    public String getUnit() {
+        return unit;
+    }
+
+    public Map<String, String> getCustomFields() {
+        return customFields;
+    }
+
     // Setters
     public void setProductId(String productId) {
         this.productId = productId;
@@ -75,11 +87,11 @@ public class Product implements Serializable {
         this.stockQuantity = stockQuantity;
     }
 
-    public String getUnit() {
-        return unit;
-    }
-
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public void setCustomFields(Map<String, String> customFields) {
+        this.customFields = customFields;
     }
 }

@@ -33,6 +33,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <activity
+            android:name=".Activity.ProductDetailsActivity"
+            android:exported="false" />
 
         <activity
             android:name=".Activity.ShareExportActivity"
@@ -50,6 +53,9 @@
         <activity
             android:name=".Activity.NewProductActivity"
             android:exported="true" />
+        <activity
+            android:name=".Activity.CustomFieldsActivity"
+            android:exported="false" />
         <activity
             android:name=".Registration.LoginActivity"
             android:exported="true" />
