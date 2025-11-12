@@ -37,7 +37,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         Product product = productList.get(position);
 
         holder.tvName.setText(product.getName());
-        holder.tvQuantity.setText(String.valueOf(product.getStockQuantity()));
+        holder.tvQuantity.setText(String.valueOf(product.getEffectiveQuantity()));
 
         holder.itemView.setOnClickListener(v -> {
             Context context = holder.itemView.getContext();

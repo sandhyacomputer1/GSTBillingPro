@@ -36,6 +36,9 @@
         <activity
             android:name=".Activity.ProductDetailsActivity"
             android:exported="false" />
+        <activity
+            android:name=".Activity.FieldMappingActivity"
+            android:exported="false" />
 
         <activity
             android:name=".Activity.ShareExportActivity"

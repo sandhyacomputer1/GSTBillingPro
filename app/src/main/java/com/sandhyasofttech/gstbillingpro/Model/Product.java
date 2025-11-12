@@ -12,7 +12,8 @@ public class Product implements Serializable {
     private double gstRate;
     private int stockQuantity;
     private String unit;
-    private Map<String, String> customFields; // <-- ADD THIS
+    private String customerName;
+    private Map<String, String> customFields;
 
     // Default constructor (required for Firebase)
     public Product() { }
@@ -25,8 +26,8 @@ public class Product implements Serializable {
         this.price = price;
         this.gstRate = gstRate;
         this.stockQuantity = stockQuantity;
-        this.unit=unit;
-        this.customFields = new HashMap<>(); // <-- ADD THIS
+        this.unit = unit;
+        this.customFields = new HashMap<>();
     }
 
     // Getters
@@ -56,6 +57,10 @@ public class Product implements Serializable {
 
     public String getUnit() {
         return unit;
+    }
+
+    public String getCustomerName() {
+        return customerName;
     }
 
     public Map<String, String> getCustomFields() {
@@ -91,7 +96,31 @@ public class Product implements Serializable {
         this.unit = unit;
     }
 
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
     public void setCustomFields(Map<String, String> customFields) {
         this.customFields = customFields;
+    }
+
+    // Helper method to get the quantity from default or custom fields
+    public int getEffectiveQuantity() {
+        if (stockQuantity > 0) {
+            return stockQuantity;
+        }
+        if (customFields != null) {
+            for (Map.Entry<String, String> entry : customFields.entrySet()) {
+                String key = entry.getKey().toLowerCase();
+                if (key.contains("quantity") || key.contains("qty")) {
+                    try {
+                        return Integer.parseInt(entry.getValue());
+                    } catch (NumberFormatException e) {
+                        // Ignore if the value is not a valid number
+                    }
+                }
+            }
+        }
+        return 0; // Return 0 if no quantity is found
     }
 }

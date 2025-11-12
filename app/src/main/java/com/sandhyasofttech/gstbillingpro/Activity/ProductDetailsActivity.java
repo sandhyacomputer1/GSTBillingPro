@@ -1,6 +1,7 @@
 package com.sandhyasofttech.gstbillingpro.Activity;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,10 +54,19 @@ public class ProductDetailsActivity extends AppCompatActivity {
     }
 
     private void displayProductDetails() {
+        CardView cvCustomer = findViewById(R.id.cvCustomer);
+        TextView tvCustomerName = findViewById(R.id.tvCustomerName);
         LinearLayout llDefaultFieldsContainer = findViewById(R.id.llDefaultFieldsContainer);
         LinearLayout llCustomFieldsContainer = findViewById(R.id.llCustomFieldsContainer);
         CardView cvDefaultFields = findViewById(R.id.cvDefaultFields);
         CardView cvCustomFields = findViewById(R.id.cvCustomFields);
+
+        if (!TextUtils.isEmpty(product.getCustomerName())) {
+            cvCustomer.setVisibility(View.VISIBLE);
+            tvCustomerName.setText(product.getCustomerName());
+        } else {
+            cvCustomer.setVisibility(View.GONE);
+        }
 
         llDefaultFieldsContainer.removeAllViews();
         llCustomFieldsContainer.removeAllViews();

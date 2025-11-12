@@ -1,5 +1,6 @@
 package com.sandhyasofttech.gstbillingpro.Fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,12 +32,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfReader;
-import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
-import com.itextpdf.kernel.pdf.canvas.parser.listener.LocationTextExtractionStrategy;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import com.sandhyasofttech.gstbillingpro.Activity.FieldMappingActivity;
 import com.sandhyasofttech.gstbillingpro.Activity.NewProductActivity;
 import com.sandhyasofttech.gstbillingpro.Adapter.ProductsAdapter;
 import com.sandhyasofttech.gstbillingpro.Model.Product;
@@ -51,7 +51,9 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,15 +86,23 @@ public class ProductFragment extends Fragment {
     private final ActivityResultLauncher<Intent> filePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     Uri uri = result.getData().getData();
                     if (uri != null) {
-                        importDataFromFile(uri);
-                    } else {
-                        showToast("Failed to get file URI.");
+                        getHeaderAndGoToMapping(uri);
                     }
                 }
             });
+
+    private final ActivityResultLauncher<Intent> fieldMappingLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Uri uri = result.getData().getParcelableExtra("fileUri");
+                    importDataFromFile(uri);
+                }
+            });
+
 
     @Nullable
     @Override
@@ -104,7 +114,6 @@ public class ProductFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize UI components
         rvProducts = view.findViewById(R.id.rvProducts);
         fabAddProduct = view.findViewById(R.id.fabAddProduct);
         btnImportProducts = view.findViewById(R.id.btnImportProducts);
@@ -133,9 +142,7 @@ public class ProductFragment extends Fragment {
 
     private void setupListeners() {
         fabAddProduct.setOnClickListener(v -> startActivity(new Intent(getContext(), NewProductActivity.class)));
-
         btnImportProducts.setOnClickListener(v -> showImportInstructionsDialog());
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -151,20 +158,14 @@ public class ProductFragment extends Fragment {
     }
 
     private void showImportInstructionsDialog() {
-        String instructions = "Please ensure your file (Excel, CSV, or PDF) has columns in the following order:\n\n" +
-                "1. Product Name\n" +
-                "2. HSN Code\n" +
-                "3. Price\n" +
-                "4. GST Rate (%)\n" +
-                "5. Stock Quantity\n" +
-                "6. Unit (Optional, e.g., pcs, kg)";
+        String instructions = "This feature allows you to import products from an Excel (.xls, .xlsx) or CSV (.csv) file.\n\n" +
+                "1. Your file MUST have a header row (the first row should contain titles like \"Product Name\", \"Price\", etc).\n\n" +
+                "2. If you have a PDF file, please convert it to Excel or CSV first using an online tool or your Mobile\'s Application.";
 
         new AlertDialog.Builder(requireContext())
                 .setTitle("Import Instructions")
                 .setMessage(instructions)
-                .setPositiveButton("Choose File", (dialog, which) -> {
-                    openFilePicker();
-                })
+                .setPositiveButton("Choose File", (dialog, which) -> openFilePicker())
                 .setNegativeButton("Cancel", null)
                 .show();
     }
@@ -173,11 +174,54 @@ public class ProductFragment extends Fragment {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
-                "application/pdf", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "application/vnd.ms-excel", "text/csv"
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel", "text/csv"});
+        filePickerLauncher.launch(Intent.createChooser(intent, "Select an Excel or CSV file"));
+    }
+
+    private void getHeaderAndGoToMapping(Uri uri) {
+        executor.execute(() -> {
+            ArrayList<String> header = new ArrayList<>();
+            try (InputStream inputStream = requireContext().getContentResolver().openInputStream(uri)) {
+                if (inputStream == null) throw new IOException("Unable to open input stream for URI");
+
+                String fileName = uri.getLastPathSegment() != null ? uri.getLastPathSegment() : "";
+
+                if (fileName.toLowerCase().endsWith(".csv")) {
+                    try (CSVReader reader = new CSVReader(new InputStreamReader(inputStream))) {
+                        String[] headerRow = reader.readNext();
+                        if (headerRow != null) {
+                            header.addAll(Arrays.asList(headerRow));
+                        }
+                    }
+                } else if (fileName.toLowerCase().endsWith(".xlsx") || fileName.toLowerCase().endsWith(".xls")) {
+                    try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+                        Sheet sheet = workbook.getSheetAt(0);
+                        Row headerRow = sheet.getRow(0);
+                        if (headerRow != null) {
+                            for (Cell cell : headerRow) {
+                                header.add(getCellValueAsString(cell));
+                            }
+                        }
+                    }
+                }
+
+                handler.post(() -> {
+                    if (header.isEmpty()) {
+                        showToast("Could not read a header row from the file. Please ensure the first row contains column titles.");
+                        return;
+                    }
+
+                    Intent intent = new Intent(getContext(), FieldMappingActivity.class);
+                    intent.putExtra("fileUri", uri);
+                    intent.putStringArrayListExtra("fileColumns", header);
+                    fieldMappingLauncher.launch(intent);
+                });
+
+            } catch (Exception e) {
+                Log.e(TAG, "Error reading file header", e);
+                handler.post(() -> showToast("Error reading file: " + e.getMessage()));
+            }
         });
-        filePickerLauncher.launch(Intent.createChooser(intent, "Select a file to import"));
     }
 
     private void importDataFromFile(final Uri uri) {
@@ -189,16 +233,12 @@ public class ProductFragment extends Fragment {
                 if (inputStream == null) throw new IOException("Unable to open input stream for URI");
 
                 String fileName = uri.getLastPathSegment() != null ? uri.getLastPathSegment() : "";
-                String lowerCaseFileName = fileName.toLowerCase();
+                Map<String, Integer> mapping = loadSavedMapping();
 
-                if (lowerCaseFileName.endsWith(".pdf")) {
-                    importedProducts = parsePdf(inputStream);
-                } else if (lowerCaseFileName.endsWith(".xlsx") || lowerCaseFileName.endsWith(".xls")) {
-                    importedProducts = parseExcel(inputStream);
-                } else if (lowerCaseFileName.endsWith(".csv")) {
-                    importedProducts = parseCsv(inputStream);
-                } else {
-                    errorMsg = "Unsupported file type. Please select a PDF, Excel, or CSV file.";
+                if (fileName.toLowerCase().endsWith(".xlsx") || fileName.toLowerCase().endsWith(".xls")) {
+                    importedProducts = parseExcel(inputStream, mapping);
+                } else if (fileName.toLowerCase().endsWith(".csv")) {
+                    importedProducts = parseCsv(inputStream, mapping);
                 }
 
             } catch (Exception e) {
@@ -220,34 +260,22 @@ public class ProductFragment extends Fragment {
         });
     }
 
-    private List<Product> parsePdf(InputStream inputStream) throws IOException {
+    private List<Product> parseExcel(InputStream inputStream, Map<String, Integer> mapping) throws IOException {
         List<Product> list = new ArrayList<>();
-        try (PdfReader reader = new PdfReader(inputStream); PdfDocument pdfDoc = new PdfDocument(reader)) {
-            for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
-                String text = PdfTextExtractor.getTextFromPage(pdfDoc.getPage(i), new LocationTextExtractionStrategy());
-                String[] lines = text.split("\n");
-                boolean headerPassed = false;
+        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            Row headerRow = sheet.getRow(0);
+            if (headerRow == null) return list;
 
-                for (String line : lines) {
-                    if (line.trim().isEmpty()) continue;
-                    if (!headerPassed) {
-                        if (line.toLowerCase().contains("name") && line.toLowerCase().contains("hsn")) {
-                            headerPassed = true;
-                        }
-                        continue;
-                    }
+            List<String> header = new ArrayList<>();
+            for (Cell cell : headerRow) {
+                header.add(getCellValueAsString(cell));
+            }
 
-                    String[] parts = line.split("\\s{2,}");
-                    if (parts.length < 5) continue; // Name, HSN, Price, GST, Qty
-
-                    Product p = new Product();
-                    p.setProductId(UUID.randomUUID().toString());
-                    p.setName(parts[0].trim());
-                    p.setHsnCode(parts[1].trim());
-                    p.setPrice(parseDouble(parts[2].trim()));
-                    p.setGstRate(parseDouble(parts[3].trim()));
-                    p.setStockQuantity(parseInt(parts[4].trim()));
-                    p.setUnit(parts.length > 5 ? parts[5].trim() : "pcs"); // Add Unit
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) continue; // Skip header
+                Product p = createProductFromRow(row, mapping, header);
+                if (p != null && p.getName() != null && !p.getName().isEmpty()) {
                     list.add(p);
                 }
             }
@@ -255,99 +283,151 @@ public class ProductFragment extends Fragment {
         return list;
     }
 
-    private List<Product> parseExcel(InputStream inputStream) throws IOException {
-        List<Product> list = new ArrayList<>();
-        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0);
-            for (Row row : sheet) {
-                if (row.getRowNum() == 0 || getCellValueAsString(row.getCell(0)).isEmpty()) continue;
-
-                Product p = new Product();
-                p.setProductId(UUID.randomUUID().toString());
-                p.setName(getCellValueAsString(row.getCell(0)));
-                p.setHsnCode(getCellValueAsString(row.getCell(1)));
-                p.setPrice(parseDouble(getCellValueAsString(row.getCell(2))));
-                p.setGstRate(parseDouble(getCellValueAsString(row.getCell(3))));
-                p.setStockQuantity(parseInt(getCellValueAsString(row.getCell(4))));
-                String unit = getCellValueAsString(row.getCell(5));
-                p.setUnit(unit.isEmpty() ? "pcs" : unit); // Add Unit
-                list.add(p);
-            }
-        }
-        return list;
-    }
-
-    private List<Product> parseCsv(InputStream inputStream) throws IOException, CsvValidationException {
+    private List<Product> parseCsv(InputStream inputStream, Map<String, Integer> mapping) throws IOException, CsvValidationException {
         List<Product> list = new ArrayList<>();
         try (CSVReader csvReader = new CSVReader(new InputStreamReader(inputStream))) {
-            csvReader.readNext(); // Skip header
+            String[] header = csvReader.readNext();
+            if (header == null) return list;
+
             String[] line;
             while ((line = csvReader.readNext()) != null) {
-                if (line.length < 5) continue;
-
-                Product p = new Product();
-                p.setProductId(UUID.randomUUID().toString());
-                p.setName(line[0].trim());
-                p.setHsnCode(line[1].trim());
-                p.setPrice(parseDouble(line[2].trim()));
-                p.setGstRate(parseDouble(line[3].trim()));
-                p.setStockQuantity(parseInt(line[4].trim()));
-                p.setUnit(line.length > 5 && !line[5].trim().isEmpty() ? line[5].trim() : "pcs"); // Add Unit
-                list.add(p);
+                Product p = createProductFromLine(line, mapping, Arrays.asList(header));
+                if (p != null && p.getName() != null && !p.getName().isEmpty()) {
+                    list.add(p);
+                }
             }
         }
         return list;
     }
 
-    private void uploadProductsToFirebase(List<Product> productsToUpload) {
-        if (productsToUpload.isEmpty()) {
-            showToast("No products found in the file to upload.");
-            return;
-        }
+    private Product createProductFromRow(Row row, Map<String, Integer> mapping, List<String> header) {
+        Product p = new Product();
+        p.setProductId(UUID.randomUUID().toString());
+        Map<String, String> customFields = new HashMap<>();
 
-        Set<String> existingProductNames = new HashSet<>();
-        for (Product p : productList) {
-            if (p.getName() != null && !p.getName().isEmpty()) {
-                existingProductNames.add(p.getName().toLowerCase());
+        Set<Integer> mappedColumnIndexes = new HashSet<>();
+
+        // 1. Process explicitly mapped fields
+        for (Map.Entry<String, Integer> entry : mapping.entrySet()) {
+            String appField = entry.getKey();
+            int columnIndex = entry.getValue() - 1; // -1 for "-- Not Mapped --"
+            if (columnIndex < 0) continue;
+
+            mappedColumnIndexes.add(columnIndex);
+            String value = getCellValueAsString(row.getCell(columnIndex));
+
+            switch (appField) {
+                case "Product Name": p.setName(value); break;
+                case "HSN Code": p.setHsnCode(value); break;
+                case "Price": p.setPrice(parseDouble(value)); break;
+                case "GST Rate": p.setGstRate(parseDouble(value)); break;
+                case "Stock Quantity": p.setStockQuantity(parseInt(value)); break;
+                case "Unit": p.setUnit(value); break;
+                default: customFields.put(appField, value); break;
             }
         }
 
-        Map<String, Object> newProductsMap = new HashMap<>();
-        int newProductsCount = 0;
-        int skippedDuplicatesCount = 0;
-
-        for (Product productFromFile : productsToUpload) {
-            String productName = productFromFile.getName();
-            if (productName != null && !productName.trim().isEmpty()) {
-                if (existingProductNames.contains(productName.toLowerCase())) {
-                    skippedDuplicatesCount++;
-                } else {
-                    newProductsMap.put(productFromFile.getProductId(), productFromFile);
-                    existingProductNames.add(productName.toLowerCase());
-                    newProductsCount++;
+        // 2. Catch-all for unmapped fields
+        for (int i = 0; i < header.size(); i++) {
+            if (!mappedColumnIndexes.contains(i)) {
+                String headerName = header.get(i);
+                String value = getCellValueAsString(row.getCell(i));
+                if (value != null && !value.isEmpty()) {
+                    customFields.put(headerName, value);
                 }
             }
         }
 
-        if (newProductsMap.isEmpty()) {
-            showToast("Import finished. No new products were added. " + skippedDuplicatesCount + " duplicates were found and skipped.");
+        p.setCustomFields(customFields);
+        return p;
+    }
+
+    private Product createProductFromLine(String[] line, Map<String, Integer> mapping, List<String> header) {
+        Product p = new Product();
+        p.setProductId(UUID.randomUUID().toString());
+        Map<String, String> customFields = new HashMap<>();
+
+        Set<Integer> mappedColumnIndexes = new HashSet<>();
+
+        // 1. Process explicitly mapped fields
+        for (Map.Entry<String, Integer> entry : mapping.entrySet()) {
+            String appField = entry.getKey();
+            int columnIndex = entry.getValue() - 1; // -1 for "-- Not Mapped --"
+            if (columnIndex < 0 || columnIndex >= line.length) continue;
+
+            mappedColumnIndexes.add(columnIndex);
+            String value = line[columnIndex].trim();
+
+            switch (appField) {
+                case "Product Name": p.setName(value); break;
+                case "HSN Code": p.setHsnCode(value); break;
+                case "Price": p.setPrice(parseDouble(value)); break;
+                case "GST Rate": p.setGstRate(parseDouble(value)); break;
+                case "Stock Quantity": p.setStockQuantity(parseInt(value)); break;
+                case "Unit": p.setUnit(value); break;
+                default: customFields.put(appField, value); break;
+            }
+        }
+
+        // 2. Catch-all for unmapped fields
+        for (int i = 0; i < header.size(); i++) {
+            if (!mappedColumnIndexes.contains(i)) {
+                if (i < line.length) {
+                    String headerName = header.get(i);
+                    String value = line[i].trim();
+                    if (!value.isEmpty()) {
+                        customFields.put(headerName, value);
+                    }
+                }
+            }
+        }
+
+        p.setCustomFields(customFields);
+        return p;
+    }
+
+    private Map<String, Integer> loadSavedMapping() {
+        SharedPreferences prefs = requireActivity().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString("FIELD_MAPPING", null);
+        if (json != null) {
+            Type type = new TypeToken<Map<String, Integer>>() {}.getType();
+            return gson.fromJson(json, type);
+        }
+        return new HashMap<>();
+    }
+
+    private void uploadProductsToFirebase(List<Product> productsToUpload) {
+        if (productsToUpload.isEmpty()) {
+            showToast("No new products to import.");
+            return;
+        }
+        Set<String> existingProductNames = new HashSet<>();
+        for (Product p : productList) {
+            if (p.getName() != null) {
+                existingProductNames.add(p.getName().toLowerCase());
+            }
+        }
+
+        Map<String, Object> batchUpdate = new HashMap<>();
+        int newProductsCount = 0;
+        for (Product product : productsToUpload) {
+            if (product.getName() != null && !product.getName().isEmpty() && !existingProductNames.contains(product.getName().toLowerCase())) {
+                batchUpdate.put(product.getProductId(), product);
+                existingProductNames.add(product.getName().toLowerCase());
+                newProductsCount++;
+            }
+        }
+
+        if (batchUpdate.isEmpty()) {
+            showToast("All products in the file already exist or have no name.");
             return;
         }
 
         int finalNewProductsCount = newProductsCount;
-        int finalSkippedDuplicatesCount = skippedDuplicatesCount;
-        productsRef.updateChildren(newProductsMap)
-                .addOnSuccessListener(aVoid -> {
-                    String message = finalNewProductsCount + " new products imported successfully.";
-                    if (finalSkippedDuplicatesCount > 0) {
-                        message += "\n" + finalSkippedDuplicatesCount + " duplicates were skipped.";
-                    }
-                    showToast(message);
-                })
-                .addOnFailureListener(e -> {
-                    showToast("Database error: Failed to upload new products.");
-                    Log.e(TAG, "Firebase batch upload failed", e);
-                });
+        productsRef.updateChildren(batchUpdate)
+                .addOnSuccessListener(aVoid -> showToast(finalNewProductsCount + " new products imported successfully."))
+                .addOnFailureListener(e -> showToast("Database error: Failed to upload products."));
     }
 
     private void loadProducts() {
@@ -388,14 +468,11 @@ public class ProductFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    // --- HELPER METHODS ---
     private String getCellValueAsString(Cell cell) {
         if (cell == null) return "";
         switch (cell.getCellType()) {
             case STRING: return cell.getStringCellValue().trim();
-            case NUMERIC:
-                double val = cell.getNumericCellValue();
-                return val == (long) val ? String.valueOf((long) val) : String.valueOf(val);
+            case NUMERIC: double val = cell.getNumericCellValue(); return val == (long) val ? String.valueOf((long) val) : String.valueOf(val);
             case BOOLEAN: return String.valueOf(cell.getBooleanCellValue());
             case FORMULA: return cell.getCellFormula();
             default: return "";
