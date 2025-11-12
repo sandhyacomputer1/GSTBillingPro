@@ -7,6 +7,8 @@
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:layout_margin="10dp"
+    android:fitsSystemWindows="true"
+
     android:background="@drawable/edittext_bg"
     android:paddingTop="8dp"
     android:paddingBottom="8dp">

@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
+
     android:background="#FAFAFA">
 
     <ScrollView
@@ -33,7 +35,7 @@
                     android:id="@+id/imgUserProfile"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:src="@drawable/person"
+                    android:src="@drawable/img_4"
                     app:civ_border_width="2dp"
                     app:civ_border_color="#E0E0E0" />
 
@@ -246,6 +248,7 @@
             <LinearLayout
                 android:id="@+id/layoutAddress"
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
@@ -373,6 +376,7 @@
                 android:id="@+id/layoutBackup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:background="@android:color/white"
@@ -433,6 +437,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:visibility="gone"
                 android:padding="16dp"
                 android:background="@android:color/white"
                 android:gravity="center_vertical"

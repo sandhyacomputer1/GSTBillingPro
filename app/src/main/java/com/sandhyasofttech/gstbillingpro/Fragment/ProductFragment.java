@@ -160,7 +160,7 @@ public class ProductFragment extends Fragment {
     private void showImportInstructionsDialog() {
         String instructions = "This feature allows you to import products from an Excel (.xls, .xlsx) or CSV (.csv) file.\n\n" +
                 "1. Your file MUST have a header row (the first row should contain titles like \"Product Name\", \"Price\", etc).\n\n" +
-                "2. If you have a PDF file, please convert it to Excel or CSV first using an online tool or your Mobile\'s Application.";
+                "2. If you have a PDF file, please convert it to Excel or CSV first using an online tool or your computer's software.";
 
         new AlertDialog.Builder(requireContext())
                 .setTitle("Import Instructions")

@@ -5,6 +5,8 @@
     android:layout_height="150dp"
    android:background="@drawable/headerdark"
     android:gravity="center_vertical"
+    android:fitsSystemWindows="true"
+
     android:padding="16dp">
 
 <ImageView

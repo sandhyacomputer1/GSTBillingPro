@@ -6,6 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:elevation="6dp"
+    android:fitsSystemWindows="true"
+
     app:cardCornerRadius="10dp"
     app:cardBackgroundColor="@android:color/white"
     android:foreground="?attr/selectableItemBackground">

@@ -7,6 +7,8 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:background="#F8FAFC"
+    android:fitsSystemWindows="true"
+
     tools:context=".fragments.DashboardFragment">
 
     <LinearLayout
