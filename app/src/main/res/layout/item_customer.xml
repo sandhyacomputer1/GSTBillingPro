@@ -5,11 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fitsSystemWindows="true"
-
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="10dp"
     app:cardElevation="4dp"
-    android:foreground="?attr/selectableItemBackground"
+    android:backgroundTint="@color/white"
     android:clickable="true"
     android:focusable="true">
 
@@ -19,6 +18,13 @@
         android:orientation="horizontal"
         android:padding="14dp"
         android:gravity="center_vertical">
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/img_4"
+            android:layout_marginEnd="9dp"
+           />
+
 
         <!-- Customer Name -->
         <TextView

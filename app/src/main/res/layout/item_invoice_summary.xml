@@ -5,8 +5,7 @@
     android:orientation="horizontal"
     android:padding="12dp"
     android:fitsSystemWindows="true"
-
-    android:background="?attr/selectableItemBackground"
+    android:backgroundTint="@color/white"
     android:gravity="center_vertical">
 
     <!-- Left Side: Invoice Info -->

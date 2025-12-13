@@ -14,9 +14,7 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.GSTBIllingPro">
-        <activity
-            android:name=".custmore.InvoiceDetailsActivity"
-            android:exported="false" />
+
         <activity
             android:name=".custmore.CustomerDetailsActivity"
             android:exported="false" />

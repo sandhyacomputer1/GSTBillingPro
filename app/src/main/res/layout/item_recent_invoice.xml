@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Invoice Card Layout -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="10dp"
-    android:fitsSystemWindows="true"
-
     android:layout_marginVertical="6dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardCornerRadius="14dp"
+    app:cardCornerRadius="10dp"
     app:cardElevation="5dp"
     app:strokeWidth="1dp"
-    app:strokeColor="#E0E0E0"
-    app:cardBackgroundColor="@android:color/white">
+    android:backgroundTint="@color/white"
+    app:strokeColor="#E0E0E0">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,39 +22,57 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <!-- 🔹 Row 1: Invoice Number and Date -->
+        <!-- Row 1: Customer Name (START), Invoice Number (HIDDEN), Date (END) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvInvoiceNo"
-                android:layout_width="0dp"
+                android:id="@+id/tvCustomerName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Invoice #INV-20251103-29AC5E"
+                android:text="Sagar Patil"
+                android:textColor="#212121"
                 android:textSize="15sp"
-                android:textColor="@color/black" />
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="end"
                 android:text="2025-11-03"
-                android:textSize="13sp"
-                android:textColor="#757575" />
+                android:textColor="#757575"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvInvoiceNo"
+                android:layout_width="0dp"
+                android:layout_weight="0"
+                android:layout_height="wrap_content"
+                android:text="Invoice #INV-20251103-29AC5E"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:visibility="gone" /> <!-- invoice hidden -->
         </LinearLayout>
 
-        <!-- 🔹 Divider -->
+        <!-- Divider (HIDDEN) -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="8dp"
-            android:background="#E0E0E0" />
+            android:background="#E0E0E0"
+            /> <!-- divider -->
 
-        <!-- 🔹 Row 2: Customer Info -->
+        <!-- Row 2: Customer Info (Phone Hidden) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,19 +89,11 @@
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:src="@drawable/ic_customer"
-                    android:visibility="gone"
                     android:layout_marginEnd="6dp"
                     android:contentDescription="Customer Icon"
-                    app:tint="#616161" />
+                    app:tint="#616161"
+                    android:visibility="gone" /> <!-- ICON GONE -->
 
-                <TextView
-                    android:id="@+id/tvCustomerName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sagar Patil"
-                    android:textSize="15sp"
-                    android:textColor="#212121"
-                    android:textStyle="bold" />
             </LinearLayout>
 
             <TextView
@@ -94,65 +103,67 @@
                 android:layout_marginTop="2dp"
                 android:text="ID: +918605042158"
                 android:textSize="13sp"
-                android:textColor="#0B0B0B" />
+                android:textColor="#0B0B0B"
+                android:visibility="gone" /> <!-- Phone hidden -->
         </LinearLayout>
 
-        <!-- 🔹 Row 3: Total Amount -->
+        <!-- Row 3: Total Amount (SHOW) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end"
-           >
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
 
             <TextView
-                android:text="Total: "
+                android:text="Total "
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
+                android:layout_marginBottom="6dp"
                 android:textColor="#424242" />
 
             <TextView
                 android:id="@+id/tvTotalAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="₹8.64"
+                android:text="₹8,640"
                 android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="@color/blue"
+                android:textSize="14sp"
+                android:textColor="@color/black1"
                 android:layout_marginStart="4dp" />
         </LinearLayout>
 
-        <!-- 🔹 Optional Footer Row: View / Share -->
+        <!-- Row 4: View + Share (SHOW) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:visibility="gone"
             android:orientation="horizontal"
             android:layout_marginTop="8dp">
 
             <TextView
                 android:id="@+id/tvViewDetails"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="View Details"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:textStyle="bold"
+                android:background="@drawable/view"
                 android:textSize="13sp"
                 android:textColor="@color/blue"
-                android:padding="6dp" />
+                android:padding="8dp"
+                />
 
             <TextView
                 android:id="@+id/tvShare"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Share"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:textStyle="bold"
                 android:textSize="13sp"
                 android:textColor="@color/blue"
-                android:padding="6dp" />
+                android:padding="8dp"
+                android:background="@drawable/share"
+                android:layout_marginStart="16dp"
+                />
         </LinearLayout>
 
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

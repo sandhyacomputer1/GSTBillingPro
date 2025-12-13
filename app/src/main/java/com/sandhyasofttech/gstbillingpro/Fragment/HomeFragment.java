@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +14,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,18 +43,16 @@ import java.util.Set;
 
 public class HomeFragment extends Fragment {
 
-    // UI
     private TextView tvTodaysSales, tvMonthSales;
     private MaterialButton btnNewInvoice, btnAddCustomer, btnShareExport, btnViewAllInvoices;
     private RecyclerView rvRecentActivity;
-
-    // Business Summary
     private TextView tvTotalCustomers, tvTotalProducts, tvLastBackup;
+    private ExtendedFloatingActionButton fabNewInvoice;
+    private NestedScrollView scrollView;
 
     private String userMobile;
     private DatabaseReference userRef, productsRef, invoicesRef;
 
-    // For dynamic calculation
     private final SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     private final SimpleDateFormat monthFmt = new SimpleDateFormat("yyyy-MM", Locale.US);
     private final Set<String> uniqueProductIds = new HashSet<>();
@@ -66,7 +68,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize UI
+        // === FIND ALL VIEWS ===
         tvTodaysSales = view.findViewById(R.id.tvTodaysSales);
         tvMonthSales = view.findViewById(R.id.tvMonthSales);
         btnNewInvoice = view.findViewById(R.id.btnNewInvoice);
@@ -74,12 +76,13 @@ public class HomeFragment extends Fragment {
         btnShareExport = view.findViewById(R.id.btnShareExport);
         btnViewAllInvoices = view.findViewById(R.id.btnViewAllInvoices);
         rvRecentActivity = view.findViewById(R.id.rvRecentActivity);
-
         tvTotalCustomers = view.findViewById(R.id.tvTotalCustomers);
-        tvTotalProducts = view.findViewById(R.id.tvTotalProducts); // Now shows invoice count
+        tvTotalProducts = view.findViewById(R.id.tvTotalProducts);
         tvLastBackup = view.findViewById(R.id.tvLastBackup);
+        fabNewInvoice = view.findViewById(R.id.fabNewInvoice);
+        scrollView = view.findViewById(R.id.scrollView);
 
-        // Get user mobile
+        // === USER SESSION CHECK ===
         SharedPreferences prefs = requireActivity().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE);
         userMobile = prefs.getString("USER_MOBILE", null);
         if (userMobile == null) {
@@ -87,29 +90,20 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        // Firebase refs
+        // === FIREBASE REFERENCES ===
         userRef = FirebaseDatabase.getInstance().getReference("users").child(userMobile);
         productsRef = FirebaseDatabase.getInstance().getReference("products");
         invoicesRef = userRef.child("invoices");
 
-        // Load all data
-        loadDynamicSalesAndProducts();   // <-- Still calculates sales + unique products (used for sales logic)
+        // === LOAD ALL DATA ===
+        loadDynamicSalesAndProducts();
         loadRecentInvoices();
         listenToCustomerCount();
-        listenToInvoiceCount();          // <-- NEW: Replaces product count
+        listenToInvoiceCount();
         loadLastBackup();
 
-        // Button Actions
-        btnNewInvoice.setOnClickListener(v -> {
-            ((MainActivity) requireActivity()).syncNavigation(R.id.nav_invoice);
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                    .replace(R.id.fragment_container, new InvoiceBillingFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
-
+        // === BUTTON CLICKS ===
+        btnNewInvoice.setOnClickListener(v -> openInvoiceFragment());
         btnAddCustomer.setOnClickListener(v -> {
             ((MainActivity) requireActivity()).syncNavigation(R.id.nav_customer);
             requireActivity().getSupportFragmentManager()
@@ -119,12 +113,68 @@ public class HomeFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
-
         btnShareExport.setOnClickListener(v -> startActivity(new Intent(getContext(), ShareExportActivity.class)));
         btnViewAllInvoices.setOnClickListener(v -> startActivity(new Intent(getContext(), AllInvoicesActivity.class)));
+
+        // === FAB CLICK ===
+        if (fabNewInvoice != null) {
+            fabNewInvoice.setOnClickListener(v -> openInvoiceFragment());
+        }
+
+        // === VYAPAR STYLE SMOOTH SCROLL BEHAVIOR ===
+        if (scrollView != null && fabNewInvoice != null) {
+            final Handler handler = new Handler(Looper.getMainLooper());
+            final long DELAY_SHOW = 1300L; // 1.3 seconds
+
+            final Runnable showFabRunnable = () -> {
+                if (!fabNewInvoice.isShown()) {
+                    fabNewInvoice.show(); // SLIDE UP FROM BOTTOM
+                }
+            };
+
+            scrollView.setOnScrollChangeListener(
+                    (NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+
+                        // Cancel previous delayed show
+                        handler.removeCallbacks(showFabRunnable);
+
+                        // SCROLLING DOWN → HIDE (SLIDE DOWN)
+                        if (scrollY > oldScrollY + 25 && scrollY > 500) {
+                            if (fabNewInvoice.isShown()) {
+                                fabNewInvoice.hide(); // SLIDE DOWN
+                            }
+                        }
+
+                        // SCROLLING UP → SHOW IMMEDIATELY (SLIDE UP)
+                        else if (scrollY < oldScrollY - 25) {
+                            if (!fabNewInvoice.isShown()) {
+                                fabNewInvoice.show(); // SLIDE UP
+                            }
+                        }
+
+                        // USER STOPPED SCROLLING → SHOW AFTER 1.3 SEC
+                        handler.postDelayed(showFabRunnable, DELAY_SHOW);
+                    });
+        }
+
+        // === SHOW FAB ON FIRST LOAD ===
+        if (fabNewInvoice != null) {
+            fabNewInvoice.postDelayed(() -> fabNewInvoice.show(), 400);
+        }
     }
 
-    // NEW: Dynamic Sales + Unique Products (Live)
+    // === OPEN INVOICE FRAGMENT ===
+    private void openInvoiceFragment() {
+        ((MainActivity) requireActivity()).syncNavigation(R.id.nav_invoice);
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                .replace(R.id.fragment_container, new InvoiceBillingFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    // === LOAD TODAY & MONTH SALES ===
     private void loadDynamicSalesAndProducts() {
         String today = dateFmt.format(new Date());
         String currentMonth = monthFmt.format(new Date());
@@ -145,15 +195,9 @@ public class HomeFragment extends Fragment {
 
                     if (invDate == null || grandTotal == null) continue;
 
-                    // Sales
-                    if (invDate.equals(today)) {
-                        todaySale += grandTotal;
-                    }
-                    if (invDate.startsWith(currentMonth)) {
-                        monthSale += grandTotal;
-                    }
+                    if (invDate.equals(today)) todaySale += grandTotal;
+                    if (invDate.startsWith(currentMonth)) monthSale += grandTotal;
 
-                    // Unique Products (still used for internal logic if needed)
                     DataSnapshot items = invSnap.child("items");
                     for (DataSnapshot item : items.getChildren()) {
                         String productId = item.child("productId").getValue(String.class);
@@ -163,10 +207,8 @@ public class HomeFragment extends Fragment {
                     }
                 }
 
-                // Update UI
-                tvTodaysSales.setText(formatCurrency((long) todaySale));
-                tvMonthSales.setText(formatCurrency((long) monthSale));
-                // tvTotalProducts is now handled by listenToInvoiceCount()
+                if (tvTodaysSales != null) tvTodaysSales.setText(formatCurrency((long) todaySale));
+                if (tvMonthSales != null) tvMonthSales.setText(formatCurrency((long) monthSale));
             }
 
             @Override
@@ -176,7 +218,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    // Recent Invoices (Last 10)
+    // === LOAD RECENT 10 INVOICES ===
     private void loadRecentInvoices() {
         invoicesRef.limitToLast(10).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -193,8 +235,10 @@ public class HomeFragment extends Fragment {
                     }
                 }
                 Collections.reverse(list);
-                rvRecentActivity.setLayoutManager(new LinearLayoutManager(getContext()));
-                rvRecentActivity.setAdapter(new RecentInvoiceAdapter(list));
+                if (rvRecentActivity != null) {
+                    rvRecentActivity.setLayoutManager(new LinearLayoutManager(getContext()));
+                    rvRecentActivity.setAdapter(new RecentInvoiceAdapter(list));
+                }
             }
 
             @Override
@@ -204,39 +248,39 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    // REAL-TIME CUSTOMER COUNT
+    // === TOTAL CUSTOMERS ===
     private void listenToCustomerCount() {
         userRef.child("customers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long count = snapshot.getChildrenCount();
-                tvTotalCustomers.setText(" " + count);
+                if (tvTotalCustomers != null) tvTotalCustomers.setText(" " + count);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                tvTotalCustomers.setText("Total Customers : Error");
+                if (tvTotalCustomers != null) tvTotalCustomers.setText(" Error");
             }
         });
     }
 
-    // NEW: REAL-TIME INVOICE COUNT (Replaces product count)
+    // === TOTAL INVOICES ===
     private void listenToInvoiceCount() {
         invoicesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long count = snapshot.getChildrenCount();
-                tvTotalProducts.setText(" " + count); // Now shows invoice count
+                if (tvTotalProducts != null) tvTotalProducts.setText(" " + count);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                tvTotalProducts.setText("Total Invoices : Error");
+                if (tvTotalProducts != null) tvTotalProducts.setText(" Error");
             }
         });
     }
 
-    // LAST BACKUP
+    // === LAST BACKUP TIME ===
     private void loadLastBackup() {
         userRef.child("summary").child("lastBackup").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -245,21 +289,20 @@ public class HomeFragment extends Fragment {
                 String text = (timestamp == null || timestamp == 0)
                         ? "Last Backup: Never"
                         : "Last Backup: " + formatBackupTime(timestamp);
-                tvLastBackup.setText(text);
+                if (tvLastBackup != null) tvLastBackup.setText(text);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                tvLastBackup.setText("Last Backup: Error");
+                if (tvLastBackup != null) tvLastBackup.setText("Last Backup: Error");
             }
         });
     }
 
-    // Format backup time
+    // === FORMAT BACKUP TIME ===
     private String formatBackupTime(long timestamp) {
         long now = System.currentTimeMillis();
         long diff = now - timestamp;
-
         long minute = 60 * 1000;
         long hour = 60 * minute;
         long day = 24 * hour;
@@ -278,7 +321,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // Format currency
+    // === FORMAT CURRENCY ===
     private String formatCurrency(long amount) {
         return "₹" + String.format("%,d", amount);
     }

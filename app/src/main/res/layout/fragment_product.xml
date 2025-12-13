@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
-
+    android:background="#F5FAFF"
     tools:context=".Fragment.ProductFragment">
 
     <!-- Search and Product Count -->
@@ -40,20 +40,13 @@
 
     </LinearLayout>
 
-    <!--
-        CHANGE 1:
-        The RecyclerView's layout_above attribute is removed.
-        It now fills the space behind the floating buttons.
-        A bottom padding is added to prevent the last item from being hidden.
-    -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvProducts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/header_layout"
         android:clipToPadding="false"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
+
         android:paddingBottom="80dp"
         tools:listitem="@layout/item_product" />
 
