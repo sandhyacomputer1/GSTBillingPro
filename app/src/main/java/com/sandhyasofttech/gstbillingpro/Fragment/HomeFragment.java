@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttech.gstbillingpro.Activity.AllInvoicesActivity;
+import com.sandhyasofttech.gstbillingpro.Activity.PendingPaymentsActivity;
 import com.sandhyasofttech.gstbillingpro.Activity.ShareExportActivity;
 import com.sandhyasofttech.gstbillingpro.Adapter.RecentInvoiceAdapter;
 import com.sandhyasofttech.gstbillingpro.MainActivity;
@@ -46,9 +47,11 @@ public class HomeFragment extends Fragment {
     private TextView tvTodaysSales, tvMonthSales;
     private MaterialButton btnNewInvoice, btnAddCustomer, btnShareExport, btnViewAllInvoices;
     private RecyclerView rvRecentActivity;
-    private TextView tvTotalCustomers, tvTotalProducts, tvLastBackup;
+    private TextView tvTotalCustomers, tvTotalProducts, tvLastBackup,tvPendingAmount;
     private ExtendedFloatingActionButton fabNewInvoice;
     private NestedScrollView scrollView;
+    private View layoutPending;
+
 
     private String userMobile;
     private DatabaseReference userRef, productsRef, invoicesRef;
@@ -82,6 +85,11 @@ public class HomeFragment extends Fragment {
         fabNewInvoice = view.findViewById(R.id.fabNewInvoice);
         scrollView = view.findViewById(R.id.scrollView);
 
+        tvPendingAmount = view.findViewById(R.id.tvPendingAmount);
+        layoutPending = view.findViewById(R.id.layoutPending);
+
+
+
         // === USER SESSION CHECK ===
         SharedPreferences prefs = requireActivity().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE);
         userMobile = prefs.getString("USER_MOBILE", null);
@@ -89,6 +97,11 @@ public class HomeFragment extends Fragment {
             Toast.makeText(getContext(), "Session expired. Please log in again.", Toast.LENGTH_LONG).show();
             return;
         }
+        layoutPending.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), PendingPaymentsActivity.class);
+            startActivity(intent);
+        });
+
 
         // === FIREBASE REFERENCES ===
         userRef = FirebaseDatabase.getInstance().getReference("users").child(userMobile);
@@ -180,40 +193,56 @@ public class HomeFragment extends Fragment {
         String currentMonth = monthFmt.format(new Date());
 
         invoicesRef.addValueEventListener(new ValueEventListener() {
+
             double todaySale = 0.0;
             double monthSale = 0.0;
+            double totalPending = 0.0;
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                todaySale = 0.0;
-                monthSale = 0.0;
+
+                todaySale = 0;
+                monthSale = 0;
+                totalPending = 0;
                 uniqueProductIds.clear();
 
                 for (DataSnapshot invSnap : snapshot.getChildren()) {
+
                     String invDate = invSnap.child("invoiceDate").getValue(String.class);
                     Double grandTotal = invSnap.child("grandTotal").getValue(Double.class);
+                    Double pending = invSnap.child("pendingAmount").getValue(Double.class);
 
-                    if (invDate == null || grandTotal == null) continue;
+                    if (grandTotal == null) continue;
 
-                    if (invDate.equals(today)) todaySale += grandTotal;
-                    if (invDate.startsWith(currentMonth)) monthSale += grandTotal;
+                    if (invDate != null) {
+                        if (invDate.equals(today)) todaySale += grandTotal;
+                        if (invDate.startsWith(currentMonth)) monthSale += grandTotal;
+                    }
 
-                    DataSnapshot items = invSnap.child("items");
-                    for (DataSnapshot item : items.getChildren()) {
+                    if (pending != null && pending > 0) {
+                        totalPending += pending;
+                    }
+
+                    for (DataSnapshot item : invSnap.child("items").getChildren()) {
                         String productId = item.child("productId").getValue(String.class);
-                        if (productId != null && !productId.isEmpty()) {
-                            uniqueProductIds.add(productId);
-                        }
+                        if (productId != null) uniqueProductIds.add(productId);
                     }
                 }
 
-                if (tvTodaysSales != null) tvTodaysSales.setText(formatCurrency((long) todaySale));
-                if (tvMonthSales != null) tvMonthSales.setText(formatCurrency((long) monthSale));
+                if (tvTodaysSales != null)
+                    tvTodaysSales.setText(formatCurrency((long) todaySale));
+
+                if (tvMonthSales != null)
+                    tvMonthSales.setText(formatCurrency((long) monthSale));
+
+                if (tvPendingAmount != null)
+                    tvPendingAmount.setText(formatCurrency((long) totalPending));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Sales Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),
+                        "Failed to load dashboard data", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -247,6 +276,8 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
+
 
     // === TOTAL CUSTOMERS ===
     private void listenToCustomerCount() {

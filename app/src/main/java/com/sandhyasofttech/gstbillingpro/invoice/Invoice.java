@@ -1,82 +1,182 @@
-// File: Invoice.java
 package com.sandhyasofttech.gstbillingpro.invoice;
 
-import com.google.firebase.database.IgnoreExtraProperties;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-@IgnoreExtraProperties
 public class Invoice {
-
     public String invoiceNumber;
-    public String customerId;
+    public String customerPhone;
     public String customerName;
     public String invoiceDate;
-    public List<InvoiceItem> items = new ArrayList<>();
+    public List<InvoiceItem> items;
     public double totalTaxableValue;
     public double totalCGST;
     public double totalSGST;
     public double totalIGST;
     public double grandTotal;
-    public String companyLogoUrl;
-    public String signatureUrl;
+    public String businessName;
+    public String businessAddress;
 
-    public Invoice() {}
+    // Payment tracking fields
+    public double paidAmount;
+    public double pendingAmount;
+    public String paymentStatus;
 
-    public Invoice(String invoiceNumber, String customerId, String customerName, String invoiceDate,
-                   List<InvoiceItem> items, double totalTaxableValue, double totalCGST, double totalSGST,
-                   double totalIGST, double grandTotal, String companyLogoUrl, String signatureUrl) {
+    // Additional fields for better tracking
+    public String invoiceTime;
+    public long timestamp;
+    public String customerAddress;
+    public String paymentDate;
+
+    // Default constructor (required for Firebase)
+    public Invoice() {
+        this.paidAmount = 0;
+        this.pendingAmount = 0;
+        this.paymentStatus = "Pending";
+    }
+
+    // Constructor with all original parameters
+    public Invoice(String invoiceNumber, String customerPhone, String customerName,
+                   String invoiceDate, List<InvoiceItem> items, double totalTaxableValue,
+                   double totalCGST, double totalSGST, double totalIGST, double grandTotal,
+                   String businessName, String businessAddress) {
         this.invoiceNumber = invoiceNumber;
-        this.customerId = customerId;
+        this.customerPhone = customerPhone;
         this.customerName = customerName;
         this.invoiceDate = invoiceDate;
-        this.items = items != null ? items : new ArrayList<>();
+        this.items = items;
         this.totalTaxableValue = totalTaxableValue;
         this.totalCGST = totalCGST;
         this.totalSGST = totalSGST;
         this.totalIGST = totalIGST;
         this.grandTotal = grandTotal;
-        this.companyLogoUrl = companyLogoUrl;
-        this.signatureUrl = signatureUrl;
+        this.businessName = businessName;
+        this.businessAddress = businessAddress;
+
+        // Initialize new fields with default values
+        this.paidAmount = 0;
+        this.pendingAmount = grandTotal;
+        this.paymentStatus = "Pending";
     }
 
-    // UNIVERSAL SETTER: Accepts both Map (old) and List (new)
-    @SuppressWarnings("unchecked")
-    public void setItems(Object data) {
-        this.items = new ArrayList<>();
-
-        if (data instanceof List) {
-            // New format: [ {...}, {...} ]
-            for (Object obj : (List<?>) data) {
-                if (obj instanceof Map) {
-                    addItemFromMap((Map<String, Object>) obj);
-                }
-            }
-        } else if (data instanceof Map) {
-            // Old format: { "0": {...}, "1": {...} }
-            Map<String, Object> map = (Map<String, Object>) data;
-            for (Object obj : map.values()) {
-                if (obj instanceof Map) {
-                    addItemFromMap((Map<String, Object>) obj);
-                }
-            }
-        }
+    // Getters and Setters for new fields
+    public double getPaidAmount() {
+        return paidAmount;
     }
 
-    private void addItemFromMap(Map<String, Object> itemMap) {
-        InvoiceItem item = new InvoiceItem();
-        item.productId = (String) itemMap.get("productId");
-        item.productName = (String) itemMap.get("productName");
-        item.quantity = getDouble(itemMap, "quantity");
-        item.rate = getDouble(itemMap, "rate");
-        item.taxPercent = getDouble(itemMap, "taxPercent");
-        this.items.add(item);
+    public void setPaidAmount(double paidAmount) {
+        this.paidAmount = paidAmount;
     }
 
-    private double getDouble(Map<String, Object> map, String key) {
-        Object val = map.get(key);
-        return (val instanceof Number) ? ((Number) val).doubleValue() : 0.0;
+    public double getPendingAmount() {
+        return pendingAmount;
+    }
+
+    public void setPendingAmount(double pendingAmount) {
+        this.pendingAmount = pendingAmount;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    // You can also add getters/setters for other fields if needed
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getInvoiceDate() {
+        return invoiceDate;
+    }
+
+    public void setInvoiceDate(String invoiceDate) {
+        this.invoiceDate = invoiceDate;
+    }
+
+    public List<InvoiceItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<InvoiceItem> items) {
+        this.items = items;
+    }
+
+    public double getTotalTaxableValue() {
+        return totalTaxableValue;
+    }
+
+    public void setTotalTaxableValue(double totalTaxableValue) {
+        this.totalTaxableValue = totalTaxableValue;
+    }
+
+    public double getTotalCGST() {
+        return totalCGST;
+    }
+
+    public void setTotalCGST(double totalCGST) {
+        this.totalCGST = totalCGST;
+    }
+
+    public double getTotalSGST() {
+        return totalSGST;
+    }
+
+    public void setTotalSGST(double totalSGST) {
+        this.totalSGST = totalSGST;
+    }
+
+    public double getTotalIGST() {
+        return totalIGST;
+    }
+
+    public void setTotalIGST(double totalIGST) {
+        this.totalIGST = totalIGST;
+    }
+
+    public double getGrandTotal() {
+        return grandTotal;
+    }
+
+    public void setGrandTotal(double grandTotal) {
+        this.grandTotal = grandTotal;
+    }
+
+    public String getBusinessName() {
+        return businessName;
+    }
+
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
+    }
+
+    public String getBusinessAddress() {
+        return businessAddress;
+    }
+
+    public void setBusinessAddress(String businessAddress) {
+        this.businessAddress = businessAddress;
     }
 }

@@ -32,8 +32,20 @@
                 android:resource="@xml/file_paths" />
         </provider>
         <activity
+            android:name=".Activity.PendingPaymentsActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".Activity.ProductSelectionActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".Activity.PaymentActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".Activity.CustomerSelectionActivity"
+            android:exported="false"/>
+        <activity
             android:name=".Activity.ProductDetailsActivity"
-            android:exported="false" />
+            android:exported="false"/>
         <activity
             android:name=".Activity.FieldMappingActivity"
             android:exported="false" />
