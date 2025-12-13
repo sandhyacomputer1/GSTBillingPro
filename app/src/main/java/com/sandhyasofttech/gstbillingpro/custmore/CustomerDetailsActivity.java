@@ -40,9 +40,14 @@ public class CustomerDetailsActivity extends AppCompatActivity {
     private static final int PERMISSION_CALL = 101;
 
     // Views
+// Views
     private TextView tvName, tvPhone, tvEmail, tvGstin, tvAddress;
     private MaterialButton btnCall, btnWhatsApp, btnEdit, btnDelete, btnExportPdf;
     private RecyclerView rvProducts, rvInvoices;
+
+    // Portfolio views
+    private TextView tvTotalInvoices, tvPaidCount, tvUnpaidCount, tvAmountSummary;
+
 
     // Data
     private String customerPhone, customerName, userMobile;
@@ -52,6 +57,8 @@ public class CustomerDetailsActivity extends AppCompatActivity {
     private final List<InvoiceSummary> invoiceList = new ArrayList<>();
     private ProductAdapter productAdapter;
     private InvoiceAdapter invoiceAdapter;
+    private int totalInvoices = 0, paidCount = 0, partialCount = 0, unpaidCount = 0;
+    private double totalAmount = 0, totalPaid = 0, totalPending = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +88,11 @@ public class CustomerDetailsActivity extends AppCompatActivity {
         btnExportPdf = findViewById(R.id.btnExportPdf);
         rvProducts = findViewById(R.id.rvProducts);
         rvInvoices = findViewById(R.id.rvInvoices);
+
+        tvTotalInvoices = findViewById(R.id.tvTotalInvoices);
+        tvPaidCount = findViewById(R.id.tvPaidCount);
+        tvUnpaidCount = findViewById(R.id.tvUnpaidCount);
+        tvAmountSummary = findViewById(R.id.tvAmountSummary);
     }
 
     private void getUserMobile() {
@@ -192,6 +204,11 @@ public class CustomerDetailsActivity extends AppCompatActivity {
             doc.add(new Paragraph("Email: " + tvEmail.getText()));
             doc.add(new Paragraph(tvGstin.getText().toString()));
             doc.add(new Paragraph(tvAddress.getText().toString()));
+            doc.add(new Paragraph("\nSummary:").setBold());
+            doc.add(new Paragraph("Total Invoices: " + totalInvoices));
+            doc.add(new Paragraph("Total Amount: ₹" + String.format("%,.0f", totalAmount)));
+            doc.add(new Paragraph("Total Paid: ₹" + String.format("%,.0f", totalPaid)));
+            doc.add(new Paragraph("Total Pending: ₹" + String.format("%,.0f", totalPending)));
 
             doc.add(new Paragraph("\nProducts Used:").setBold());
             for (String p : productNames) doc.add(new Paragraph("• " + p));
@@ -256,6 +273,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                 productAdapter.notifyDataSetChanged();
             }
 
+
             @Override public void onCancelled(DatabaseError e) { }
         });
     }
@@ -270,21 +288,55 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                     String custName = inv.child("customerName").getValue(String.class);
                     if ((customerPhone != null && customerPhone.equals(custId)) ||
                             (customerName != null && customerName.equals(custName))) {
+
                         String no = inv.child("invoiceNumber").getValue(String.class);
                         String date = inv.child("invoiceDate").getValue(String.class);
                         Double total = inv.child("grandTotal").getValue(Double.class);
+                        Double paid = inv.child("paidAmount").getValue(Double.class);
+                        Double pending = inv.child("pendingAmount").getValue(Double.class);
+                        String status = inv.child("paymentStatus").getValue(String.class);
                         String id = inv.getKey();
+
                         if (no != null && date != null && total != null && id != null) {
                             invoiceList.add(new InvoiceSummary(no, date, total, id));
+
+                            totalInvoices++;
+                            totalAmount += total;
+                            if (paid != null) totalPaid += paid;
+                            if (pending != null) totalPending += pending;
+
+                            if ("Paid".equalsIgnoreCase(status)) paidCount++;
+                            else if ("Partial".equalsIgnoreCase(status)) partialCount++;
+                            else unpaidCount++;
                         }
                     }
+
                 }
+                updatePortfolioUI();
                 invoiceAdapter.notifyDataSetChanged();
             }
 
             @Override public void onCancelled(DatabaseError e) { }
         });
     }
+
+    private void updatePortfolioUI() {
+        // safety check (optional)
+        if (tvTotalInvoices == null || tvAmountSummary == null) {
+            Log.e(TAG, "Portfolio views not bound properly");
+            return;
+        }
+
+        tvTotalInvoices.setText(String.valueOf(totalInvoices));
+        tvPaidCount.setText(String.valueOf(paidCount));
+        tvUnpaidCount.setText(String.valueOf(unpaidCount));
+
+        String summary = "Total: ₹" + String.format("%,.0f", totalAmount) +
+                " | Paid: ₹" + String.format("%,.0f", totalPaid) +
+                " | Pending: ₹" + String.format("%,.0f", totalPending);
+        tvAmountSummary.setText(summary);
+    }
+
 
     // ────────────────────── ADAPTERS ──────────────────────
     static class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -298,6 +350,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
             ((TextView) holder.itemView.findViewById(R.id.tvProductName)).setText("• " + list.get(pos));
         }
+
         @Override public int getItemCount() { return list.size(); }
     }
 
@@ -325,4 +378,5 @@ public class CustomerDetailsActivity extends AppCompatActivity {
         String number, date, id; double total;
         InvoiceSummary(String n, String d, double t, String id) { number = n; date = d; total = t; this.id = id; }
     }
+
 }

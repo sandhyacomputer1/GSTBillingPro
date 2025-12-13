@@ -36,11 +36,13 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_invoice_details);
 
         invoiceId = getIntent().getStringExtra("invoice_id");
+
         if (invoiceId == null || invoiceId.isEmpty()) {
             Toast.makeText(this, "Invalid invoice", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
+
 
         userMobile = getSharedPreferences("APP_PREFS", MODE_PRIVATE).getString("USER_MOBILE", null);
         if (userMobile == null) {
