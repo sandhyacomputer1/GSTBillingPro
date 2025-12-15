@@ -46,7 +46,8 @@ public class PaymentActivity extends AppCompatActivity {
     private RadioGroup rgPaymentStatus;
     private MaterialButton btnGenerateInvoice;
     private RecyclerView rvSummary;
-
+    private boolean isGstEnabled = false;   // 🔥 GST OFF by default
+    private boolean isIntraState = true;
     private String customerName, customerPhone, customerAddress, userMobile;
     private ArrayList<CartItem> cartItems;
     private double cartTotal, totalTaxable, totalCGST, totalSGST, totalIGST, grandTotal;
@@ -54,7 +55,6 @@ public class PaymentActivity extends AppCompatActivity {
 
     private DatabaseReference usersRef, invoicesRef, infoRef;
     private String businessName = "Your Business", businessGstin = "", businessAddress = "";
-    private boolean isIntraState = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,23 +158,50 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void calculateTotals() {
-        totalTaxable = totalCGST = totalSGST = totalIGST = 0;
+
+        totalTaxable = 0;
+        totalCGST = 0;
+        totalSGST = 0;
+        totalIGST = 0;
 
         for (CartItem item : cartItems) {
-            double val = item.getTaxableValue();
-            totalTaxable += val;
-            GstCalculationUtil.GstDetails gst = GstCalculationUtil.calculateGst(
-                    val, item.getTaxPercent(), isIntraState);
-            totalCGST += gst.cgst;
-            totalSGST += gst.sgst;
-            totalIGST += gst.igst;
+            double taxable = item.getTaxableValue();
+            totalTaxable += taxable;
+
+            if (isGstEnabled) {
+                GstCalculationUtil.GstDetails gst =
+                        GstCalculationUtil.calculateGst(
+                                taxable,
+                                item.getTaxPercent(),
+                                isIntraState
+                        );
+
+                totalCGST += gst.cgst;
+                totalSGST += gst.sgst;
+                totalIGST += gst.igst;
+            }
         }
 
-        grandTotal = totalTaxable + totalCGST + totalSGST + totalIGST;
+        // ✅ Grand Total Logic
+        grandTotal = totalTaxable;
+        if (isGstEnabled) {
+            grandTotal += totalCGST + totalSGST + totalIGST;
+        }
 
+        // UI update
         tvSubtotal.setText(String.format(Locale.getDefault(), "₹%.2f", totalTaxable));
-        tvTax.setText(String.format(Locale.getDefault(),
-                "CGST: ₹%.2f | SGST: ₹%.2f | IGST: ₹%.2f", totalCGST, totalSGST, totalIGST));
+
+        if (isGstEnabled) {
+            tvTax.setVisibility(View.VISIBLE);
+            tvTax.setText(String.format(
+                    Locale.getDefault(),
+                    "CGST: ₹%.2f | SGST: ₹%.2f | IGST: ₹%.2f",
+                    totalCGST, totalSGST, totalIGST
+            ));
+        } else {
+            tvTax.setVisibility(View.GONE);
+        }
+
         tvGrandTotal.setText(String.format(Locale.getDefault(), "₹%.2f", grandTotal));
 
         pendingAmount = grandTotal;
@@ -266,9 +293,11 @@ public class PaymentActivity extends AppCompatActivity {
         invoiceData.put("timestamp", timestamp);
         invoiceData.put("items", invoiceItems);
         invoiceData.put("totalTaxableValue", invoice.totalTaxableValue);
-        invoiceData.put("totalCGST", invoice.totalCGST);
-        invoiceData.put("totalSGST", invoice.totalSGST);
-        invoiceData.put("totalIGST", invoice.totalIGST);
+        invoiceData.put("totalCGST", isGstEnabled ? invoice.totalCGST : 0);
+        invoiceData.put("totalSGST", isGstEnabled ? invoice.totalSGST : 0);
+        invoiceData.put("totalIGST", isGstEnabled ? invoice.totalIGST : 0);
+        invoiceData.put("gstEnabled", isGstEnabled);
+
         invoiceData.put("grandTotal", invoice.grandTotal);
         invoiceData.put("businessName", invoice.businessName);
         invoiceData.put("businessAddress", invoice.businessAddress);
@@ -444,26 +473,36 @@ public class PaymentActivity extends AppCompatActivity {
             // Totals
             int totalsX = pageWidth - margin - 200;
             canvas.drawText("Taxable Amount:", totalsX, yPos, regularPaint);
-            canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.totalTaxableValue),
+            canvas.drawText("₹" + invoice.totalTaxableValue,
                     pageWidth - margin - 70, yPos, regularPaint);
             yPos += 18;
 
-            canvas.drawText("CGST:", totalsX, yPos, regularPaint);
-            canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.totalCGST),
-                    pageWidth - margin - 70, yPos, regularPaint);
-            yPos += 18;
+            if (isGstEnabled) {
 
-            canvas.drawText("SGST:", totalsX, yPos, regularPaint);
-            canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.totalSGST),
-                    pageWidth - margin - 70, yPos, regularPaint);
-            yPos += 18;
-
-            if (invoice.totalIGST > 0) {
-                canvas.drawText("IGST:", totalsX, yPos, regularPaint);
-                canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.totalIGST),
+                canvas.drawText("CGST:", totalsX, yPos, regularPaint);
+                canvas.drawText("₹" + invoice.totalCGST,
                         pageWidth - margin - 70, yPos, regularPaint);
                 yPos += 18;
+
+                canvas.drawText("SGST:", totalsX, yPos, regularPaint);
+                canvas.drawText("₹" + invoice.totalSGST,
+                        pageWidth - margin - 70, yPos, regularPaint);
+                yPos += 18;
+
+                if (invoice.totalIGST > 0) {
+                    canvas.drawText("IGST:", totalsX, yPos, regularPaint);
+                    canvas.drawText("₹" + invoice.totalIGST,
+                            pageWidth - margin - 70, yPos, regularPaint);
+                    yPos += 18;
+                }
             }
+            canvas.drawText(
+                    isGstEnabled ? "TAX INVOICE" : "INVOICE",
+                    pageWidth - margin - 120,
+                    yPos,
+                    titlePaint
+            );
+
 
             canvas.drawLine(totalsX - 10, yPos, pageWidth - margin, yPos, boldPaint);
             yPos += 18;
