@@ -65,6 +65,39 @@
     <string name="sample_product_price">₹250.00</string>
     <string name="sample_product_stock">स्टॉक: 50</string>
     <string name="sample_product_gst">GST: 18%</string>
+    <!-- Invoice / Item Card -->
+
+    <string name="sample_product_names">प्रीमियम बासमती तांदूळ</string>
+
+    <string name="sample_customer_name">ग्राहक: राजेश कुमार</string>
+
+    <string name="sample_quantity">2.50 कि.ग्रॅ.</string>
+
+    <string name="sample_invoice_date">07 नोव्हेंबर 2025</string>
+
+    <string name="sample_invoice_number">बीजक क्रमांक: INV-2025-089</string>
+
+    <!-- Invoice Card -->
+
+    <string name="sample_customer_name1">सागर पाटील</string>
+
+    <string name="sample_invoice_date_short">03 नोव्हेंबर 2025</string>
+
+    <string name="sample_invoice_number_full">
+    बीजक क्र.: INV-20251103-29AC5E
+</string>
+
+    <string name="sample_customer_id">ओळख क्रमांक: +91 8605042158</string>
+
+    <string name="label_total">एकूण रक्कम</string>
+
+    <string name="sample_total_amount">₹8,640</string>
+
+    <string name="desc_customer_icon">ग्राहक चिन्ह</string>
+
+    <string name="desc_view_invoice">बीजक तपशील पहा</string>
+
+    <string name="desc_share_invoice">बीजक शेअर करा</string>
 
 
 </resources>

@@ -29,7 +29,7 @@
             android:id="@+id/tvProductName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Premium Basmati Rice"
+            android:text="@string/sample_product_names"
             android:textColor="@color/black"
             android:letterSpacing="0.01"
             android:maxLines="2"
@@ -42,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Customer: Rajesh Kumar"
+            android:text="@string/sample_customer_name"
             android:textColor="@color/black"
 
             android:drawablePadding="4dp"
@@ -78,7 +78,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
-                    android:text="2.50 kg"
+                    android:text="@string/sample_quantity"
                     android:textSize="14dp"
                     android:textColor="@color/black"
                     />
@@ -109,7 +109,7 @@
                         android:textColor="@color/black"
                         android:textSize="14dp"
 
-                        android:text="07 Nov 2025"
+                        android:text="@string/sample_invoice_date"
                 />
                 </LinearLayout>
 

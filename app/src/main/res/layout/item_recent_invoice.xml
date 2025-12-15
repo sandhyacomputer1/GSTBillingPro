@@ -33,7 +33,7 @@
                 android:id="@+id/tvCustomerName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sagar Patil"
+                android:text="@string/sample_customer_name1"
                 android:textColor="#212121"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="end"
-                android:text="2025-11-03"
+                android:text="@string/sample_invoice_date_short"
                 android:textColor="#757575"
                 android:textSize="13sp" />
 
@@ -115,7 +115,7 @@
             android:layout_marginTop="8dp">
 
             <TextView
-                android:text="Total "
+                android:text="@string/label_total"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
@@ -126,7 +126,7 @@
                 android:id="@+id/tvTotalAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="₹8,640"
+                android:text="@string/sample_total_amount"
                 android:textStyle="bold"
                 android:textSize="14sp"
                 android:textColor="@color/black1"
@@ -161,8 +161,7 @@
                 android:textColor="@color/blue"
                 android:padding="8dp"
                 android:background="@drawable/share"
-                android:layout_marginStart="16dp"
-                />
+                android:layout_marginStart="16dp"/>
         </LinearLayout>
 
     </LinearLayout>
