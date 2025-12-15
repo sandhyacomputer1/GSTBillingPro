@@ -98,6 +98,12 @@
     <string name="desc_view_invoice">बीजक तपशील पहा</string>
 
     <string name="desc_share_invoice">बीजक शेअर करा</string>
+    <string name="label_paid">भरलेली रक्कम</string>
+
+    <string name="label_pending">बाकी रक्कम</string>
+
+    <string name="hint_collect_payment">  पेमेंट घेण्यासाठी टॅप करा</string>
+
 
 
 </resources>
