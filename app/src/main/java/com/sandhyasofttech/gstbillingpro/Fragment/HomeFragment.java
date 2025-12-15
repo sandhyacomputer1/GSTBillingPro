@@ -249,32 +249,75 @@ public class HomeFragment extends Fragment {
 
     // === LOAD RECENT 10 INVOICES ===
     private void loadRecentInvoices() {
-        invoicesRef.limitToLast(10).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<RecentInvoiceItem> list = new ArrayList<>();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    String invoiceNo = ds.child("invoiceNumber").getValue(String.class);
-                    String customerName = ds.child("customerName").getValue(String.class);
-                    Double grandTotal = ds.child("grandTotal").getValue(Double.class);
-                    String date = ds.child("invoiceDate").getValue(String.class);
 
-                    if (invoiceNo != null && customerName != null && grandTotal != null && date != null) {
-                        list.add(new RecentInvoiceItem(invoiceNo, null, customerName, grandTotal, date));
+        invoicesRef.limitToLast(10)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        ArrayList<RecentInvoiceItem> list = new ArrayList<>();
+
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+
+                            String invoiceNo =
+                                    ds.child("invoiceNumber").getValue(String.class);
+
+                            String customerName =
+                                    ds.child("customerName").getValue(String.class);
+
+                            // ✅ OPTIONAL (DO NOT FILTER)
+                            String customerPhone =
+                                    ds.child("customerPhone").getValue(String.class);
+
+                            Double grandTotal =
+                                    ds.child("grandTotal").getValue(Double.class);
+
+                            // ✅ SAFE pending
+                            double pendingAmount = 0;
+                            Object pendingObj = ds.child("pendingAmount").getValue();
+                            if (pendingObj instanceof Number) {
+                                pendingAmount = ((Number) pendingObj).doubleValue();
+                            }
+
+                            String date =
+                                    ds.child("invoiceDate").getValue(String.class);
+
+                            // ✅ ONLY REQUIRED FIELDS
+                            if (invoiceNo != null &&
+                                    customerName != null &&
+                                    grandTotal != null &&
+                                    date != null) {
+
+                                list.add(new RecentInvoiceItem(
+                                        invoiceNo,
+                                        customerPhone == null ? "" : customerPhone,
+                                        customerName,
+                                        grandTotal,
+                                        pendingAmount,
+                                        date
+                                ));
+                            }
+                        }
+
+                        Collections.reverse(list);
+
+                        // 🔥 IMPORTANT
+                        rvRecentActivity.setLayoutManager(
+                                new LinearLayoutManager(getContext())
+                        );
+                        rvRecentActivity.setAdapter(
+                                new RecentInvoiceAdapter(list)
+                        );
                     }
-                }
-                Collections.reverse(list);
-                if (rvRecentActivity != null) {
-                    rvRecentActivity.setLayoutManager(new LinearLayoutManager(getContext()));
-                    rvRecentActivity.setAdapter(new RecentInvoiceAdapter(list));
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Failed to load recent invoices", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(getContext(),
+                                "Failed to load recent invoices",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
 

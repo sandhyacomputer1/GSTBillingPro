@@ -10,6 +10,8 @@
     android:layout_marginEnd="16dp"
     android:layout_marginTop="8dp"
     app:cardCornerRadius="12dp"
+    android:background="@color/white"
+
     app:cardElevation="2dp"
     app:strokeColor="#E0E0E0"
     app:strokeWidth="1dp">
@@ -18,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@color/white"
         android:padding="16dp">
 
         <TextView
