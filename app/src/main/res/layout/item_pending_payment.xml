@@ -6,27 +6,30 @@
     android:id="@+id/cardPayment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp"
-    android:layout_marginTop="8dp"
-    app:cardCornerRadius="12dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
-    app:strokeColor="#E0E0E0"
-    app:strokeWidth="1dp">
+    app:strokeWidth="0dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@android:color/white"
         android:padding="16dp">
 
-        <!-- Header Row -->
+        <!-- Header Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- Invoice Info -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -39,8 +42,9 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#333"
-                    tools:text="INV-20241215-ABC123" />
+                    android:textColor="#212121"
+                    android:fontFamily="sans-serif-medium"
+                    tools:text="INV-2024-001" />
 
                 <TextView
                     android:id="@+id/tvCustomerName"
@@ -48,23 +52,38 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:textSize="14sp"
-                    android:textColor="#666"
+                    android:textColor="#616161"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     tools:text="John Doe" />
+
+                <TextView
+                    android:id="@+id/tvInvoiceDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textSize="12sp"
+                    android:textColor="#9E9E9E"
+                    android:visibility="gone"
+                    tools:text="2024-12-13"
+                    tools:visibility="visible" />
 
             </LinearLayout>
 
+            <!-- Status Badge -->
             <TextView
-                android:id="@+id/tvStatus"
+                android:id="@+id/tvStatusBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
-                android:background="@drawable/bg_status"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textStyle="bold"
-                tools:text="Partial" />
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.05"
+                tools:text="PARTIAL"
+                tools:textColor="#F57C00"
+                tools:background="#FFF3E0" />
 
         </LinearLayout>
 
@@ -72,16 +91,17 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:background="#E0E0E0" />
+            android:layout_marginVertical="12dp"
+            android:background="#EEEEEE" />
 
         <!-- Amount Details -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="3">
 
+            <!-- Total Amount -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -89,27 +109,60 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total"
+                    android:textSize="11sp"
+                    android:textColor="#9E9E9E"
+                    android:fontFamily="sans-serif" />
+
+                <TextView
                     android:id="@+id/tvTotalAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="13sp"
-                    android:textColor="#666"
-                    tools:text="Total: ₹5000.00" />
+                    android:layout_marginTop="2dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#424242"
+                    android:fontFamily="sans-serif-medium"
+                    tools:text="₹5,000" />
+
+            </LinearLayout>
+
+            <!-- Paid Amount -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Paid"
+                    android:textSize="11sp"
+                    android:textColor="#9E9E9E"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/tvPaidAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textSize="13sp"
+                    android:layout_marginTop="2dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
                     android:textColor="#4CAF50"
-                    tools:text="Paid: ₹3000.00" />
+                    android:fontFamily="sans-serif-medium"
+                    tools:text="₹2,000" />
 
             </LinearLayout>
 
+            <!-- Pending Amount -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="end">
 
@@ -117,22 +170,36 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Pending"
-                    android:textSize="12sp"
-                    android:textColor="#999" />
+                    android:textSize="11sp"
+                    android:textColor="#9E9E9E"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/tvPendingAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textSize="20sp"
+                    android:layout_marginTop="2dp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#FF5722"
-                    tools:text="₹2000.00" />
+                    android:textColor="#D32F2F"
+                    android:fontFamily="sans-serif-medium"
+                    tools:text="₹3,000" />
 
             </LinearLayout>
 
         </LinearLayout>
+
+        <!-- Action Hint -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Tap to collect payment"
+            android:textSize="12sp"
+            android:textColor="#1565C0"
+            android:gravity="center"
+            android:alpha="0.8"
+            android:fontFamily="sans-serif" />
 
     </LinearLayout>
 

@@ -15,16 +15,18 @@ import com.sandhyasofttech.gstbillingpro.R;
 import java.util.List;
 import java.util.Locale;
 
-public class ProductSelectionAdapter extends RecyclerView.Adapter<ProductSelectionAdapter.ViewHolder> {
+public class ProductSelectionAdapter
+        extends RecyclerView.Adapter<ProductSelectionAdapter.ViewHolder> {
 
-    private List<Product> products;
-    private OnProductClickListener listener;
+    private final List<Product> products;
+    private final OnProductClickListener listener;
 
     public interface OnProductClickListener {
         void onProductClick(Product product);
     }
 
-    public ProductSelectionAdapter(List<Product> products, OnProductClickListener listener) {
+    public ProductSelectionAdapter(List<Product> products,
+                                   OnProductClickListener listener) {
         this.products = products;
         this.listener = listener;
     }
@@ -39,8 +41,7 @@ public class ProductSelectionAdapter extends RecyclerView.Adapter<ProductSelecti
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Product product = products.get(position);
-        holder.bind(product);
+        holder.bind(products.get(position));
     }
 
     @Override
@@ -49,10 +50,11 @@ public class ProductSelectionAdapter extends RecyclerView.Adapter<ProductSelecti
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
+
         MaterialCardView cardView;
         TextView tvName, tvPrice, tvStock, tvGst;
 
-        ViewHolder(View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.cardProduct);
             tvName = itemView.findViewById(R.id.tvProductName);
@@ -62,16 +64,33 @@ public class ProductSelectionAdapter extends RecyclerView.Adapter<ProductSelecti
         }
 
         void bind(Product product) {
+
             tvName.setText(product.getName());
-            tvPrice.setText(String.format(Locale.getDefault(), "₹%.2f", product.getPrice()));
-            tvStock.setText("Stock: " + product.getEffectiveQuantity());
+
+            tvPrice.setText(String.format(
+                    Locale.getDefault(),
+                    "₹%.2f",
+                    product.getPrice()
+            ));
+
+            // ✅ STOCK + UNIT (SAFE)
+            String unit = product.getUnit() != null
+                    ? product.getUnit()
+                    : "";
+
+            String stockText = unit.isEmpty()
+                    ? String.valueOf(product.getEffectiveQuantity())
+                    : product.getEffectiveQuantity() + " " + unit;
+
+            tvStock.setText("Stock: " + stockText);
+
             tvGst.setText("GST: " + product.getGstRate() + "%");
 
-            // Change stock color based on availability
+            // 🔴 LOW STOCK / 🟢 GOOD STOCK COLOR
             if (product.getEffectiveQuantity() < 10) {
-                tvStock.setTextColor(0xFFFF5722); // Red for low stock
+                tvStock.setTextColor(0xFFFF5722); // Red
             } else {
-                tvStock.setTextColor(0xFF4CAF50); // Green for good stock
+                tvStock.setTextColor(0xFF4CAF50); // Green
             }
 
             cardView.setOnClickListener(v -> {

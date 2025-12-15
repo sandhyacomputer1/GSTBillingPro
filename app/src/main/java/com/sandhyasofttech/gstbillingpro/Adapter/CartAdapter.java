@@ -20,8 +20,8 @@ import java.util.Locale;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
-    private List<CartItem> cartItems;
-    private CartListener listener;
+    private final List<CartItem> cartItems;
+    private final CartListener listener;
 
     public interface CartListener {
         void onQuantityChanged();
@@ -43,8 +43,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CartItem item = cartItems.get(position);
-        holder.bind(item, position);
+        holder.bind(cartItems.get(position), position);
     }
 
     @Override
@@ -53,6 +52,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
+
         TextView tvName, tvPrice, tvTotal;
         EditText etQuantity;
         ImageButton btnRemove, btnMinus, btnPlus;
@@ -69,74 +69,75 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         }
 
         void bind(CartItem item, int position) {
+
+            final String unit = item.getUnit() == null ? "" : item.getUnit();
+
             tvName.setText(item.getProductName());
-            tvPrice.setText(String.format(Locale.getDefault(), "₹%.2f x %.0f", 
-                item.getRate(), item.getQuantity()));
-            tvTotal.setText(String.format(Locale.getDefault(), "₹%.2f", 
-                item.getTaxableValue()));
-            
-            etQuantity.setText(String.format(Locale.getDefault(), "%.0f", item.getQuantity()));
+            updateDisplay(item, unit);
 
-            // Remove button
+            etQuantity.setText(unit.isEmpty()
+                    ? String.valueOf((int) item.getQuantity())
+                    : ((int) item.getQuantity()) + " " + unit);
+
             btnRemove.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onItemRemoved(position);
-                }
+                if (listener != null) listener.onItemRemoved(position);
             });
 
-            // Minus button
             btnMinus.setOnClickListener(v -> {
-                double currentQty = item.getQuantity();
-                if (currentQty > 1) {
-                    item.setQuantity(currentQty - 1);
-                    etQuantity.setText(String.format(Locale.getDefault(), "%.0f", item.getQuantity()));
-                    updateDisplay(item);
+                if (item.getQuantity() > 1) {
+                    item.setQuantity(item.getQuantity() - 1);
+                    updateDisplay(item, unit);
                     if (listener != null) listener.onQuantityChanged();
                 }
             });
 
-            // Plus button
             btnPlus.setOnClickListener(v -> {
-                double currentQty = item.getQuantity();
-                if (currentQty < item.getMaxStock()) {
-                    item.setQuantity(currentQty + 1);
-                    etQuantity.setText(String.format(Locale.getDefault(), "%.0f", item.getQuantity()));
-                    updateDisplay(item);
+                if (item.getQuantity() < item.getMaxStock()) {
+                    item.setQuantity(item.getQuantity() + 1);
+                    updateDisplay(item, unit);
                     if (listener != null) listener.onQuantityChanged();
                 }
             });
 
-            // Quantity text change
             etQuantity.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+                @Override public void afterTextChanged(Editable s) {}
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (!s.toString().isEmpty()) {
-                        try {
-                            double qty = Double.parseDouble(s.toString());
+                    try {
+                        String clean = s.toString().replace(unit, "").trim();
+                        if (!clean.isEmpty()) {
+                            double qty = Double.parseDouble(clean);
                             if (qty > 0 && qty <= item.getMaxStock()) {
                                 item.setQuantity(qty);
-                                updateDisplay(item);
+                                updateDisplay(item, unit);
                                 if (listener != null) listener.onQuantityChanged();
                             }
-                        } catch (NumberFormatException e) {
-                            // Ignore invalid input
                         }
-                    }
+                    } catch (Exception ignored) {}
                 }
-
-                @Override
-                public void afterTextChanged(Editable s) {}
             });
         }
 
-        void updateDisplay(CartItem item) {
-            tvPrice.setText(String.format(Locale.getDefault(), "₹%.2f x %.0f", 
-                item.getRate(), item.getQuantity()));
-            tvTotal.setText(String.format(Locale.getDefault(), "₹%.2f", 
-                item.getTaxableValue()));
+        void updateDisplay(CartItem item, String unit) {
+
+            String qtyText = unit.isEmpty()
+                    ? String.format(Locale.getDefault(), "%.0f", item.getQuantity())
+                    : String.format(Locale.getDefault(), "%.0f %s", item.getQuantity(), unit);
+
+            tvPrice.setText(String.format(
+                    Locale.getDefault(),
+                    "₹%.2f x %s",
+                    item.getRate(),
+                    qtyText
+            ));
+
+            tvTotal.setText(String.format(
+                    Locale.getDefault(),
+                    "₹%.2f",
+                    item.getTaxableValue()
+            ));
         }
     }
 }

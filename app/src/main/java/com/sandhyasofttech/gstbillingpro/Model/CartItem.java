@@ -3,6 +3,7 @@ package com.sandhyasofttech.gstbillingpro.Model;
 import java.io.Serializable;
 
 public class CartItem implements Serializable {
+
     private String productId;
     private String productName;
     private double quantity;
@@ -10,15 +11,32 @@ public class CartItem implements Serializable {
     private double taxPercent;
     private int maxStock;
 
+    // ✅ ONLY ADDED FIELD
+    private String unit;
+
     public CartItem() {}
 
-    public CartItem(String productId, String productName, double quantity, double rate, double taxPercent, int maxStock) {
+    // ❌ OLD CONSTRUCTOR (KEEP AS IS – DO NOT REMOVE)
+    public CartItem(String productId, String productName, double quantity,
+                    double rate, double taxPercent, int maxStock) {
         this.productId = productId;
         this.productName = productName;
         this.quantity = quantity;
         this.rate = rate;
         this.taxPercent = taxPercent;
         this.maxStock = maxStock;
+    }
+
+    // ✅ NEW CONSTRUCTOR (WITH UNIT)
+    public CartItem(String productId, String productName, double quantity,
+                    double rate, double taxPercent, int maxStock, String unit) {
+        this.productId = productId;
+        this.productName = productName;
+        this.quantity = quantity;
+        this.rate = rate;
+        this.taxPercent = taxPercent;
+        this.maxStock = maxStock;
+        this.unit = unit;
     }
 
     public String getProductId() {
@@ -67,6 +85,15 @@ public class CartItem implements Serializable {
 
     public void setMaxStock(int maxStock) {
         this.maxStock = maxStock;
+    }
+
+    // ✅ ONLY ADDED GETTER & SETTER
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public double getTaxableValue() {

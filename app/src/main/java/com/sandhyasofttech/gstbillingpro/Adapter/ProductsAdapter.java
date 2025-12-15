@@ -28,16 +28,29 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_product, parent, false);
         return new ProductViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
+
         Product product = productList.get(position);
 
         holder.tvName.setText(product.getName());
-        holder.tvQuantity.setText(String.valueOf(product.getEffectiveQuantity()));
+
+        // ✅ Quantity + Unit
+        String unit = product.getUnit();
+        String qtyText;
+
+        if (unit != null && !unit.isEmpty()) {
+            qtyText = product.getEffectiveQuantity() + " " + unit;
+        } else {
+            qtyText = String.valueOf(product.getEffectiveQuantity());
+        }
+
+        holder.tvQuantity.setText(qtyText);
 
         holder.itemView.setOnClickListener(v -> {
             Context context = holder.itemView.getContext();
@@ -53,6 +66,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
     }
 
     static class ProductViewHolder extends RecyclerView.ViewHolder {
+
         TextView tvName, tvQuantity;
         ImageView ivForwardArrow;
 

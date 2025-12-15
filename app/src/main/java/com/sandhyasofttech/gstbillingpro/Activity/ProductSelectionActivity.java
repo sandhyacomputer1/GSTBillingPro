@@ -203,6 +203,7 @@ public class ProductSelectionActivity extends AppCompatActivity {
     }
 
     private void showQuantityDialog(Product product) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_quantity, null);
         builder.setView(dialogView);
@@ -214,34 +215,38 @@ public class ProductSelectionActivity extends AppCompatActivity {
         MaterialButton btnAdd = dialogView.findViewById(R.id.btnAdd);
         MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancel);
 
+        String unit = product.getUnit() != null ? product.getUnit() : "";
+
         tvProductName.setText(product.getName());
-        tvStock.setText("Available: " + product.getEffectiveQuantity());
-        tvPrice.setText(String.format(Locale.getDefault(), "₹%.2f per unit", product.getPrice()));
+        tvStock.setText("Available: " + product.getEffectiveQuantity() + " " + unit);
+        tvPrice.setText(String.format(
+                Locale.getDefault(),
+                "₹%.2f per %s",
+                product.getPrice(),
+                unit.isEmpty() ? "unit" : unit
+        ));
 
         AlertDialog dialog = builder.create();
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
         btnAdd.setOnClickListener(v -> {
+
             String qtyStr = etQuantity.getText().toString().trim();
             if (qtyStr.isEmpty()) {
-                Toast.makeText(this, "Please enter quantity", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Enter quantity", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             double qty = Double.parseDouble(qtyStr);
-            if (qty <= 0) {
-                Toast.makeText(this, "Quantity must be greater than 0", Toast.LENGTH_SHORT).show();
+
+            if (qty <= 0 || qty > product.getEffectiveQuantity()) {
+                Toast.makeText(this,
+                        "Only " + product.getEffectiveQuantity() + " " + unit + " available",
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (qty > product.getEffectiveQuantity()) {
-                Toast.makeText(this, "Only " + product.getEffectiveQuantity() + " available", 
-                    Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Check if product already in cart
             boolean found = false;
             for (CartItem item : cartItems) {
                 if (item.getProductId().equals(product.getProductId())) {
@@ -253,12 +258,13 @@ public class ProductSelectionActivity extends AppCompatActivity {
 
             if (!found) {
                 CartItem cartItem = new CartItem(
-                    product.getProductId(),
-                    product.getName(),
-                    qty,
-                    product.getPrice(),
-                    product.getGstRate(),
-                    product.getEffectiveQuantity()
+                        product.getProductId(),
+                        product.getName(),
+                        qty,                     // ✅ USER ENTERED QTY
+                        product.getPrice(),
+                        product.getGstRate(),
+                        product.getStockQuantity(),
+                        product.getUnit()         // ✅ UNIT PASSED
                 );
                 cartItems.add(cartItem);
             }
