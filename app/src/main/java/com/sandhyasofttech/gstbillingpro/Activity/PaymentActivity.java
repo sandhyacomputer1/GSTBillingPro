@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,7 +44,8 @@ public class PaymentActivity extends AppCompatActivity {
     private TextView tvCustomerName, tvSubtotal, tvTax, tvGrandTotal;
     private TextView tvAmountPaid, tvBalance, tvPendingAmount;
     private EditText etPaidAmount;
-    private RadioGroup rgPaymentStatus;
+    private RadioGroup rgPaymentStatus, rgPaymentMode;
+    private RadioButton rbCash, rbOnline;
     private MaterialButton btnGenerateInvoice;
     private RecyclerView rvSummary;
     private boolean isGstEnabled = false;   // 🔥 GST OFF by default
@@ -52,6 +54,7 @@ public class PaymentActivity extends AppCompatActivity {
     private ArrayList<CartItem> cartItems;
     private double cartTotal, totalTaxable, totalCGST, totalSGST, totalIGST, grandTotal;
     private double paidAmount = 0, pendingAmount = 0;
+    private String paymentMode = "Cash"; // Default payment mode
 
     private DatabaseReference usersRef, invoicesRef, infoRef;
     private String businessName = "Your Business", businessGstin = "", businessAddress = "";
@@ -78,6 +81,9 @@ public class PaymentActivity extends AppCompatActivity {
         tvPendingAmount = findViewById(R.id.tvPendingAmount);
         etPaidAmount = findViewById(R.id.etPaidAmount);
         rgPaymentStatus = findViewById(R.id.rgPaymentStatus);
+        rgPaymentMode = findViewById(R.id.rgPaymentMode);
+        rbCash = findViewById(R.id.rbCash);
+        rbOnline = findViewById(R.id.rbOnline);
         btnGenerateInvoice = findViewById(R.id.btnGenerateInvoice);
         rvSummary = findViewById(R.id.rvSummary);
 
@@ -106,6 +112,15 @@ public class PaymentActivity extends AppCompatActivity {
 
         // Setup summary recycler
         setupSummaryRecycler();
+
+        // Payment mode listener
+        rgPaymentMode.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.rbCash) {
+                paymentMode = "Cash";
+            } else if (checkedId == R.id.rbOnline) {
+                paymentMode = "Online";
+            }
+        });
 
         // Payment amount listener
         etPaidAmount.addTextChangedListener(new TextWatcher() {
@@ -302,22 +317,24 @@ public class PaymentActivity extends AppCompatActivity {
         invoiceData.put("businessName", invoice.businessName);
         invoiceData.put("businessAddress", invoice.businessAddress);
 
-        // Payment details
+        // Payment details with mode
         invoiceData.put("paidAmount", paidAmount);
         invoiceData.put("pendingAmount", pendingAmount);
         invoiceData.put("paymentStatus", paymentStatus);
+        invoiceData.put("paymentMode", paymentMode);  // 🔥 NEW: Save payment mode
         invoiceData.put("paymentDate", invoiceDate);
 
         // Save to Firebase
         invoicesRef.child(invoiceNumber).setValue(invoiceData)
                 .addOnSuccessListener(aVoid -> {
 
-                    // 🔥 FIRST HISTORY ENTRY (VERY IMPORTANT)
+                    // Add initial payment history
                     addInvoiceHistoryAtCreation(
                             invoiceNumber,
-                            paidAmount,        // paid now
-                            paidAmount,        // total paid
-                            pendingAmount      // pending
+                            paidAmount,
+                            paidAmount,
+                            pendingAmount,
+                            paymentMode  // 🔥 NEW: Pass payment mode
                     );
 
                     if (!paymentStatus.equals("Paid")) {
@@ -327,7 +344,8 @@ public class PaymentActivity extends AppCompatActivity {
                                 customerPhone,
                                 grandTotal,
                                 paidAmount,
-                                pendingAmount
+                                pendingAmount,
+                                paymentMode  // 🔥 NEW: Pass payment mode
                         );
                     }
 
@@ -342,7 +360,8 @@ public class PaymentActivity extends AppCompatActivity {
 
     private void savePendingPayment(String invoiceNumber, String customerName,
                                     String customerPhone, double totalAmount,
-                                    double paidAmount, double pendingAmount) {
+                                    double paidAmount, double pendingAmount,
+                                    String paymentMode) {  // 🔥 NEW parameter
         DatabaseReference pendingPaymentsRef = usersRef.child("pendingPayments");
 
         Map<String, Object> paymentData = new HashMap<>();
@@ -353,6 +372,7 @@ public class PaymentActivity extends AppCompatActivity {
         paymentData.put("paidAmount", paidAmount);
         paymentData.put("pendingAmount", pendingAmount);
         paymentData.put("paymentStatus", pendingAmount > 0 ? "Partial" : "Pending");
+        paymentData.put("paymentMode", paymentMode);  // 🔥 NEW: Save payment mode
         paymentData.put("lastPaymentDate", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
         paymentData.put("timestamp", System.currentTimeMillis());
 
@@ -519,6 +539,11 @@ public class PaymentActivity extends AppCompatActivity {
                     pageWidth - margin - 70, yPos, regularPaint);
             yPos += 18;
 
+            // 🔥 NEW: Show payment mode in PDF
+            canvas.drawText("Payment Mode:", totalsX, yPos, regularPaint);
+            canvas.drawText(paymentMode, pageWidth - margin - 70, yPos, regularPaint);
+            yPos += 18;
+
             canvas.drawText("Pending Amount:", totalsX, yPos, regularPaint);
             canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.pendingAmount),
                     pageWidth - margin - 70, yPos, regularPaint);
@@ -611,7 +636,8 @@ public class PaymentActivity extends AppCompatActivity {
     private void addInvoiceHistoryAtCreation(String invoiceNumber,
                                              double paidNow,
                                              double totalPaid,
-                                             double pendingAfter) {
+                                             double pendingAfter,
+                                             String paymentMode) {  // 🔥 NEW parameter
 
         DatabaseReference historyRef = invoicesRef.child(invoiceNumber).child("history");
 
@@ -622,12 +648,11 @@ public class PaymentActivity extends AppCompatActivity {
         history.put("paidNow", paidNow);
         history.put("totalPaid", totalPaid);
         history.put("pendingAfter", pendingAfter);
-        history.put("paymentMode", "Cash");
+        history.put("paymentMode", paymentMode);  // 🔥 NEW: Save payment mode in history
         history.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
         history.put("time", new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date()));
         history.put("timestamp", ServerValue.TIMESTAMP);
 
         historyRef.child(historyId).setValue(history);
     }
-
 }

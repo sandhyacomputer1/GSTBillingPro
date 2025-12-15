@@ -37,7 +37,9 @@
         <activity
             android:name=".soldproduct.SoldProductsActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".Activity.InvDetailsActivity"
+            android:exported="false"/>
 
         <activity
             android:name=".Activity.PendingPaymentsActivity"

@@ -4,7 +4,6 @@
     android:id="@+id/customer_fragment"
     android:fitsSystemWindows="true"
     android:background="#F5FAFF"
-
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -16,7 +15,7 @@
         android:iconifiedByDefault="false"
         android:queryHint="Search customers by name or phone"
         android:background="@drawable/edittext_bg"
-        android:layout_margin="12dp" />
+        android:layout_margin="10dp" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -29,7 +28,7 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingBottom="80dp"
-            android:layout_margin="12dp" />
+            android:layout_margin="10dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAddCustomer"

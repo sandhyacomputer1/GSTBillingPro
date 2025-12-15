@@ -188,16 +188,35 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
 
     @Override
     public void onBindViewHolder(@NonNull CustomerViewHolder holder, int position) {
-        Customer c = customerList.get(position);
-        holder.tvName.setText(c.name != null ? c.name : "Unknown");
 
-        // Click on entire card → open details
+        Customer c = customerList.get(position);
+
+        // Name
+        holder.tvName.setText(
+                c.name != null && !c.name.isEmpty() ? c.name : "Unknown"
+        );
+
+        // Phone
+        if (c.phone != null && !c.phone.isEmpty()) {
+            holder.tvPhone.setVisibility(View.VISIBLE);
+            holder.tvPhone.setText(c.phone);
+        } else {
+            holder.tvPhone.setVisibility(View.GONE);
+        }
+
+        // Address / Location
+        if (c.address != null && !c.address.isEmpty()) {
+            holder.tvAddress.setVisibility(View.VISIBLE);
+            holder.tvAddress.setText(c.address);
+        } else {
+            holder.tvAddress.setVisibility(View.GONE);
+        }
+
+        // Click → open details
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, CustomerDetailsActivity.class);
-            intent.putExtra("customer_name", c.name);
             intent.putExtra("customer_phone", c.phone);
-            intent.putExtra("customer_email", c.email);
-            intent.putExtra("customer_gstin", c.gstin);
+            intent.putExtra("customer_name", c.name);
             intent.putExtra("customer_address", c.address);
             context.startActivity(intent);
         });
@@ -242,11 +261,15 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
     };
 
     static class CustomerViewHolder extends RecyclerView.ViewHolder {
-        final TextView tvName;
+
+        TextView tvName, tvPhone, tvAddress;
 
         CustomerViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvCustomerName);
+            tvPhone = itemView.findViewById(R.id.tvCustomerPhone);
+            tvAddress = itemView.findViewById(R.id.tvCustomerAddress);
         }
     }
+
 }

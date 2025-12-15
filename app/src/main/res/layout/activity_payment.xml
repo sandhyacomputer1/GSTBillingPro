@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
     android:background="#F5FAFF"
     android:fillViewport="true">
@@ -140,7 +139,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:background="@color/white"
-
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -265,11 +263,20 @@
                     android:textStyle="bold"
                     android:textColor="#333" />
 
+                <!-- Payment Status -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Payment Status"
+                    android:textSize="13sp"
+                    android:textColor="#666" />
+
                 <RadioGroup
                     android:id="@+id/rgPaymentStatus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="8dp"
                     android:orientation="horizontal">
 
                     <RadioButton
@@ -289,6 +296,40 @@
 
                 </RadioGroup>
 
+                <!-- Payment Mode -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Payment Mode"
+                    android:textSize="13sp"
+                    android:textColor="#666" />
+
+                <RadioGroup
+                    android:id="@+id/rgPaymentMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/rbCash"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="💵 Cash"
+                        android:checked="true" />
+
+                    <RadioButton
+                        android:id="@+id/rbOnline"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="💳 Online" />
+
+                </RadioGroup>
+
+                <!-- Amount Paid -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -308,6 +349,7 @@
                     android:inputType="numberDecimal"
                     android:textSize="16sp" />
 
+                <!-- Payment Summary -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
