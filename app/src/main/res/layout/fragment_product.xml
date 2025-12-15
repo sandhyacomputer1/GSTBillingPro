@@ -26,7 +26,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_bg"
             android:iconifiedByDefault="false"
-            android:queryHint="Search Products..." />
+            android:queryHint="@string/hint_search_products"
+            />
 
         <TextView
             android:id="@+id/tvTotalProducts"
@@ -36,7 +37,8 @@
             android:gravity="end"
             android:textColor="?android:attr/textColorSecondary"
             android:textStyle="bold"
-            tools:text="Total Products: 125" />
+            tools:text="@string/label_total_products_sample"
+ />
 
     </LinearLayout>
 
@@ -93,7 +95,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="25dp"
         android:backgroundTint="@color/blue"
-        android:text="IMPORT"
+        android:text="@string/btn_import"
         app:icon="@android:drawable/stat_sys_upload" />
 
     <!-- Add Product FAB -->
@@ -106,7 +108,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="25dp"
         android:backgroundTint="@color/blue"
-        android:contentDescription="Add new product"
+        android:contentDescription="@string/desc_add_product"
         android:src="@android:drawable/ic_input_add"
         app:tint="@android:color/white" />
 

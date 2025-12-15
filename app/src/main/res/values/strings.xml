@@ -18,6 +18,53 @@
             <b>6. Unit</b> (e.g., pcs, kg, ltr)
         </string>
 
+    <!-- Toolbar -->
+    <string name="title_add_product">नवीन उत्पादन जोडा</string>
+    <string name="nav_back">मागे जा</string>
+
+    <!-- Product Fields -->
+    <string name="hint_product_name">उत्पादनाचे नाव</string>
+    <string name="hint_hsn_code">HSN / SAC कोड</string>
+    <string name="hint_unit">युनिट निवडा</string>
+    <string name="hint_price">किंमत (₹)</string>
+    <string name="hint_gst_rate">GST दर (%)</string>
+    <string name="hint_stock_qty">स्टॉक प्रमाण</string>
+
+    <!-- Buttons -->
+    <string name="btn_save_product">उत्पादन जतन करा</string>
+    <string name="btn_manage_custom_fields">कस्टम फील्ड्स व्यवस्थापित करा</string>
+
+    <!-- Validation / Errors -->
+    <string name="error_required">हे फील्ड आवश्यक आहे</string>
+    <string name="error_select_unit">कृपया युनिट निवडा</string>
+
+    <!-- Toast Messages -->
+    <string name="msg_product_saved">उत्पादन यशस्वीपणे जतन झाले</string>
+    <string name="msg_product_failed">उत्पादन जतन करण्यात अयशस्वी</string>
+    <!-- Product List / Fragment -->
+
+    <string name="hint_search_products">उत्पादन शोधा…</string>
+
+    <string name="label_total_products">एकूण उत्पादने</string>
+    <string name="label_total_products_sample">एकूण उत्पादने: 125</string>
+
+    <string name="btn_import">आयात करा</string>
+
+<!--    <string name="desc_add_product">नवीन उत्पादन जोडा</string>-->
+
+    <string name="label_in_stock">स्टॉक मध्ये:</string>
+    <!-- Product Item (List) -->
+
+    <string name="label_stock">स्टॉक:</string>
+    <string name="label_gst">GST:</string>
+
+    <string name="desc_add_product">उत्पादन जोडा</string>
+
+    <!-- Sample / tools text -->
+    <string name="sample_product_name">उत्पादनाचे नाव</string>
+    <string name="sample_product_price">₹250.00</string>
+    <string name="sample_product_stock">स्टॉक: 50</string>
+    <string name="sample_product_gst">GST: 18%</string>
 
 
 </resources>

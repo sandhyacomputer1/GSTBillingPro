@@ -12,10 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@drawable/bg_header_gradient"
-        app:title="Add Product"
+        app:title="@string/title_add_product"
+        app:navigationContentDescription="@string/nav_back"
         app:titleTextColor="@android:color/white"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:navigationContentDescription="Back" />
+        app:navigationIcon="@drawable/ic_arrow_back" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                     android:id="@+id/etProductName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Product Name"
+                    android:hint="@string/hint_product_name"
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -64,7 +64,7 @@
                     android:id="@+id/etHSNCode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="HSN/SAC Code"
+                    android:hint="@string/hint_hsn_code"
                     android:inputType="text"
                     android:maxLength="8" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -83,7 +83,7 @@
                     android:id="@+id/etUnit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Unit"
+                    android:hint="@string/hint_unit"
                     android:focusable="false"
                     android:clickable="true"
                     android:drawableEnd="@drawable/ic_arrow_drop_down"/>
@@ -106,7 +106,7 @@
                     android:id="@+id/etPrice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Price (₹)"
+                    android:hint="@string/hint_price"
                     android:inputType="numberDecimal" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -126,7 +126,7 @@
                     android:id="@+id/etGSTRate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="GST Rate (%)"
+                    android:hint="@string/hint_gst_rate"
                     android:inputType="numberDecimal" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -146,7 +146,7 @@
                     android:id="@+id/etStockQuantity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Stock Quantity"
+                    android:hint="@string/hint_stock_qty"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -160,7 +160,7 @@
                 android:id="@+id/btnSaveProduct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Save Product"
+                android:text="@string/btn_save_product"
                 android:layout_marginTop="16dp"
                 app:cornerRadius="8dp"
                 android:textAllCaps="false"
@@ -172,7 +172,7 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Manage Custom Fields"
+                android:text="@string/btn_manage_custom_fields"
                 app:backgroundTint="@color/blue"
                 android:layout_marginTop="8dp"
                 app:cornerRadius="8dp"
