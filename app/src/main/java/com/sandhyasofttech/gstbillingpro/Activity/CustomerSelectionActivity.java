@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttech.gstbillingpro.Adapter.CustomerAdapter;
 import com.sandhyasofttech.gstbillingpro.R;
+import com.sandhyasofttech.gstbillingpro.custmore.AddCustomerActivity;
 import com.sandhyasofttech.gstbillingpro.custmore.Customer;
 
 import java.util.ArrayList;
@@ -83,11 +84,10 @@ public class CustomerSelectionActivity extends AppCompatActivity {
 
         // Add customer button
         fabAddCustomer.setOnClickListener(v -> {
-            // Navigate to Add Customer Activity
-            Toast.makeText(this, "Add Customer Feature", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(CustomerSelectionActivity.this, AddCustomerActivity.class);
+            startActivity(intent);
         });
-
-        // Back button
+      // Back button
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 

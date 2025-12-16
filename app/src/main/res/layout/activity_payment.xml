@@ -116,8 +116,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:maxHeight="250dp"
-                    tools:listitem="@layout/item_payment_summary" />
+                    android:maxHeight="250dp"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

@@ -4,13 +4,21 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttech.gstbillingpro.MainActivity;
 import com.sandhyasofttech.gstbillingpro.R;
 
@@ -65,12 +73,49 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void navigateNext() {
-        boolean isLoggedIn = getSharedPreferences("APP_PREFS", MODE_PRIVATE)
-                .getBoolean("IS_LOGGED_IN", false);
 
-        Intent intent = isLoggedIn ? new Intent(this, MainActivity.class) : new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        finish();
+        SharedPreferences prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE);
+        boolean isLoggedIn = prefs.getBoolean("IS_LOGGED_IN", false);
+        String mobile = prefs.getString("USER_MOBILE", null);
+
+        if (!isLoggedIn || mobile == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
+        // 🔥 VERIFY STATUS FROM FIREBASE AGAIN
+        FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(mobile)
+                .child("info")
+                .child("status")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+
+                        Boolean status = snapshot.getValue(Boolean.class);
+
+                        if (status != null && status) {
+                            // ✅ ALLOW
+                            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                        } else {
+                            // ❌ BLOCK
+                            prefs.edit().clear().apply();
+                            Toast.makeText(SplashActivity.this,
+                                    "Your account is inactive. Please contact admin.",
+                                    Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+                        }
+                        finish();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+                        finish();
+                    }
+                });
     }
+
 }

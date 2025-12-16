@@ -1,10 +1,14 @@
 package com.sandhyasofttech.gstbillingpro.Activity;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -49,26 +53,65 @@ public class InvDetailsActivity extends AppCompatActivity {
     ArrayList<InvModel> itemList = new ArrayList<>();
     ArrayList<PaymentHistoryModel> paymentList = new ArrayList<>();
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inv_detailss);
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         String invoiceNumber = getIntent().getStringExtra("invoiceNumber");
         String mobile = getSharedPreferences("APP_PREFS", MODE_PRIVATE)
                 .getString("USER_MOBILE", "");
 
+        // 🔥 FIXED: Button listeners - Move after setContentView
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
+        // 🔥 EDIT BUTTON - Navigate to edit with invoice data
+        findViewById(R.id.btnEdit).setOnClickListener(v -> {
+            Intent editIntent = new Intent(InvDetailsActivity.this, PaymentActivity.class);
+            editIntent.putExtra("INVOICE_NUMBER", invoiceNumber);
+            editIntent.putExtra("EDIT_MODE", true);
+            startActivity(editIntent);
+        });
+
+        // 🔥 DELETE BUTTON - Proper Firebase delete
+        findViewById(R.id.btnDelete).setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Delete Invoice")
+                    .setMessage("Are you sure you want to delete this invoice?")
+                    .setPositiveButton("Delete", (dialog, which) -> deleteInvoice(invoiceNumber, mobile))
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+
+        // Rest of your existing code...
         invoiceRef = FirebaseDatabase.getInstance()
-                .getReference("users")
-                .child(mobile)
-                .child("invoices")
-                .child(invoiceNumber);
+                .getReference("users").child(mobile).child("invoices").child(invoiceNumber);
 
         initViews();
         loadInvoiceDetails();
         loadItems();
         loadPaymentHistory();
+    }
+
+    // 🔥 NEW: Delete method
+    private void deleteInvoice(String invoiceNumber, String mobile) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance()
+                .getReference("users").child(mobile);
+
+        // Delete from invoices
+        usersRef.child("invoices").child(invoiceNumber).removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    // Delete from pending payments if exists
+                    usersRef.child("pendingPayments").child(invoiceNumber).removeValue();
+
+                    Toast.makeText(this, "Invoice deleted successfully", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void initViews() {

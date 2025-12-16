@@ -59,19 +59,41 @@ public class LoginActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         String storedPin = snapshot.child("pin").getValue(String.class);
-                        if (storedPin != null && storedPin.equals(pin)) {
-                            SharedPreferences prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE);
-                            prefs.edit()
-                                    .putBoolean("IS_LOGGED_IN", true)
-                                    .putString("USER_MOBILE", mobile)
-                                    .apply();
+                        Boolean status = snapshot.child("status").getValue(Boolean.class);
 
-                            Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
+                        if (storedPin != null && storedPin.equals(pin)) {
+
+                            if (status != null && status) {
+                                // ✅ STATUS = TRUE → LOGIN ALLOWED
+
+                                SharedPreferences prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE);
+                                prefs.edit()
+                                        .putBoolean("IS_LOGGED_IN", true)
+                                        .putString("USER_MOBILE", mobile)
+                                        .apply();
+
+                                Toast.makeText(LoginActivity.this,
+                                        "Login successful ✔️", Toast.LENGTH_SHORT).show();
+
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
+
+                            } else {
+                                // ❌ STATUS = FALSE → FORCE LOGOUT
+                                SharedPreferences prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE);
+                                prefs.edit().clear().apply();
+
+                                Toast.makeText(LoginActivity.this,
+                                        "Your account is not activated yet.\nPlease contact admin.",
+                                        Toast.LENGTH_LONG).show();
+
+                            }
+
                         } else {
-                            Toast.makeText(LoginActivity.this, "Incorrect PIN", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this,
+                                    "Incorrect PIN", Toast.LENGTH_SHORT).show();
                         }
+
                     } else {
                         Toast.makeText(LoginActivity.this, "User not found, please register first", Toast.LENGTH_LONG).show();
                         startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));

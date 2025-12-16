@@ -72,7 +72,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 return;
             }
 
-            User user = new User(bName, bType, oName, gst, mob, mail, addr, p);
+            User user = new User(bName, bType, oName, gst, mob, mail, addr, p,false);
 
             // Save user data under mobile/info node
             databaseUsers.child(mob).child("info").setValue(user)
@@ -90,13 +90,13 @@ public class RegistrationActivity extends AppCompatActivity {
     public static class User {
         public String businessName, businessType, ownerName, gstin;
         public String mobile, email, address, pin;
-
+        public boolean status;
         public User() {
             // Empty constructor needed for Firebase
         }
 
         public User(String businessName, String businessType, String ownerName, String gstin,
-                    String mobile, String email, String address, String pin) {
+                    String mobile, String email, String address, String pin, boolean status) {
             this.businessName = businessName;
             this.businessType = businessType;
             this.ownerName = ownerName;
@@ -105,6 +105,8 @@ public class RegistrationActivity extends AppCompatActivity {
             this.email = email;
             this.address = address;
             this.pin = pin;
+            this.status = status;
+
         }
     }
 }

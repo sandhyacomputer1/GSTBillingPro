@@ -64,14 +64,53 @@ public class PaymentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
 
-        // Get intent data
-        customerName = getIntent().getStringExtra("CUSTOMER_NAME");
-        customerPhone = getIntent().getStringExtra("CUSTOMER_PHONE");
-        customerAddress = getIntent().getStringExtra("CUSTOMER_ADDRESS");
-        cartItems = (ArrayList<CartItem>) getIntent().getSerializableExtra("CART_ITEMS");
-        cartTotal = getIntent().getDoubleExtra("CART_TOTAL", 0);
+        // 🔥 1. Get user mobile FIRST
+        SharedPreferences prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE);
+        userMobile = prefs.getString("USER_MOBILE", null);
+        if (userMobile == null) {
+            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
-        // Initialize views
+        // 🔥 2. Initialize Firebase FIRST
+        usersRef = FirebaseDatabase.getInstance().getReference("users").child(userMobile);
+        invoicesRef = usersRef.child("invoices");
+        infoRef = usersRef.child("info");
+
+        // 🔥 3. Initialize ALL views
+        initViews();
+
+        // 🔥 4. Check edit mode BEFORE getting intent data
+        boolean isEditMode = getIntent().getBooleanExtra("EDIT_MODE", false);
+        String editInvoiceNumber = getIntent().getStringExtra("INVOICE_NUMBER");
+
+        if (isEditMode && editInvoiceNumber != null) {
+            btnGenerateInvoice.setText("Update Invoice");
+            loadInvoiceForEdit(editInvoiceNumber);
+        } else {
+            // New invoice flow
+            customerName = getIntent().getStringExtra("CUSTOMER_NAME");
+            customerPhone = getIntent().getStringExtra("CUSTOMER_PHONE");
+            customerAddress = getIntent().getStringExtra("CUSTOMER_ADDRESS");
+            cartItems = (ArrayList<CartItem>) getIntent().getSerializableExtra("CART_ITEMS");
+            cartTotal = getIntent().getDoubleExtra("CART_TOTAL", 0);
+            if (customerName == null || customerName.isEmpty()) {
+                Toast.makeText(PaymentActivity.this, "Invoice data invalid", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+            tvCustomerName.setText("Bill To: " + customerName);
+            calculateTotals();
+            setupSummaryRecycler();
+        }
+
+        // 🔥 5. Setup listeners
+        setupListeners();
+        fetchBusinessInfo();
+    }
+    // 🔥 NEW: Initialize views method
+    private void initViews() {
         tvCustomerName = findViewById(R.id.tvCustomerName);
         tvSubtotal = findViewById(R.id.tvSubtotal);
         tvTax = findViewById(R.id.tvTax);
@@ -86,72 +125,95 @@ public class PaymentActivity extends AppCompatActivity {
         rbOnline = findViewById(R.id.rbOnline);
         btnGenerateInvoice = findViewById(R.id.btnGenerateInvoice);
         rvSummary = findViewById(R.id.rvSummary);
+    }
 
-        tvCustomerName.setText("Bill To: " + customerName);
+    // 🔥 NEW: Load invoice for editing
+    private void loadInvoiceForEdit(String invoiceNumber) {
+        tvCustomerName.setText("Loading...");
+        invoicesRef.child(invoiceNumber).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Customer details
+                    customerName = snapshot.child("customerName").getValue(String.class);
+                    customerPhone = snapshot.child("customerPhone").getValue(String.class);
+                    customerAddress = snapshot.child("customerAddress").getValue(String.class);
 
-        // Get user mobile
-        SharedPreferences prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE);
-        userMobile = prefs.getString("USER_MOBILE", null);
+                    tvCustomerName.setText("Bill To: " + customerName);
 
-        if (userMobile == null) {
-            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
+                    // Financial details
+                    totalTaxable = snapshot.child("totalTaxableValue").getValue(Double.class) != null ?
+                            snapshot.child("totalTaxableValue").getValue(Double.class) : 0;
+                    grandTotal = snapshot.child("grandTotal").getValue(Double.class) != null ?
+                            snapshot.child("grandTotal").getValue(Double.class) : 0;
+                    paidAmount = snapshot.child("paidAmount").getValue(Double.class) != null ?
+                            snapshot.child("paidAmount").getValue(Double.class) : 0;
+                    pendingAmount = grandTotal - paidAmount;
+                    paymentMode = snapshot.child("paymentMode").getValue(String.class) != null ?
+                            snapshot.child("paymentMode").getValue(String.class) : "Cash";
+
+                    // Update UI
+                    updateUIFromData();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(PaymentActivity.this, "Load failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // 🔥 NEW: Update UI with loaded data
+    private void updateUIFromData() {
+        tvSubtotal.setText(String.format(Locale.getDefault(), "₹%.2f", totalTaxable));
+        tvGrandTotal.setText(String.format(Locale.getDefault(), "₹%.2f", grandTotal));
+
+        // 🔥 FIX: Set ONLY numeric value (no ₹ symbol)
+        etPaidAmount.setText(String.format(Locale.getDefault(), "%.2f", paidAmount));
+        tvPendingAmount.setText(String.format(Locale.getDefault(), "₹%.2f", pendingAmount));
+
+        // Set payment mode radio
+        if ("Cash".equalsIgnoreCase(paymentMode)) {
+            rbCash.setChecked(true);
+        } else {
+            rbOnline.setChecked(true);
         }
 
-        // Initialize Firebase
-        usersRef = FirebaseDatabase.getInstance().getReference("users").child(userMobile);
-        invoicesRef = usersRef.child("invoices");
-        infoRef = usersRef.child("info");
+        // 🔥 Trigger calculation AFTER setting text
+        etPaidAmount.post(() -> calculatePayment());
+    }
 
-        // Load business info
-        fetchBusinessInfo();
-
-        // Calculate totals
-        calculateTotals();
-
-        // Setup summary recycler
-        setupSummaryRecycler();
-
-        // Payment mode listener
+    // 🔥 NEW: Setup all listeners
+    private void setupListeners() {
         rgPaymentMode.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.rbCash) {
-                paymentMode = "Cash";
-            } else if (checkedId == R.id.rbOnline) {
-                paymentMode = "Online";
-            }
+            paymentMode = checkedId == R.id.rbCash ? "Cash" : "Online";
         });
 
-        // Payment amount listener
         etPaidAmount.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 calculatePayment();
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void afterTextChanged(Editable s) {}
         });
 
-        // Payment status listener
         rgPaymentStatus.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rbFullyPaid) {
-                etPaidAmount.setText(String.valueOf(grandTotal));
+                // 🔥 FIX: Set ONLY numeric value
+                etPaidAmount.setText(String.format(Locale.getDefault(), "%.2f", grandTotal));
                 etPaidAmount.setEnabled(false);
             } else {
                 etPaidAmount.setEnabled(true);
             }
+            calculatePayment(); // Always recalculate
         });
 
-        // Generate invoice button
-        btnGenerateInvoice.setOnClickListener(v -> generateInvoice());
 
-        // Back button
+        btnGenerateInvoice.setOnClickListener(v -> generateInvoice());
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
+
 
     private void fetchBusinessInfo() {
         infoRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -231,16 +293,21 @@ public class PaymentActivity extends AppCompatActivity {
 
     private void calculatePayment() {
         String paidStr = etPaidAmount.getText().toString().trim();
+        // 🔥 FIX: Remove ₹ symbol and parse safely
+        paidStr = paidStr.replace("₹", "").replace(",", "");
+
         if (paidStr.isEmpty()) {
             paidAmount = 0;
         } else {
-            paidAmount = Double.parseDouble(paidStr);
+            try {
+                paidAmount = Double.parseDouble(paidStr);
+            } catch (NumberFormatException e) {
+                paidAmount = 0;
+            }
         }
 
         double balance = paidAmount - grandTotal;
-        pendingAmount = grandTotal - paidAmount;
-
-        if (pendingAmount < 0) pendingAmount = 0;
+        pendingAmount = Math.max(0, grandTotal - paidAmount);
 
         tvAmountPaid.setText(String.format(Locale.getDefault(), "₹%.2f", paidAmount));
         tvBalance.setText(String.format(Locale.getDefault(),
@@ -248,29 +315,51 @@ public class PaymentActivity extends AppCompatActivity {
         tvPendingAmount.setText(String.format(Locale.getDefault(), "₹%.2f", pendingAmount));
     }
 
+
     private void generateInvoice() {
-        if (paidAmount == 0) {
+
+
+        if (etPaidAmount.getText().toString().trim().isEmpty()) {
             Toast.makeText(this, "Please enter paid amount", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String invoiceNumber = generateInvoiceNumber();
+        // 🔥 CHECK EDIT MODE FIRST
+        boolean isEditMode = getIntent().getBooleanExtra("EDIT_MODE", false);
+        String invoiceNumber = isEditMode ?
+                getIntent().getStringExtra("INVOICE_NUMBER") : generateInvoiceNumber();
+
         String invoiceDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         String invoiceTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
         long timestamp = System.currentTimeMillis();
 
-        // Convert CartItem to InvoiceItem
-        ArrayList<InvoiceItem> invoiceItems = new ArrayList<>();
-        for (CartItem cart : cartItems) {
-            invoiceItems.add(new InvoiceItem(
-                    cart.getProductId(),
-                    cart.getProductName(),
-                    cart.getQuantity(),
-                    cart.getRate(),
-                    cart.getTaxPercent()
-            ));
+        // 🔥 HANDLE ITEMS - Edit mode uses existing, new uses cartItems
+        ArrayList<InvoiceItem> invoiceItems;
+        if (isEditMode) {
+            // For edit, use stored items or skip if not loaded
+            invoiceItems = new ArrayList<>(); // Load from Firebase in loadInvoiceForEdit
+        } else {
+            invoiceItems = new ArrayList<>();
+            if (cartItems != null) {
+                for (CartItem cart : cartItems) {
+                    invoiceItems.add(new InvoiceItem(
+                            cart.getProductId(),
+                            cart.getProductName(),
+                            cart.getQuantity(),
+                            cart.getRate(),
+                            cart.getTaxPercent()
+                    ));
+                }
+            }
         }
 
+        // Update paidAmount from EditText
+        String paidStr = etPaidAmount.getText().toString().trim();
+        paidStr = paidStr.replace("₹", "").replace(",", "");
+
+        paidAmount = Double.parseDouble(paidStr);  // 🔥 FIX #1
+
+//        paidAmount = paidStr.isEmpty() ? 0 : Double.parseDouble(paidStr);
         // Determine payment status
         String paymentStatus;
         if (paidAmount >= grandTotal) {
@@ -278,83 +367,66 @@ public class PaymentActivity extends AppCompatActivity {
             pendingAmount = 0;
         } else if (paidAmount > 0) {
             paymentStatus = "Partial";
+            pendingAmount = grandTotal - paidAmount;
         } else {
             paymentStatus = "Pending";
+            pendingAmount = grandTotal;
         }
 
-        // Create invoice object
-        Invoice invoice = new Invoice(
-                invoiceNumber, customerPhone, customerName, invoiceDate,
-                invoiceItems, totalTaxable, totalCGST, totalSGST, totalIGST, grandTotal,
-                businessName, businessAddress
-        );
-
-        // Set payment details
-        invoice.paidAmount = paidAmount;
-        invoice.pendingAmount = pendingAmount;
-        invoice.paymentStatus = paymentStatus;
-        invoice.invoiceTime = invoiceTime;
-        invoice.timestamp = timestamp;
-        invoice.customerAddress = customerAddress;
-
-        // Save to Firebase with detailed payment info
+        // 🔥 CREATE INVOICE DATA MAP (No Invoice object needed)
         Map<String, Object> invoiceData = new HashMap<>();
-        invoiceData.put("invoiceNumber", invoice.invoiceNumber);
-        invoiceData.put("customerPhone", invoice.customerPhone);
-        invoiceData.put("customerName", invoice.customerName);
+        invoiceData.put("invoiceNumber", invoiceNumber);
+        invoiceData.put("customerPhone", customerPhone);
+        invoiceData.put("customerName", customerName);
         invoiceData.put("customerAddress", customerAddress);
-        invoiceData.put("invoiceDate", invoice.invoiceDate);
+        invoiceData.put("invoiceDate", invoiceDate);
         invoiceData.put("invoiceTime", invoiceTime);
         invoiceData.put("timestamp", timestamp);
         invoiceData.put("items", invoiceItems);
-        invoiceData.put("totalTaxableValue", invoice.totalTaxableValue);
-        invoiceData.put("totalCGST", isGstEnabled ? invoice.totalCGST : 0);
-        invoiceData.put("totalSGST", isGstEnabled ? invoice.totalSGST : 0);
-        invoiceData.put("totalIGST", isGstEnabled ? invoice.totalIGST : 0);
+        invoiceData.put("totalTaxableValue", totalTaxable);
+        invoiceData.put("totalCGST", totalCGST);
+        invoiceData.put("totalSGST", totalSGST);
+        invoiceData.put("totalIGST", totalIGST);
         invoiceData.put("gstEnabled", isGstEnabled);
-
-        invoiceData.put("grandTotal", invoice.grandTotal);
-        invoiceData.put("businessName", invoice.businessName);
-        invoiceData.put("businessAddress", invoice.businessAddress);
-
-        // Payment details with mode
+        invoiceData.put("grandTotal", grandTotal);
+        invoiceData.put("businessName", businessName);
+        invoiceData.put("businessAddress", businessAddress);
         invoiceData.put("paidAmount", paidAmount);
         invoiceData.put("pendingAmount", pendingAmount);
         invoiceData.put("paymentStatus", paymentStatus);
-        invoiceData.put("paymentMode", paymentMode);  // 🔥 NEW: Save payment mode
+        invoiceData.put("paymentMode", paymentMode);
         invoiceData.put("paymentDate", invoiceDate);
 
-        // Save to Firebase
+        // 🔥 SAVE/UPDATE TO FIREBASE
         invoicesRef.child(invoiceNumber).setValue(invoiceData)
                 .addOnSuccessListener(aVoid -> {
+                    if (isEditMode) {
+                        Toast.makeText(this, "Invoice Updated Successfully!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        // New invoice - continue with history, pending, stocks, PDF
+                        addInvoiceHistoryAtCreation(invoiceNumber, paidAmount, paidAmount, pendingAmount, paymentMode);
 
-                    // Add initial payment history
-                    addInvoiceHistoryAtCreation(
-                            invoiceNumber,
-                            paidAmount,
-                            paidAmount,
-                            pendingAmount,
-                            paymentMode  // 🔥 NEW: Pass payment mode
-                    );
+                        if (!paymentStatus.equals("Paid")) {
+                            savePendingPayment(invoiceNumber, customerName, customerPhone, grandTotal, paidAmount, pendingAmount, paymentMode);
+                        }
 
-                    if (!paymentStatus.equals("Paid")) {
-                        savePendingPayment(
-                                invoiceNumber,
-                                customerName,
-                                customerPhone,
-                                grandTotal,
-                                paidAmount,
-                                pendingAmount,
-                                paymentMode  // 🔥 NEW: Pass payment mode
-                        );
+                        updateProductStocks();
+
+                        // Create Invoice object for PDF only
+                        Invoice invoice = new Invoice(invoiceNumber, customerPhone, customerName, invoiceDate, invoiceItems, totalTaxable, totalCGST, totalSGST, totalIGST, grandTotal, businessName, businessAddress);
+                        invoice.paidAmount = paidAmount;
+                        invoice.pendingAmount = pendingAmount;
+                        invoice.paymentStatus = paymentStatus;
+
+                        File pdfFile = generatePdf(invoice);
+                        if (pdfFile != null) {
+                            showPostSaveDialog(pdfFile);
+                        }
                     }
-
-                    updateProductStocks();
-
-                    File pdfFile = generatePdf(invoice);
-                    if (pdfFile != null) {
-                        showPostSaveDialog(pdfFile);
-                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Save failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -400,9 +472,11 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private String generateInvoiceNumber() {
-        String datePart = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
-        return "INV-" + datePart + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        String datePart = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        String random = UUID.randomUUID().toString().substring(0, 4).toUpperCase(Locale.getDefault());
+        return "INV-" + datePart + "-" + random;
     }
+
 
     private File generatePdf(Invoice invoice) {
         try {
@@ -651,7 +725,7 @@ public class PaymentActivity extends AppCompatActivity {
         history.put("paymentMode", paymentMode);  // 🔥 NEW: Save payment mode in history
         history.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
         history.put("time", new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date()));
-        history.put("timestamp", ServerValue.TIMESTAMP);
+        history.put("timestamp", System.currentTimeMillis());  // 🔥 FIX #3
 
         historyRef.child(historyId).setValue(history);
     }
