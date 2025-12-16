@@ -41,6 +41,7 @@ public class AllInvoicesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_invoices);
 
+
         // ================= TOOLBAR =================
         Toolbar toolbar = findViewById(R.id.toolbarAllInvoices);
         setSupportActionBar(toolbar);

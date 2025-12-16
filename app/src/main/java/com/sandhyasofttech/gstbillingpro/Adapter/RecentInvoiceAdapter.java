@@ -40,7 +40,6 @@ public class RecentInvoiceAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
         RecentInvoiceItem item = invoices.get(position);
 
         holder.tvInvoiceNo.setText(item.invoiceNo);
@@ -48,49 +47,45 @@ public class RecentInvoiceAdapter
         holder.tvCustomerId.setText(item.customerId);
         holder.tvDate.setText(item.date);
 
-        // ✅ SAME AS PendingPaymentsAdapter
         holder.tvTotalAmount.setText(String.format(
                 Locale.getDefault(), "₹%,.2f", item.grandTotal
         ));
 
+        // 🔥 Show pending text ONLY when pending > 0
         if (item.pendingAmount > 0) {
             holder.tvPendingAmount.setVisibility(View.VISIBLE);
             holder.tvPendingAmount.setText(String.format(
-                    Locale.getDefault(),
-                    "Pending: ₹%,.0f",
-                    item.pendingAmount
+                    Locale.getDefault(), "Pending ₹%,.0f", item.pendingAmount
             ));
+            holder.tvRemind.setVisibility(View.VISIBLE);
+
+            // 🔥 REMIND BUTTON at END - Same WhatsApp logic
+            holder.tvRemind.setOnClickListener(v -> sharePendingReminder(item));
         } else {
             holder.tvPendingAmount.setVisibility(View.GONE);
+            holder.tvRemind.setVisibility(View.GONE);
         }
-
-        // SHARE → WHATSAPP
-        holder.tvShare.setOnClickListener(v -> {
-
-            if (item.customerId == null || item.customerId.isEmpty()) {
-                Toast.makeText(context,
-                        "Customer mobile not available",
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            String message =
-                    "Hello " + item.customerName + ",\n\n" +
-                            "Invoice No: " + item.invoiceNo + "\n" +
-                            "Total Amount: ₹" + String.format("%.2f", item.grandTotal) + "\n" +
-                            "Pending Amount: ₹" + String.format("%.0f", item.pendingAmount) + "\n\n" +
-                            "Thank you.";
-
-            String url = "https://wa.me/91" + item.customerId +
-                    "?text=" + Uri.encode(message);
-
-            context.startActivity(
-                    new Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            );
-        });
 
         holder.itemView.setAlpha(0f);
         holder.itemView.animate().alpha(1f).setDuration(300).start();
+    }
+
+    // 🔥 WhatsApp reminder for pending amount
+    private void sharePendingReminder(RecentInvoiceItem item) {
+        if (item.customerId == null || item.customerId.isEmpty()) {
+            Toast.makeText(context, "Customer mobile not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String message = "Hello " + item.customerName + ",\n\n" +
+                "📋 Invoice No: " + item.invoiceNo + "\n" +
+                "💰 Total Amount: ₹" + String.format(Locale.getDefault(), "%,.2f", item.grandTotal) + "\n" +
+                "⚠️  PENDING AMOUNT: ₹" + String.format(Locale.getDefault(), "%,.0f", item.pendingAmount) + "\n\n" +
+                "⏰ Kindly clear your pending payment at the earliest.\n\n" +
+                "Thank you 🙏";
+
+        String url = "https://wa.me/91" + item.customerId + "?text=" + Uri.encode(message);
+        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
 
     @Override
@@ -99,11 +94,9 @@ public class RecentInvoiceAdapter
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-
         TextView tvInvoiceNo, tvCustomerName, tvCustomerId,
-                tvTotalAmount, tvPendingAmount, tvDate;
-
-        ImageView tvViewDetails, tvShare;
+                tvTotalAmount, tvPendingAmount, tvDate, tvRemind;
+        ImageView tvViewDetails;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -113,8 +106,8 @@ public class RecentInvoiceAdapter
             tvTotalAmount = itemView.findViewById(R.id.tvTotalAmount);
             tvPendingAmount = itemView.findViewById(R.id.tvPendingAmount);
             tvDate = itemView.findViewById(R.id.tvDate);
+            tvRemind = itemView.findViewById(R.id.tvRemind);
             tvViewDetails = itemView.findViewById(R.id.tvViewDetails);
-            tvShare = itemView.findViewById(R.id.tvShare);
         }
     }
 }

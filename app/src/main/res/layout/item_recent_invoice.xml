@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"/>
             </LinearLayout>
 
-            <!-- AMOUNTS -->
+            <!-- AMOUNTS - SIMPLIFIED PENDING DISPLAY -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -86,15 +86,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
+                <!-- PENDING AMOUNT TEXT ONLY -->
                 <TextView
                     android:id="@+id/tvPendingAmount"
-                    android:text="• Pending ₹5,250"
+                    android:text="Pending ₹5,250"
                     android:textSize="12sp"
                     android:textColor="#D32F2F"
                     android:layout_marginStart="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"/>
+                    android:visibility="gone"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -106,7 +107,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"/>
 
-        <!-- RIGHT SECTION: ACTIONS -->
+        <!-- RIGHT SECTION: REMIND BUTTON (END POSITION) -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -120,17 +121,25 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_arrow_forward"
                 android:padding="6dp"
-                app:tint="#1976D2"
-                />
+                app:tint="#1976D2"/>
 
-            <ImageView
-                android:id="@+id/tvShare"
-                android:src="@drawable/ic_share"
-                android:padding="6dp"
-                app:tint="#4CAF50"
-                android:layout_marginStart="8dp"
+            <!-- REMIND BUTTON - SAME POSITION AS OLD SHARE -->
+            <TextView
+                android:id="@+id/tvRemind"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:text="Remind"
+                android:textSize="12sp"
+                android:textColor="#F44336"
+                android:textStyle="bold"
+                android:layout_marginStart="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:minWidth="60dp"
+                android:gravity="center"/>
         </LinearLayout>
 
     </LinearLayout>
