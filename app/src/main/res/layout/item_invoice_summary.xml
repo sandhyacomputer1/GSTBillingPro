@@ -5,7 +5,8 @@
     android:orientation="horizontal"
     android:padding="12dp"
     android:fitsSystemWindows="true"
-    android:backgroundTint="@color/white"
+    android:layout_margin="2dp"
+    android:background="@drawable/bg_edittext"
     android:gravity="center_vertical">
 
     <!-- Left Side: Invoice Info -->

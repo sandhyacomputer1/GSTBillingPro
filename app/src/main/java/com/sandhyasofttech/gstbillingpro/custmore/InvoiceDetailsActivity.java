@@ -43,7 +43,6 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
             return;
         }
 
-
         userMobile = getSharedPreferences("APP_PREFS", MODE_PRIVATE).getString("USER_MOBILE", null);
         if (userMobile == null) {
             Toast.makeText(this, "Session expired", Toast.LENGTH_SHORT).show();
@@ -117,25 +116,21 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
                 tvGrandTotal.setText(grandTotal != null ?
                         "Grand Total: ₹" + String.format("%,.0f", grandTotal) : "₹0");
 
-                // === Items ===
+                // === Items - NO TAX CALCULATION ===
                 itemList.clear();
                 DataSnapshot itemsSnap = snapshot.child("items");
                 for (DataSnapshot item : itemsSnap.getChildren()) {
-                    String productId = item.child("productId").getValue(String.class);
                     String productName = item.child("productName").getValue(String.class);
                     Double quantity = item.child("quantity").getValue(Double.class);
                     Double rate = item.child("rate").getValue(Double.class);
-                    Double taxAmount = item.child("taxAmount").getValue(Double.class);
-                    Double taxPercent = item.child("taxPercent").getValue(Double.class);
 
                     if (productName != null && quantity != null && rate != null) {
-                        double lineTotal = (rate * quantity) + (taxAmount != null ? taxAmount : 0);
+                        // 🔥 SIMPLE: Total = Qty * Rate (NO TAX)
+                        double lineTotal = quantity * rate;
                         itemList.add(new InvoiceItem(
                                 productName,
                                 quantity,
                                 rate,
-                                taxAmount,
-                                taxPercent,
                                 lineTotal
                         ));
                     }
@@ -153,7 +148,7 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
         });
     }
 
-    // ────────────────────── ADAPTER ──────────────────────
+    // ────────────────────── SIMPLIFIED ADAPTER ──────────────────────
     static class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         private final List<InvoiceItem> items;
 
@@ -173,12 +168,7 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
             InvoiceItem item = items.get(position);
             holder.tvProductName.setText(item.productName);
             holder.tvQty.setText("Qty: " + String.format("%.2f", item.quantity));
-            holder.tvRate.setText("Rate: ₹" + String.format("%,.2f", item.rate));
-            if (item.taxPercent != null) {
-                holder.tvTax.setText("Tax (" + String.format("%.0f", item.taxPercent) + "%): ₹" + String.format("%,.0f", item.taxAmount));
-            } else {
-                holder.tvTax.setText("Tax: ₹0");
-            }
+            holder.tvRate.setText("Rate: ₹" + String.format("%,.0f", item.rate));
             holder.tvLineTotal.setText("Total: ₹" + String.format("%,.0f", item.lineTotal));
         }
 
@@ -188,31 +178,27 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
         }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
-            TextView tvProductName, tvQty, tvRate, tvTax, tvLineTotal;
+            TextView tvProductName, tvQty, tvRate, tvLineTotal;
 
             ViewHolder(android.view.View itemView) {
                 super(itemView);
                 tvProductName = itemView.findViewById(R.id.tvProductName);
                 tvQty = itemView.findViewById(R.id.tvQty);
                 tvRate = itemView.findViewById(R.id.tvRate);
-                tvTax = itemView.findViewById(R.id.tvTax);
                 tvLineTotal = itemView.findViewById(R.id.tvLineTotal);
             }
         }
     }
 
-    // ────────────────────── MODEL ──────────────────────
+    // ────────────────────── SIMPLIFIED MODEL ──────────────────────
     static class InvoiceItem {
         String productName;
-        double quantity, rate, taxAmount, lineTotal;
-        Double taxPercent;
+        double quantity, rate, lineTotal;
 
-        InvoiceItem(String name, double qty, double rate, Double taxAmt, Double taxPct, double lineTotal) {
+        InvoiceItem(String name, double qty, double rate, double lineTotal) {
             this.productName = name;
             this.quantity = qty;
             this.rate = rate;
-            this.taxAmount = taxAmt != null ? taxAmt : 0;
-            this.taxPercent = taxPct;
             this.lineTotal = lineTotal;
         }
     }

@@ -4,7 +4,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="12dp"
+    android:layout_margin="2dp"
     android:fitsSystemWindows="true"
+    android:background="@drawable/bg_edittext"
     android:backgroundTint="@color/white"
     >
 

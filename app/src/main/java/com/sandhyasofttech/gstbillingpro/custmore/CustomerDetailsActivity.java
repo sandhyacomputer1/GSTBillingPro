@@ -16,22 +16,44 @@ import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.properties.TextAlignment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttech.gstbillingpro.R;
+import com.itextpdf.kernel.colors.Color;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.events.Event;
+import com.itextpdf.kernel.events.IEventHandler;
+import com.itextpdf.kernel.events.PdfDocumentEvent;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.geom.Rectangle;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.LineSeparator;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
+import com.itextpdf.layout.properties.VerticalAlignment;
+import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class CustomerDetailsActivity extends AppCompatActivity {
@@ -39,15 +61,22 @@ public class CustomerDetailsActivity extends AppCompatActivity {
     private static final String TAG = "CustomerDetails";
     private static final int PERMISSION_CALL = 101;
 
+    // Professional Color Scheme
+    private static final Color COLOR_PRIMARY = new DeviceRgb(33, 33, 33);        // Dark Gray
+    private static final Color COLOR_SECONDARY = new DeviceRgb(66, 66, 66);      // Medium Gray
+    private static final Color COLOR_LIGHT_BG = new DeviceRgb(245, 245, 245);    // Light Gray
+    private static final Color COLOR_BORDER = new DeviceRgb(200, 200, 200);      // Border Gray
+    private static final Color COLOR_TABLE_HEADER = new DeviceRgb(240, 240, 240); // Table Header
+    private static final Color COLOR_TEXT = ColorConstants.BLACK;
+    private static final Color COLOR_TEXT_LIGHT = new DeviceRgb(100, 100, 100);
+
     // Views
-// Views
     private TextView tvName, tvPhone, tvEmail, tvGstin, tvAddress;
     private MaterialButton btnCall, btnWhatsApp, btnEdit, btnDelete, btnExportPdf;
     private RecyclerView rvProducts, rvInvoices;
 
     // Portfolio views
     private TextView tvTotalInvoices, tvPaidCount, tvUnpaidCount, tvAmountSummary;
-
 
     // Data
     private String customerPhone, customerName, userMobile;
@@ -57,6 +86,8 @@ public class CustomerDetailsActivity extends AppCompatActivity {
     private final List<InvoiceSummary> invoiceList = new ArrayList<>();
     private ProductAdapter productAdapter;
     private InvoiceAdapter invoiceAdapter;
+
+    // Counters
     private int totalInvoices = 0, paidCount = 0, partialCount = 0, unpaidCount = 0;
     private double totalAmount = 0, totalPaid = 0, totalPending = 0;
 
@@ -125,9 +156,8 @@ public class CustomerDetailsActivity extends AppCompatActivity {
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Customer Information");  // Only this text
+            getSupportActionBar().setTitle("Customer Information");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -193,42 +223,438 @@ public class CustomerDetailsActivity extends AppCompatActivity {
 
     private void exportToPdf() {
         try {
-            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), customerName + "_Profile.pdf");
+            String businessName = getBusinessName();
+            String fileName = customerName.replaceAll("[^a-zA-Z0-9]", "_") + "_Portfolio.pdf";
+
+            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
             PdfWriter writer = new PdfWriter(file);
             PdfDocument pdf = new PdfDocument(writer);
+            pdf.setDefaultPageSize(PageSize.A4);
+
+            // Add header and footer event handler
+            pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new HeaderFooterEventHandler(businessName));
+
             Document doc = new Document(pdf);
+            doc.setMargins(80, 40, 70, 40); // top, right, bottom, left
 
-            doc.add(new Paragraph("Customer Profile").setBold().setFontSize(20).setTextAlignment(TextAlignment.CENTER));
-            doc.add(new Paragraph("\nName: " + customerName));
-            doc.add(new Paragraph("Phone: " + customerPhone));
-            doc.add(new Paragraph("Email: " + tvEmail.getText()));
-            doc.add(new Paragraph(tvGstin.getText().toString()));
-            doc.add(new Paragraph(tvAddress.getText().toString()));
-            doc.add(new Paragraph("\nSummary:").setBold());
-            doc.add(new Paragraph("Total Invoices: " + totalInvoices));
-            doc.add(new Paragraph("Total Amount: ₹" + String.format("%,.0f", totalAmount)));
-            doc.add(new Paragraph("Total Paid: ₹" + String.format("%,.0f", totalPaid)));
-            doc.add(new Paragraph("Total Pending: ₹" + String.format("%,.0f", totalPending)));
+            PdfFont fontRegular = PdfFontFactory.createFont("Helvetica");
+            PdfFont fontBold = PdfFontFactory.createFont("Helvetica-Bold");
 
-            doc.add(new Paragraph("\nProducts Used:").setBold());
-            for (String p : productNames) doc.add(new Paragraph("• " + p));
+            String nowDate = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(new Date());
+            String nowTime = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
 
-            doc.add(new Paragraph("\nInvoices:").setBold());
-            for (InvoiceSummary i : invoiceList) {
-                doc.add(new Paragraph("• #" + i.number + " | " + i.date + " | ₹" + String.format("%,.0f", i.total)));
+            // ═══════════════════════════════════════════════════════════
+            // DOCUMENT TITLE
+            // ═══════════════════════════════════════════════════════════
+            doc.add(new Paragraph("CUSTOMER PORTFOLIO REPORT")
+                    .setFont(fontBold)
+                    .setFontSize(20)
+                    .setFontColor(COLOR_PRIMARY)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(5));
+
+            doc.add(new Paragraph("Generated on " + nowDate + " at " + nowTime)
+                    .setFont(fontRegular)
+                    .setFontSize(9)
+                    .setFontColor(COLOR_TEXT_LIGHT)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(20));
+
+            // Divider line
+            SolidLine line = new SolidLine(1f);
+            line.setColor(COLOR_BORDER);
+            doc.add(new LineSeparator(line).setMarginBottom(20));
+
+            // ═══════════════════════════════════════════════════════════
+            // SECTION 1: CUSTOMER INFORMATION
+            // ═══════════════════════════════════════════════════════════
+            addSectionHeader(doc, "CUSTOMER INFORMATION", fontBold);
+
+            Table custTable = new Table(UnitValue.createPercentArray(new float[]{30, 70}))
+                    .useAllAvailableWidth()
+                    .setMarginBottom(20);
+
+            addInfoRow(custTable, "Customer Name", customerName != null ? customerName : "N/A", fontBold, fontRegular);
+            addInfoRow(custTable, "Phone Number", customerPhone != null ? customerPhone : "N/A", fontBold, fontRegular);
+            addInfoRow(custTable, "Email Address", tvEmail.getText().toString(), fontBold, fontRegular);
+            addInfoRow(custTable, "GSTIN", tvGstin.getText().toString().replace("GSTIN: ", ""), fontBold, fontRegular);
+            addInfoRow(custTable, "Address", tvAddress.getText().toString(), fontBold, fontRegular);
+
+            doc.add(custTable);
+
+            // ═══════════════════════════════════════════════════════════
+            // SECTION 2: PORTFOLIO SUMMARY
+            // ═══════════════════════════════════════════════════════════
+            addSectionHeader(doc, "PORTFOLIO SUMMARY", fontBold);
+
+            Table summaryTable = new Table(UnitValue.createPercentArray(new float[]{25, 25, 25, 25}))
+                    .useAllAvailableWidth()
+                    .setMarginBottom(15);
+
+            // Header Row
+            summaryTable.addCell(createHeaderCell("Total Invoices", fontBold));
+            summaryTable.addCell(createHeaderCell("Paid Invoices", fontBold));
+            summaryTable.addCell(createHeaderCell("Pending Invoices", fontBold));
+            summaryTable.addCell(createHeaderCell("Total Amount", fontBold));
+
+            // Data Row 1
+            summaryTable.addCell(createDataCell(String.valueOf(totalInvoices), fontRegular));
+            summaryTable.addCell(createDataCell(String.valueOf(paidCount), fontRegular));
+            summaryTable.addCell(createDataCell(String.valueOf(unpaidCount), fontRegular));
+            summaryTable.addCell(createDataCell("₹" + formatAmount(totalAmount), fontRegular));
+
+            // Header Row 2
+            summaryTable.addCell(createHeaderCell("Total Paid", fontBold));
+            summaryTable.addCell(createHeaderCell("Total Pending", fontBold));
+            summaryTable.addCell(createHeaderCell("Average Invoice", fontBold));
+            summaryTable.addCell(createHeaderCell("Collection Rate", fontBold));
+
+            // Data Row 2
+            summaryTable.addCell(createDataCell("₹" + formatAmount(totalPaid), fontRegular));
+            summaryTable.addCell(createDataCell("₹" + formatAmount(totalPending), fontRegular));
+
+            double avgInvoice = totalInvoices > 0 ? totalAmount / totalInvoices : 0;
+            summaryTable.addCell(createDataCell("₹" + formatAmount(avgInvoice), fontRegular));
+
+            double collectionRate = totalAmount > 0 ? (totalPaid / totalAmount * 100) : 0;
+            summaryTable.addCell(createDataCell(String.format("%.1f%%", collectionRate), fontRegular));
+
+            doc.add(summaryTable);
+
+            // ═══════════════════════════════════════════════════════════
+            // SECTION 3: PRODUCTS PURCHASED
+            // ═══════════════════════════════════════════════════════════
+            if (!productNames.isEmpty()) {
+                addSectionHeader(doc, "PRODUCTS PURCHASED", fontBold);
+
+                Table prodTable = new Table(UnitValue.createPercentArray(new float[]{5, 95}))
+                        .useAllAvailableWidth()
+                        .setMarginBottom(20);
+
+                int counter = 1;
+                for (String productName : productNames) {
+                    prodTable.addCell(createProductNumberCell(String.valueOf(counter++), fontRegular));
+                    prodTable.addCell(createProductNameCell(productName, fontRegular));
+                }
+
+                doc.add(prodTable);
             }
+
+            // ═══════════════════════════════════════════════════════════
+            // SECTION 4: INVOICE DETAILS
+            // ═══════════════════════════════════════════════════════════
+            if (!invoiceList.isEmpty()) {
+                addSectionHeader(doc, "INVOICE DETAILS", fontBold);
+
+                Table invTable = new Table(UnitValue.createPercentArray(new float[]{8, 22, 20, 20, 15, 15}))
+                        .useAllAvailableWidth();
+
+                // Table Headers
+                invTable.addHeaderCell(createInvoiceHeaderCell("Sr.", fontBold));
+                invTable.addHeaderCell(createInvoiceHeaderCell("Invoice No.", fontBold));
+                invTable.addHeaderCell(createInvoiceHeaderCell("Date", fontBold));
+                invTable.addHeaderCell(createInvoiceHeaderCell("Amount", fontBold));
+                invTable.addHeaderCell(createInvoiceHeaderCell("Paid", fontBold));
+                invTable.addHeaderCell(createInvoiceHeaderCell("Balance", fontBold));
+
+                // Table Data - get complete invoice data
+                int srNo = 1;
+                double tableTotalAmount = 0;
+                double tableTotalPaid = 0;
+                double tableTotalBalance = 0;
+
+                for (InvoiceSummary invoice : invoiceList) {
+                    // Get additional data from Firebase for each invoice
+                    double invoiceTotal = invoice.total;
+                    double invoicePaid = invoice.paidAmount;
+                    double invoiceBalance = invoice.pendingAmount;
+
+                    tableTotalAmount += invoiceTotal;
+                    tableTotalPaid += invoicePaid;
+                    tableTotalBalance += invoiceBalance;
+
+                    invTable.addCell(createInvoiceDataCell(String.valueOf(srNo++), fontRegular, TextAlignment.CENTER));
+                    invTable.addCell(createInvoiceDataCell(invoice.number, fontRegular, TextAlignment.LEFT));
+                    invTable.addCell(createInvoiceDataCell(invoice.date, fontRegular, TextAlignment.LEFT));
+                    invTable.addCell(createInvoiceDataCell("₹" + formatAmount(invoiceTotal), fontRegular, TextAlignment.RIGHT));
+                    invTable.addCell(createInvoiceDataCell("₹" + formatAmount(invoicePaid), fontRegular, TextAlignment.RIGHT));
+                    invTable.addCell(createInvoiceDataCell("₹" + formatAmount(invoiceBalance), fontRegular, TextAlignment.RIGHT));
+                }
+
+                // Total Row
+                invTable.addCell(createInvoiceTotalCell("", fontBold, TextAlignment.CENTER));
+                invTable.addCell(createInvoiceTotalCell("", fontBold, TextAlignment.CENTER));
+                invTable.addCell(createInvoiceTotalCell("TOTAL", fontBold, TextAlignment.RIGHT));
+                invTable.addCell(createInvoiceTotalCell("₹" + formatAmount(tableTotalAmount), fontBold, TextAlignment.RIGHT));
+                invTable.addCell(createInvoiceTotalCell("₹" + formatAmount(tableTotalPaid), fontBold, TextAlignment.RIGHT));
+                invTable.addCell(createInvoiceTotalCell("₹" + formatAmount(tableTotalBalance), fontBold, TextAlignment.RIGHT));
+
+                doc.add(invTable);
+            }
+
+            // Add end note
+            doc.add(new Paragraph("\n"));
+            SolidLine endLine = new SolidLine(0.5f);
+            endLine.setColor(COLOR_BORDER);
+            doc.add(new LineSeparator(endLine).setMarginTop(10).setMarginBottom(10));
+            doc.add(new Paragraph("This is a computer-generated document and does not require a signature.")
+                    .setFont(fontRegular)
+                    .setFontSize(8)
+                    .setFontColor(COLOR_TEXT_LIGHT)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setItalic());
 
             doc.close();
 
+            // Share PDF
             Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
             Intent share = new Intent(Intent.ACTION_SEND);
             share.setType("application/pdf");
             share.putExtra(Intent.EXTRA_STREAM, uri);
-            startActivity(Intent.createChooser(share, "Share PDF"));
+            share.putExtra(Intent.EXTRA_SUBJECT, "Customer Portfolio - " + customerName);
+            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(share, "Share Customer Portfolio"));
+
+            Toast.makeText(this, "PDF generated successfully!", Toast.LENGTH_SHORT).show();
+
         } catch (Exception e) {
-            Toast.makeText(this, "PDF Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Error generating PDF: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Log.e(TAG, "PDF Generation Error", e);
         }
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // HELPER METHODS FOR PDF STYLING
+    // ═══════════════════════════════════════════════════════════════════
+
+    private void addSectionHeader(Document doc, String title, PdfFont font) {
+        doc.add(new Paragraph(title)
+                .setFont(font)
+                .setFontSize(12)
+                .setFontColor(COLOR_PRIMARY)
+                .setBackgroundColor(COLOR_LIGHT_BG)
+                .setPadding(8)
+                .setMarginTop(5)
+                .setMarginBottom(10));
+    }
+
+    private void addInfoRow(Table table, String label, String value, PdfFont boldFont, PdfFont regularFont) {
+        if (value == null || value.isEmpty() || value.equals("Not provided")) {
+            value = "—";
+        }
+
+        table.addCell(new Cell()
+                .add(new Paragraph(label))
+                .setFont(boldFont)
+                .setFontSize(10)
+                .setFontColor(COLOR_SECONDARY)
+                .setBorder(Border.NO_BORDER)
+                .setBorderBottom(new SolidBorder(COLOR_BORDER, 0.5f))
+                .setPaddingTop(8)
+                .setPaddingBottom(8)
+                .setPaddingLeft(5));
+
+        table.addCell(new Cell()
+                .add(new Paragraph(value))
+                .setFont(regularFont)
+                .setFontSize(10)
+                .setFontColor(COLOR_TEXT)
+                .setBorder(Border.NO_BORDER)
+                .setBorderBottom(new SolidBorder(COLOR_BORDER, 0.5f))
+                .setPaddingTop(8)
+                .setPaddingBottom(8)
+                .setPaddingLeft(10));
+    }
+
+    private Cell createHeaderCell(String text, PdfFont font) {
+        return new Cell()
+                .add(new Paragraph(text))
+                .setFont(font)
+                .setFontSize(10)
+                .setFontColor(COLOR_PRIMARY)
+                .setBackgroundColor(COLOR_TABLE_HEADER)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(new SolidBorder(COLOR_BORDER, 1f))
+                .setPadding(8);
+    }
+
+    private Cell createDataCell(String text, PdfFont font) {
+        return new Cell()
+                .add(new Paragraph(text))
+                .setFont(font)
+                .setFontSize(10)
+                .setFontColor(COLOR_TEXT)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+                .setPadding(8);
+    }
+
+    private Cell createProductNumberCell(String number, PdfFont font) {
+        return new Cell()
+                .add(new Paragraph(number + "."))
+                .setFont(font)
+                .setFontSize(10)
+                .setFontColor(COLOR_SECONDARY)
+                .setBorder(Border.NO_BORDER)
+                .setBorderBottom(new SolidBorder(COLOR_BORDER, 0.5f))
+                .setPaddingTop(6)
+                .setPaddingBottom(6)
+                .setPaddingLeft(5)
+                .setTextAlignment(TextAlignment.RIGHT);
+    }
+
+    private Cell createProductNameCell(String name, PdfFont font) {
+        return new Cell()
+                .add(new Paragraph(name))
+                .setFont(font)
+                .setFontSize(10)
+                .setFontColor(COLOR_TEXT)
+                .setBorder(Border.NO_BORDER)
+                .setBorderBottom(new SolidBorder(COLOR_BORDER, 0.5f))
+                .setPaddingTop(6)
+                .setPaddingBottom(6)
+                .setPaddingLeft(10);
+    }
+
+    private Cell createInvoiceHeaderCell(String text, PdfFont font) {
+        return new Cell()
+                .add(new Paragraph(text))
+                .setFont(font)
+                .setFontSize(10)
+                .setFontColor(ColorConstants.WHITE)
+                .setBackgroundColor(COLOR_PRIMARY)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(Border.NO_BORDER)
+                .setPadding(10);
+    }
+
+    private Cell createInvoiceDataCell(String text, PdfFont font, TextAlignment alignment) {
+        return new Cell()
+                .add(new Paragraph(text))
+                .setFont(font)
+                .setFontSize(9)
+                .setFontColor(COLOR_TEXT)
+                .setTextAlignment(alignment)
+                .setBorder(Border.NO_BORDER)
+                .setBorderBottom(new SolidBorder(COLOR_BORDER, 0.5f))
+                .setPaddingTop(8)
+                .setPaddingBottom(8)
+                .setPaddingLeft(5)
+                .setPaddingRight(5);
+    }
+
+    private Cell createInvoiceTotalCell(String text, PdfFont font, TextAlignment alignment) {
+        return new Cell()
+                .add(new Paragraph(text))
+                .setFont(font)
+                .setFontSize(10)
+                .setFontColor(COLOR_PRIMARY)
+                .setBackgroundColor(COLOR_LIGHT_BG)
+                .setTextAlignment(alignment)
+                .setBorder(Border.NO_BORDER)
+                .setBorderTop(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                .setPadding(10);
+    }
+
+    private String formatAmount(double amount) {
+        return String.format("%,.2f", amount);
+    }
+
+    private String getBusinessName() {
+        // Try to get from SharedPreferences or Firebase
+        String name = getSharedPreferences("APP_PREFS", MODE_PRIVATE)
+                .getString("BUSINESS_NAME", "GST Billing Pro");
+        return name;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // HEADER AND FOOTER EVENT HANDLER
+    // ═══════════════════════════════════════════════════════════════════
+
+    private class HeaderFooterEventHandler implements IEventHandler {
+        private final String businessName;
+
+        public HeaderFooterEventHandler(String businessName) {
+            this.businessName = businessName;
+        }
+
+        @Override
+        public void handleEvent(Event event) {
+            PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
+            PdfDocument pdfDoc = docEvent.getDocument();
+            int pageNumber = pdfDoc.getPageNumber(docEvent.getPage());
+            Rectangle pageSize = docEvent.getPage().getPageSize();
+
+            PdfCanvas canvas = new PdfCanvas(docEvent.getPage());
+
+            try {
+                PdfFont fontBold = PdfFontFactory.createFont("Helvetica-Bold");
+                PdfFont fontRegular = PdfFontFactory.createFont("Helvetica");
+
+                // ═══════ HEADER ═══════
+                float headerY = pageSize.getTop() - 30;
+
+                // Business Name (Left)
+                canvas.beginText()
+                        .setFontAndSize(fontBold, 11)
+                        .setColor(COLOR_PRIMARY, true)
+                        .moveText(40, headerY)
+                        .showText(businessName)
+                        .endText();
+
+                // Page Number (Right)
+                String pageText = "Page " + pageNumber;
+                float pageTextWidth = fontRegular.getWidth(pageText, 9);
+                canvas.beginText()
+                        .setFontAndSize(fontRegular, 9)
+                        .setColor(COLOR_TEXT_LIGHT, true)
+                        .moveText(pageSize.getRight() - 40 - pageTextWidth, headerY)
+                        .showText(pageText)
+                        .endText();
+
+                // Header Line
+                canvas.setStrokeColor(COLOR_BORDER)
+                        .setLineWidth(0.5f)
+                        .moveTo(40, headerY - 8)
+                        .lineTo(pageSize.getRight() - 40, headerY - 8)
+                        .stroke();
+
+                // ═══════ FOOTER ═══════
+                float footerY = 35;
+
+                // Footer Text
+                String footerText = "Customer Portfolio Report | Generated by " + businessName;
+                float footerTextWidth = fontRegular.getWidth(footerText, 8);
+                float footerX = (pageSize.getWidth() - footerTextWidth) / 2;
+
+                // Footer Line
+                canvas.setStrokeColor(COLOR_BORDER)
+                        .setLineWidth(0.5f)
+                        .moveTo(40, footerY + 15)
+                        .lineTo(pageSize.getRight() - 40, footerY + 15)
+                        .stroke();
+
+                canvas.beginText()
+                        .setFontAndSize(fontRegular, 8)
+                        .setColor(COLOR_TEXT_LIGHT, true)
+                        .moveText(footerX, footerY)
+                        .showText(footerText)
+                        .endText();
+
+                canvas.release();
+
+            } catch (Exception e) {
+                Log.e(TAG, "Header/Footer error: ", e);
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // RECYCLER VIEW SETUP AND ADAPTERS
+    // ═══════════════════════════════════════════════════════════════════
 
     private void setupRecyclers() {
         productAdapter = new ProductAdapter(productNames);
@@ -273,8 +699,9 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                 productAdapter.notifyDataSetChanged();
             }
 
-
-            @Override public void onCancelled(DatabaseError e) { }
+            @Override
+            public void onCancelled(DatabaseError e) {
+            }
         });
     }
 
@@ -283,9 +710,17 @@ public class CustomerDetailsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 invoiceList.clear();
+                totalInvoices = 0;
+                paidCount = 0;
+                unpaidCount = 0;
+                totalAmount = 0;
+                totalPaid = 0;
+                totalPending = 0;
+
                 for (DataSnapshot inv : snapshot.getChildren()) {
                     String custId = inv.child("customerId").getValue(String.class);
                     String custName = inv.child("customerName").getValue(String.class);
+
                     if ((customerPhone != null && customerPhone.equals(custId)) ||
                             (customerName != null && customerName.equals(custName))) {
 
@@ -293,39 +728,58 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                         String date = inv.child("invoiceDate").getValue(String.class);
                         Double total = inv.child("grandTotal").getValue(Double.class);
                         Double paid = inv.child("paidAmount").getValue(Double.class);
-                        Double pending = inv.child("pendingAmount").getValue(Double.class);
+
+                        Double pending = getPendingAmount(inv, total, paid);
                         String status = inv.child("paymentStatus").getValue(String.class);
                         String id = inv.getKey();
 
                         if (no != null && date != null && total != null && id != null) {
-                            invoiceList.add(new InvoiceSummary(no, date, total, id));
+                            double paidAmt = (paid != null) ? paid.doubleValue() : 0;
+                            double pendingAmt = (pending != null) ? pending.doubleValue() : 0;
+
+                            invoiceList.add(new InvoiceSummary(no, date, total, paidAmt, pendingAmt, id));
 
                             totalInvoices++;
-                            totalAmount += total;
-                            if (paid != null) totalPaid += paid;
-                            if (pending != null) totalPending += pending;
+                            totalAmount += total.doubleValue();
+                            if (paid != null) totalPaid += paid.doubleValue();
+                            if (pending != null && pending > 0) totalPending += pending.doubleValue();
 
-                            if ("Paid".equalsIgnoreCase(status)) paidCount++;
-                            else if ("Partial".equalsIgnoreCase(status)) partialCount++;
-                            else unpaidCount++;
+                            if (isPaidInvoice(total, paid, status)) {
+                                paidCount++;
+                            } else if (pending != null && pending > 0) {
+                                unpaidCount++;
+                            }
                         }
                     }
-
                 }
+
                 updatePortfolioUI();
                 invoiceAdapter.notifyDataSetChanged();
             }
 
-            @Override public void onCancelled(DatabaseError e) { }
+            @Override
+            public void onCancelled(DatabaseError e) {
+            }
         });
     }
 
-    private void updatePortfolioUI() {
-        // safety check (optional)
-        if (tvTotalInvoices == null || tvAmountSummary == null) {
-            Log.e(TAG, "Portfolio views not bound properly");
-            return;
+    private Double getPendingAmount(DataSnapshot inv, Double total, Double paid) {
+        Double pending = inv.child("pendingAmount").getValue(Double.class);
+        if (pending == null) pending = inv.child("pending").getValue(Double.class);
+        if (pending == null && total != null && paid != null) {
+            pending = total - paid;
         }
+        return pending;
+    }
+
+    private boolean isPaidInvoice(Double total, Double paid, String status) {
+        if ("Paid".equalsIgnoreCase(status)) return true;
+        if (total != null && paid != null && paid >= total) return true;
+        return false;
+    }
+
+    private void updatePortfolioUI() {
+        if (tvTotalInvoices == null || tvAmountSummary == null) return;
 
         tvTotalInvoices.setText(String.valueOf(totalInvoices));
         tvPaidCount.setText(String.valueOf(paidCount));
@@ -337,46 +791,87 @@ public class CustomerDetailsActivity extends AppCompatActivity {
         tvAmountSummary.setText(summary);
     }
 
+    // ═══════════════════════════════════════════════════════════════════
+    // INNER CLASSES - ADAPTERS
+    // ═══════════════════════════════════════════════════════════════════
 
-    // ────────────────────── ADAPTERS ──────────────────────
     static class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         final List<String> list;
-        ProductAdapter(List<String> list) { this.list = list; }
-        @Override public RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
+
+        ProductAdapter(List<String> list) {
+            this.list = list;
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
             return new RecyclerView.ViewHolder(
                     android.view.LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.item_product_simple, parent, false)) {};
+                            .inflate(R.layout.item_product_simple, parent, false)) {
+            };
         }
-        @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
             ((TextView) holder.itemView.findViewById(R.id.tvProductName)).setText("• " + list.get(pos));
         }
 
-        @Override public int getItemCount() { return list.size(); }
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
     }
 
     static class InvoiceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         final List<InvoiceSummary> list;
         final OnClick click;
-        interface OnClick { void onClick(String id); }
-        InvoiceAdapter(List<InvoiceSummary> list, OnClick click) { this.list = list; this.click = click; }
-        @Override public RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
+
+        interface OnClick {
+            void onClick(String id);
+        }
+
+        InvoiceAdapter(List<InvoiceSummary> list, OnClick click) {
+            this.list = list;
+            this.click = click;
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
             android.view.View v = android.view.LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_invoice_summary, parent, false);
-            return new RecyclerView.ViewHolder(v) {};
+            return new RecyclerView.ViewHolder(v) {
+            };
         }
-        @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int pos) {
             InvoiceSummary i = list.get(pos);
             ((TextView) holder.itemView.findViewById(R.id.tvInvoiceNo)).setText(i.number);
             ((TextView) holder.itemView.findViewById(R.id.tvInvoiceDate)).setText(i.date);
             ((TextView) holder.itemView.findViewById(R.id.tvInvoiceTotal)).setText("₹" + String.format("%,.0f", i.total));
             holder.itemView.setOnClickListener(v -> click.onClick(i.id));
         }
-        @Override public int getItemCount() { return list.size(); }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
     }
 
     static class InvoiceSummary {
-        String number, date, id; double total;
-        InvoiceSummary(String n, String d, double t, String id) { number = n; date = d; total = t; this.id = id; }
-    }
+        String number, date, id;
+        double total, paidAmount, pendingAmount;
 
+        InvoiceSummary(String n, String d, double t, String id) {
+            this(n, d, t, 0, t, id);
+        }
+
+        InvoiceSummary(String n, String d, double t, double paid, double pending, String id) {
+            number = n;
+            date = d;
+            total = t;
+            paidAmount = paid;
+            pendingAmount = pending;
+            this.id = id;
+        }
+    }
 }

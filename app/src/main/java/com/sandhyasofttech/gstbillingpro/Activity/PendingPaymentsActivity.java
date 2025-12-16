@@ -61,11 +61,9 @@ public class PendingPaymentsActivity extends AppCompatActivity {
                     switch (position) {
                         case 0:
                             tab.setText("Pending");
-                            tab.setIcon(R.drawable.ic_pending);
                             break;
                         case 1:
                             tab.setText("Completed");
-                            tab.setIcon(R.drawable.ic_completed);
                             break;
                     }
                 }).attach();
