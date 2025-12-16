@@ -53,6 +53,7 @@ public class InvDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inv_detailss);
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         String invoiceNumber = getIntent().getStringExtra("invoiceNumber");
         String mobile = getSharedPreferences("APP_PREFS", MODE_PRIVATE)

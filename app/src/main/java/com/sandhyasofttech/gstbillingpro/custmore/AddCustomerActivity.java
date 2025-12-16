@@ -28,10 +28,8 @@ public class AddCustomerActivity extends AppCompatActivity {
 
     private boolean isEdit = false;
     private String originalPhone = null;
-
     private DatabaseReference customersRef;
     private String userMobile;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +41,7 @@ public class AddCustomerActivity extends AppCompatActivity {
         etGstin = findViewById(R.id.etCustomerGstin);
         etAddress = findViewById(R.id.etCustomerAddress);
         btnSave = findViewById(R.id.btnSaveCustomer);
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         SharedPreferences prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE);
         userMobile = prefs.getString("USER_MOBILE", null);
