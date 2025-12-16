@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.itextpdf.layout.element.Image;
 import com.sandhyasofttech.gstbillingpro.Model.RecentInvoiceItem;
 import com.sandhyasofttech.gstbillingpro.R;
 
@@ -49,25 +47,30 @@ public class RecentInvoiceAdapter
         holder.tvCustomerName.setText(item.customerName);
         holder.tvCustomerId.setText(item.customerId);
         holder.tvDate.setText(item.date);
-        holder.tvTotalAmount.setText(
-                String.format(Locale.getDefault(), "₹%,.2f", item.grandTotal)
-        );
 
-        // 🔥 Pending
+        // ✅ SAME AS PendingPaymentsAdapter
+        holder.tvTotalAmount.setText(String.format(
+                Locale.getDefault(), "₹%,.2f", item.grandTotal
+        ));
+
         if (item.pendingAmount > 0) {
             holder.tvPendingAmount.setVisibility(View.VISIBLE);
-            holder.tvPendingAmount.setText(
-                    "Pending: ₹" + String.format(Locale.getDefault(), "%,.2f", item.pendingAmount)
-            );
+            holder.tvPendingAmount.setText(String.format(
+                    Locale.getDefault(),
+                    "Pending: ₹%,.0f",
+                    item.pendingAmount
+            ));
         } else {
             holder.tvPendingAmount.setVisibility(View.GONE);
         }
 
-        // 🔥 SHARE → WHATSAPP
+        // SHARE → WHATSAPP
         holder.tvShare.setOnClickListener(v -> {
 
             if (item.customerId == null || item.customerId.isEmpty()) {
-                Toast.makeText(context, "Customer mobile not available", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,
+                        "Customer mobile not available",
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -75,18 +78,17 @@ public class RecentInvoiceAdapter
                     "Hello " + item.customerName + ",\n\n" +
                             "Invoice No: " + item.invoiceNo + "\n" +
                             "Total Amount: ₹" + String.format("%.2f", item.grandTotal) + "\n" +
-                            "Pending Amount: ₹" + String.format("%.2f", item.pendingAmount) + "\n\n" +
-                            "Kindly clear the pending amount at your convenience.\n\nThank you.";
+                            "Pending Amount: ₹" + String.format("%.0f", item.pendingAmount) + "\n\n" +
+                            "Thank you.";
 
             String url = "https://wa.me/91" + item.customerId +
                     "?text=" + Uri.encode(message);
 
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            context.startActivity(intent);
+            context.startActivity(
+                    new Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            );
         });
 
-        // Animation
         holder.itemView.setAlpha(0f);
         holder.itemView.animate().alpha(1f).setDuration(300).start();
     }

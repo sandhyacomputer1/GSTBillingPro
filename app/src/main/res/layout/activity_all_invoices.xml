@@ -27,18 +27,18 @@
         android:iconifiedByDefault="false"
         android:queryHint="Search by Customer or Invoice No"
         android:background="@drawable/edittext_bg"
-        android:padding="10dp"
+        android:padding="5dp"
         android:textColor="#000"
         android:textSize="14sp"
         android:layout_marginBottom="8dp"
-        android:layout_margin="10dp" />
+        android:layout_margin="5dp" />
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAllInvoices"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         android:clipToPadding="false"
          />
 

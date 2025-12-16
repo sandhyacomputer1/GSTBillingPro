@@ -2,90 +2,93 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardInvoice"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fitsSystemWindows="true"
-
-    android:layout_marginVertical="8dp"
-    android:layout_marginHorizontal="12dp"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="4dp"
+    android:layout_marginHorizontal="5dp"
+    android:layout_marginVertical="5dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="3dp"
+    app:cardUseCompatPadding="true"
     app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="10dp">
 
         <!-- Invoice Number -->
         <TextView
             android:id="@+id/tvInvoiceNo"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="INV-20251103-29AC5E"
+            android:text="Invoice #INV-20251103"
+            android:textSize="15sp"
             android:textStyle="bold"
-            android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textColor="#212121" />
 
         <!-- Customer Name -->
         <TextView
             android:id="@+id/tvCustomerName"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sagar Patil"
-            android:textSize="16sp"
-            android:textColor="#222222"
-            android:layout_marginTop="6dp" />
+            android:textSize="15sp"
+            android:textColor="#424242"
+            android:layout_marginTop="4dp" />
 
-        <!-- Invoice Date -->
+        <!-- Date -->
         <TextView
             android:id="@+id/tvDate"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2025-11-03"
-            android:textSize="14sp"
+            android:text="03 Nov 2025"
+            android:textSize="13sp"
             android:textColor="#757575"
             android:layout_marginTop="2dp" />
 
-        <!-- Footer: Total Amount and Action Buttons -->
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#EEEEEE"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="10dp"/>
+
+        <!-- Amount Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="end|center_vertical"
-            android:layout_marginTop="14dp">
 
+            >
+
+            <!-- Total Amount -->
             <TextView
                 android:id="@+id/tvTotalAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="₹0.00"
+                android:text="₹1,250"
+                android:textSize="16sp"
                 android:textStyle="bold"
+                android:textColor="@color/blue"/>
 
-                android:textColor="@color/blue"
-                android:textSize="17sp"
-                android:layout_marginEnd="12dp"/>
-
-            <ImageButton
-                android:id="@+id/btnEdit"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_edit"
-                android:tint="@color/black"
-                android:contentDescription="Edit"
-                android:layout_marginEnd="12dp" />
-
-            <ImageButton
-                android:id="@+id/btnDelete"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_delete"
-                android:tint="@android:color/black"
-                android:contentDescription="Delete" />
+            <!-- Pending Badge -->
+            <TextView
+                android:id="@+id/tvPendingAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pending ₹500"
+                android:textSize="12sp"
+                android:layout_marginStart="20dp"
+                android:textStyle="bold"
+                android:textColor="#C62828"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+               />
         </LinearLayout>
+
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
