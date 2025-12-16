@@ -98,11 +98,39 @@
     <string name="desc_view_invoice">बीजक तपशील पहा</string>
 
     <string name="desc_share_invoice">बीजक शेअर करा</string>
-    <string name="label_paid">भरलेली रक्कम</string>
+    <!-- Pending Payment Labels -->
+    <string name="label_paid">Paid</string>
+    <string name="label_pending">Pending</string>
 
-    <string name="label_pending">बाकी रक्कम</string>
+    <!-- Payment Action -->
+    <string name="hint_collect_payment">Collect Payment</string>
 
-    <string name="hint_collect_payment">  पेमेंट घेण्यासाठी टॅप करा</string>
+
+    <!-- Tab Titles -->
+    <string name="tab_pending">Pending</string>
+    <string name="tab_completed">Completed</string>
+
+    <!-- Empty States -->
+    <string name="empty_pending_title">All Settled!</string>
+    <string name="empty_pending_message">No pending payments at the moment</string>
+    <string name="empty_completed_title">No Completed Payments</string>
+    <string name="empty_completed_message">Completed payments will appear here</string>
+
+    <!-- Messages -->
+    <string name="payment_collected_success">Payment collected successfully</string>
+    <string name="payment_completed_success">Payment completed successfully!</string>
+    <string name="payment_failed">Failed to save payment</string>
+
+    <!-- Filter Options -->
+    <string name="filter_all">All Payments</string>
+    <string name="filter_high_amount">High Amount (>₹5000)</string>
+    <string name="filter_low_amount">Low Amount (&lt;₹5000)</string>
+    <string name="filter_this_month">This Month</string>
+    <string name="filter_last_month">Last Month</string>
+    <string name="sort_newest">Sort: Newest First</string>
+    <string name="sort_oldest">Sort: Oldest First</string>
+    <string name="sort_highest">Sort: Highest Amount</string>
+    <string name="sort_lowest">Sort: Lowest Amount</string>
 
 
 

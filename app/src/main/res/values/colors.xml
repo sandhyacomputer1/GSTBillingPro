@@ -27,4 +27,9 @@
     <!-- Other colors -->
     <color name="error">#B00020</color>
 
+    <color name="tab_selected">#1565C0</color>
+    <color name="tab_unselected">#757575</color>
+    <color name="tab_icon_selected">#1565C0</color>
+    <color name="tab_icon_unselected">#9E9E9E</color>
+
 </resources>
