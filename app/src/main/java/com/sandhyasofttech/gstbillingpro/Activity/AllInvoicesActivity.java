@@ -47,6 +47,8 @@ public class AllInvoicesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
 
+
+
         // ================= VIEWS =================
         rvAllInvoices = findViewById(R.id.rvAllInvoices);
         etSearchInvoice = findViewById(R.id.etSearchInvoice);
@@ -65,6 +67,7 @@ public class AllInvoicesActivity extends AppCompatActivity {
         userRef = FirebaseDatabase.getInstance()
                 .getReference("users")
                 .child(userMobile);
+
 
         // ================= RECYCLER VIEW =================
         rvAllInvoices.setLayoutManager(new LinearLayoutManager(this));
@@ -87,6 +90,7 @@ public class AllInvoicesActivity extends AppCompatActivity {
                 filterInvoices(query);
                 return false;
             }
+
 
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -134,6 +138,7 @@ public class AllInvoicesActivity extends AppCompatActivity {
                             }
                         }
 
+
                         Collections.reverse(fullList);
                         filteredList.clear();
                         filteredList.addAll(fullList);
@@ -165,6 +170,7 @@ public class AllInvoicesActivity extends AppCompatActivity {
                 }
             }
         }
+
 
         adapter.notifyDataSetChanged();
     }
