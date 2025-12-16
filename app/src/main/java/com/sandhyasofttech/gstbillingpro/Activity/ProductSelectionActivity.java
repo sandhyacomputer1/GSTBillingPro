@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,33 +23,30 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttech.gstbillingpro.Adapter.ProductSelectionAdapter;
-import com.sandhyasofttech.gstbillingpro.Adapter.CartAdapter;
 import com.sandhyasofttech.gstbillingpro.Model.Product;
 import com.sandhyasofttech.gstbillingpro.Model.CartItem;
 import com.sandhyasofttech.gstbillingpro.R;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class ProductSelectionActivity extends AppCompatActivity {
 
-    private RecyclerView rvProducts, rvCart;
+    private RecyclerView rvProducts;
     private EditText etSearch;
     private ProgressBar progressBar;
-    private TextView tvEmpty, tvCustomerName, tvCartTotal, tvCartCount;
+    private TextView tvEmpty, tvCustomerName, tvSelectedCount, tvSelectedTotal;
     private MaterialButton btnProceed;
+    private View cvSummary;
 
     private ProductSelectionAdapter productAdapter;
-    private CartAdapter cartAdapter;
     private List<Product> productList = new ArrayList<>();
     private List<Product> filteredList = new ArrayList<>();
-    private ArrayList<CartItem> cartItems = new ArrayList<>();
 
     private DatabaseReference productsRef;
     private String userMobile, customerName, customerPhone, customerAddress;
-    private double cartTotal = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,17 +59,7 @@ public class ProductSelectionActivity extends AppCompatActivity {
         customerAddress = getIntent().getStringExtra("CUSTOMER_ADDRESS");
 
         // Initialize views
-        rvProducts = findViewById(R.id.rvProducts);
-        rvCart = findViewById(R.id.rvCart);
-        etSearch = findViewById(R.id.etSearch);
-        progressBar = findViewById(R.id.progressBar);
-        tvEmpty = findViewById(R.id.tvEmpty);
-        tvCustomerName = findViewById(R.id.tvCustomerName);
-        tvCartTotal = findViewById(R.id.tvCartTotal);
-        tvCartCount = findViewById(R.id.tvCartCount);
-        btnProceed = findViewById(R.id.btnProceed);
-
-        tvCustomerName.setText("Customer: " + customerName);
+        initializeViews();
 
         // Get user mobile
         SharedPreferences prefs = getSharedPreferences("APP_PREFS", MODE_PRIVATE);
@@ -91,53 +77,41 @@ public class ProductSelectionActivity extends AppCompatActivity {
                 .child(userMobile)
                 .child("products");
 
-        // Setup RecyclerViews
+        // Setup
         setupProductRecyclerView();
-        setupCartRecyclerView();
-
-        // Setup search
         setupSearch();
-
-        // Load products
         loadProducts();
 
-        // Proceed button
-        btnProceed.setOnClickListener(v -> {
-            if (cartItems.isEmpty()) {
-                Toast.makeText(this, "Please add at least one product", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            proceedToPayment();
-        });
+        // Buttons
+        setupButtons();
 
-        // Back button
+        // Initial state
+        updateSummary();
+    }
+
+    private void initializeViews() {
+        rvProducts = findViewById(R.id.rvProducts);
+        etSearch = findViewById(R.id.etSearch);
+        progressBar = findViewById(R.id.progressBar);
+        tvEmpty = findViewById(R.id.tvEmpty);
+        tvCustomerName = findViewById(R.id.tvCustomerName);
+        tvSelectedCount = findViewById(R.id.tvCartCount);
+        tvSelectedTotal = findViewById(R.id.tvCartTotal);
+        btnProceed = findViewById(R.id.btnProceed);
+        cvSummary = findViewById(R.id.cvCart);
+
+        tvCustomerName.setText("Customer: " + customerName);
+    }
+
+    private void setupButtons() {
+        btnProceed.setOnClickListener(v -> proceedToPayment());
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-
-        updateCartSummary();
     }
 
     private void setupProductRecyclerView() {
-        productAdapter = new ProductSelectionAdapter(filteredList, this::showQuantityDialog);
+        productAdapter = new ProductSelectionAdapter(filteredList, this::updateSummary);
         rvProducts.setLayoutManager(new LinearLayoutManager(this));
         rvProducts.setAdapter(productAdapter);
-    }
-
-    private void setupCartRecyclerView() {
-        cartAdapter = new CartAdapter(cartItems, new CartAdapter.CartListener() {
-            @Override
-            public void onQuantityChanged() {
-                updateCartSummary();
-            }
-
-            @Override
-            public void onItemRemoved(int position) {
-                cartItems.remove(position);
-                cartAdapter.notifyItemRemoved(position);
-                updateCartSummary();
-            }
-        });
-        rvCart.setLayoutManager(new LinearLayoutManager(this));
-        rvCart.setAdapter(cartAdapter);
     }
 
     private void setupSearch() {
@@ -157,16 +131,19 @@ public class ProductSelectionActivity extends AppCompatActivity {
 
     private void filterProducts(String query) {
         filteredList.clear();
+
         if (query.isEmpty()) {
             filteredList.addAll(productList);
         } else {
-            String lowerQuery = query.toLowerCase();
+            String lowerQuery = query.toLowerCase().trim();
             for (Product product : productList) {
-                if (product.getName().toLowerCase().contains(lowerQuery)) {
+                if (product.getName() != null &&
+                        product.getName().toLowerCase().contains(lowerQuery)) {
                     filteredList.add(product);
                 }
             }
         }
+
         productAdapter.notifyDataSetChanged();
         updateEmptyView();
     }
@@ -179,119 +156,93 @@ public class ProductSelectionActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 productList.clear();
+
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Product product = ds.getValue(Product.class);
                     if (product != null && product.getEffectiveQuantity() > 0) {
                         productList.add(product);
                     }
                 }
+
                 filteredList.clear();
                 filteredList.addAll(productList);
                 productAdapter.notifyDataSetChanged();
+
                 progressBar.setVisibility(View.GONE);
                 updateEmptyView();
+                updateSummary();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(ProductSelectionActivity.this, 
-                    "Failed to load products", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProductSelectionActivity.this,
+                        "Failed to load products: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
                 updateEmptyView();
             }
         });
     }
 
-    private void showQuantityDialog(Product product) {
+    private void updateSummary() {
+        Map<String, ProductSelectionAdapter.SelectedProduct> selectedProducts =
+                productAdapter.getSelectedProducts();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_quantity, null);
-        builder.setView(dialogView);
+        int selectedCount = selectedProducts.size();
+        double total = 0;
 
-        TextView tvProductName = dialogView.findViewById(R.id.tvProductName);
-        TextView tvStock = dialogView.findViewById(R.id.tvStock);
-        TextView tvPrice = dialogView.findViewById(R.id.tvPrice);
-        EditText etQuantity = dialogView.findViewById(R.id.etQuantity);
-        MaterialButton btnAdd = dialogView.findViewById(R.id.btnAdd);
-        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancel);
-
-        String unit = product.getUnit() != null ? product.getUnit() : "";
-
-        tvProductName.setText(product.getName());
-        tvStock.setText("Available: " + product.getEffectiveQuantity() + " " + unit);
-        tvPrice.setText(String.format(
-                Locale.getDefault(),
-                "₹%.2f per %s",
-                product.getPrice(),
-                unit.isEmpty() ? "unit" : unit
-        ));
-
-        AlertDialog dialog = builder.create();
-
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
-
-        btnAdd.setOnClickListener(v -> {
-
-            String qtyStr = etQuantity.getText().toString().trim();
-            if (qtyStr.isEmpty()) {
-                Toast.makeText(this, "Enter quantity", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            double qty = Double.parseDouble(qtyStr);
-
-            if (qty <= 0 || qty > product.getEffectiveQuantity()) {
-                Toast.makeText(this,
-                        "Only " + product.getEffectiveQuantity() + " " + unit + " available",
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            boolean found = false;
-            for (CartItem item : cartItems) {
-                if (item.getProductId().equals(product.getProductId())) {
-                    item.setQuantity(item.getQuantity() + qty);
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                CartItem cartItem = new CartItem(
-                        product.getProductId(),
-                        product.getName(),
-                        qty,                     // ✅ USER ENTERED QTY
-                        product.getPrice(),
-                        product.getGstRate(),
-                        product.getStockQuantity(),
-                        product.getUnit()         // ✅ UNIT PASSED
-                );
-                cartItems.add(cartItem);
-            }
-
-            cartAdapter.notifyDataSetChanged();
-            updateCartSummary();
-            dialog.dismiss();
-            Toast.makeText(this, "Added to cart", Toast.LENGTH_SHORT).show();
-        });
-
-        dialog.show();
-    }
-
-    private void updateCartSummary() {
-        cartTotal = 0;
-        for (CartItem item : cartItems) {
-            cartTotal += item.getTaxableValue();
+        // Calculate total
+        for (ProductSelectionAdapter.SelectedProduct selected : selectedProducts.values()) {
+            total += selected.quantity * selected.price;
         }
 
-        tvCartCount.setText(cartItems.size() + " items");
-        tvCartTotal.setText(String.format(Locale.getDefault(), "Total: ₹%.2f", cartTotal));
+        // Update UI
+        tvSelectedCount.setText(selectedCount + " selected");
+        tvSelectedTotal.setText(String.format(Locale.getDefault(), "Total: ₹%.2f", total));
 
-        // Show/hide cart section
-        findViewById(R.id.cvCart).setVisibility(cartItems.isEmpty() ? View.GONE : View.VISIBLE);
+        // Show/hide summary
+        cvSummary.setVisibility(selectedCount > 0 ? View.VISIBLE : View.GONE);
     }
 
     private void proceedToPayment() {
+        Map<String, ProductSelectionAdapter.SelectedProduct> selectedProducts =
+                productAdapter.getSelectedProducts();
+
+        if (selectedProducts.isEmpty()) {
+            Toast.makeText(this, "Please select at least one product", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create cart items from selected products
+        ArrayList<CartItem> cartItems = new ArrayList<>();
+        double cartTotal = 0;
+
+        for (Product product : productList) {
+            ProductSelectionAdapter.SelectedProduct selected =
+                    selectedProducts.get(product.getProductId());
+
+            if (selected != null) {
+                CartItem item = new CartItem(
+                        product.getProductId(),
+                        product.getName(),
+                        selected.quantity,
+                        selected.price,
+                        product.getGstRate(),
+                        product.getEffectiveQuantity(),
+                        product.getUnit()
+                );
+                cartItems.add(item);
+                cartTotal += item.getTaxableValue();
+            }
+        }
+
+        // Validate we have items
+        if (cartItems.isEmpty()) {
+            Toast.makeText(this, "No valid items selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Proceed to payment
         Intent intent = new Intent(this, PaymentActivity.class);
         intent.putExtra("CUSTOMER_NAME", customerName);
         intent.putExtra("CUSTOMER_PHONE", customerPhone);
@@ -305,9 +256,9 @@ public class ProductSelectionActivity extends AppCompatActivity {
     private void updateEmptyView() {
         if (filteredList.isEmpty()) {
             tvEmpty.setVisibility(View.VISIBLE);
-            tvEmpty.setText(productList.isEmpty() ? 
-                "No products available" : 
-                "No results found");
+            tvEmpty.setText(productList.isEmpty() ?
+                    "No products available" :
+                    "No results found");
         } else {
             tvEmpty.setVisibility(View.GONE);
         }

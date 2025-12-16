@@ -320,8 +320,6 @@ public class HomeFragment extends Fragment {
                 });
     }
 
-
-
     // === TOTAL CUSTOMERS ===
     private void listenToCustomerCount() {
         userRef.child("customers").addValueEventListener(new ValueEventListener() {

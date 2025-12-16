@@ -144,7 +144,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Cart Section -->
+    <!-- Summary Section (replaces cart) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cvCart"
         android:layout_width="0dp"
@@ -160,57 +160,45 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:background="#E8F5E9">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_check_circle"
+                android:contentDescription="Selected"
+                app:tint="#4CAF50" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Cart Items"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#333" />
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tvCartCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="#666"
-                    tools:text="3 items" />
+                    android:textColor="#4CAF50"
+                    android:textStyle="bold"
+                    tools:text="3 selected" />
+
+                <TextView
+                    android:id="@+id/tvCartTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#2E7D32"
+                    tools:text="Total: ₹1500.00" />
 
             </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvCart"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:maxHeight="200dp"
-                tools:listitem="@layout/item_cart" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:background="#E0E0E0" />
-
-            <TextView
-                android:id="@+id/tvCartTotal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#333"
-                tools:text="Total: ₹1500.00" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -223,7 +211,7 @@
         android:layout_margin="16dp"
         android:text="Proceed to Payment"
         android:gravity="center"
-        android:backgroundTint="@color/blue"
+        android:backgroundTint="#4CAF50"
         app:cornerRadius="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -6,116 +6,184 @@
     android:id="@+id/cardProduct"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="1dp"
-    app:strokeColor="#E8E8E8"
-    app:strokeWidth="0.5dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
+    app:strokeWidth="2dp"
+    app:strokeColor="#E0E0E0">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
         android:background="@android:color/white"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="14dp">
 
-        <!-- Product Info Section -->
+        <!-- Header: Product Name & Stock -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginEnd="8dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="10dp">
 
-            <!-- Product Name -->
             <TextView
                 android:id="@+id/tvProductName"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
-                android:maxLines="1"
-                android:ellipsize="end"
-                tools:text="@string/sample_product_name"
-                />
-
-            <!-- Price -->
-            <TextView
-                android:id="@+id/tvProductPrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_weight="1"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                android:textColor="@color/blue"
-                tools:text="@string/sample_product_price"
-                />
+                android:textColor="#1A1A1A"
+                android:lineSpacingExtra="2dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                tools:text="Premium Cotton T-Shirt" />
 
-            <!-- Stock and GST Info -->
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvStock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"
+                android:background="#E8F5E9"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_marginStart="10dp"
+                android:includeFontPadding="false"
+                tools:text="50 pcs" />
+
+        </LinearLayout>
+
+        <!-- Price & Quantity Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#F8F9FA"
+            android:padding="10dp">
+
+            <!-- Price Input -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="8dp">
 
                 <TextView
-                    android:id="@+id/tvProductStock"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="#4CAF50"
-                    android:drawablePadding="3dp"
-                    tools:text="@string/sample_product_stock"
-                    />
+                    android:text="Price"
+                    android:textSize="11sp"
+                    android:textColor="#666666"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.03"
+                    android:layout_marginBottom="6dp" />
 
-                <View
-                    android:layout_width="3dp"
-                    android:layout_height="3dp"
-                    android:layout_marginHorizontal="6dp"
-                    android:background="#BDBDBD"
-                    android:rotation="45"/>
+                <EditText
+                    android:id="@+id/etPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_edittext"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    android:inputType="numberDecimal"
+                    android:hint="₹0"
+                    android:textColorHint="#BDBDBD"
+                    tools:text="150.00" />
+
+            </LinearLayout>
+
+            <!-- Quantity Input -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
 
                 <TextView
-                    android:id="@+id/tvProductGst"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="#757575"
-                    tools:text="@string/sample_product_gst"
-                    />
+                    android:text="Quantity"
+                    android:textSize="11sp"
+                    android:textColor="#666666"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.03"
+                    android:layout_marginBottom="6dp" />
+
+                <EditText
+                    android:id="@+id/etQuantity"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_edittext"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    android:inputType="numberDecimal"
+                    android:hint="0"
+                    android:textColorHint="#BDBDBD"
+                    tools:text="5" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Add Button -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnAddProduct"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#E3F2FD"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground">
+        <!-- Selected Status Bar -->
+        <LinearLayout
+            android:id="@+id/layoutSelected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_add"
-                android:padding="8dp"
-                app:tint="@color/blue"
-                android:contentDescription="Add product" />
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_check_circle"
+                android:contentDescription="Selected"
+                app:tint="#2E7D32" />
 
-        </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tvSelectedInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:textColor="#1B5E20"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:includeFontPadding="false"
+                tools:text="5 pcs × ₹150 = ₹750" />
+
+            <ImageButton
+                android:id="@+id/btnRemove"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_edittext"
+                android:src="@drawable/ic_close"
+                android:contentDescription="Remove"
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#D32F2F" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
