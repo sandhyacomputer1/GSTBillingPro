@@ -117,6 +117,22 @@
                                 android:paddingStart="12dp"
                                 android:paddingEnd="12dp"
                                 android:layout_marginEnd="8dp" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnExportPdf"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:maxWidth="120dp"
+                                android:minWidth="100dp"
+                                android:text="PDF"
+                                android:textSize="13sp"
+                                app:icon="@drawable/ic_pdf"
+                                app:iconTint="#FF5722"
+                                app:strokeColor="#FF5722"
+                                app:iconGravity="textStart"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnWhatsApp"
@@ -126,6 +142,7 @@
                                 android:layout_weight="1"
                                 android:maxWidth="120dp"
                                 android:minWidth="100dp"
+                                android:visibility="gone"
                                 android:text="WhatsApp"
                                 android:textSize="13sp"
                                 app:icon="@drawable/img_2"
@@ -180,22 +197,7 @@
                                 android:paddingEnd="12dp"
                                 android:layout_marginEnd="8dp" />
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnExportPdf"
-                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:maxWidth="120dp"
-                                android:minWidth="100dp"
-                                android:text="PDF"
-                                android:textSize="13sp"
-                                app:icon="@drawable/ic_pdf"
-                                app:iconTint="#FF5722"
-                                app:strokeColor="#FF5722"
-                                app:iconGravity="textStart"
-                                android:paddingStart="12dp"
-                                android:paddingEnd="12dp" />
+
 
                         </LinearLayout>
 

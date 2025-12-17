@@ -1064,6 +1064,7 @@ private File generatedPdfFile = null;
 // BOTTOM SHEET FOR PDF SHARING OPTIONS
 // ═══════════════════════════════════════════════════════════════════
 
+
     private void showPdfShareBottomSheet() {
         if (generatedPdfFile == null || !generatedPdfFile.exists()) {
             Toast.makeText(this, "PDF file not found", Toast.LENGTH_SHORT).show();
@@ -1127,34 +1128,86 @@ private File generatedPdfFile = null;
         try {
             Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", generatedPdfFile);
 
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("application/pdf");
-            intent.setPackage("com.whatsapp");
-            intent.putExtra(Intent.EXTRA_STREAM, uri);
-            intent.putExtra(Intent.EXTRA_TEXT, "Customer Portfolio Report - " + customerName);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            // Prepare message text
+            String messageText = "📄 *Customer Portfolio Report*\n\n" +
+                    "Customer: " + customerName + "\n" +
+                    "📊 Total Invoices: " + totalInvoices + "\n" +
+                    "💰 Total Amount: ₹" + String.format("%,.2f", totalAmount) + "\n" +
+                    "✅ Paid: ₹" + String.format("%,.2f", totalPaid) + "\n" +
+                    "⏳ Pending: ₹" + String.format("%,.2f", totalPending);
 
-            // If customer has phone number, try WhatsApp Business API
+            // If customer has phone number, open chat directly with attachment
             if (customerPhone != null && !customerPhone.isEmpty()) {
                 String phone = customerPhone.replaceAll("[^0-9]", "");
-                // Try to open chat with customer directly
-                Intent chatIntent = new Intent(Intent.ACTION_VIEW);
-                chatIntent.setData(Uri.parse("https://api.whatsapp.com/send?phone=91" + phone));
-                chatIntent.setPackage("com.whatsapp");
+
+                // Remove leading zeros if any
+                if (phone.startsWith("0")) {
+                    phone = phone.substring(1);
+                }
+
+                // Add country code if not present (assuming India +91)
+                if (!phone.startsWith("91") && phone.length() == 10) {
+                    phone = "91" + phone;
+                }
 
                 try {
-                    startActivity(chatIntent);
-                    // After opening chat, user can manually share the file
-                    Toast.makeText(this, "Please share the PDF from your device", Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    // If chat doesn't open, fall back to regular share
-                    startActivity(intent);
+                    // Method 1: Try to open chat with attachment using ACTION_SEND
+                    Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                    sendIntent.setType("application/pdf");
+                    sendIntent.setPackage("com.whatsapp");
+                    sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, messageText);
+                    sendIntent.putExtra("jid", phone + "@s.whatsapp.net");
+                    sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    startActivity(sendIntent);
+                    Toast.makeText(this, "Opening chat with " + customerName, Toast.LENGTH_SHORT).show();
+
+                } catch (Exception e1) {
+                    try {
+                        // Method 2: Open chat first, then user manually shares
+                        Intent chatIntent = new Intent(Intent.ACTION_VIEW);
+                        String url = "https://wa.me/" + phone + "?text=" + Uri.encode(messageText);
+                        chatIntent.setData(Uri.parse(url));
+                        chatIntent.setPackage("com.whatsapp");
+                        startActivity(chatIntent);
+
+                        // Show instruction to share PDF
+                        new AlertDialog.Builder(this)
+                                .setTitle("Share PDF")
+                                .setMessage("Chat opened! Now tap the attachment icon (📎) to share the PDF from your device's Documents folder:\n\n" + generatedPdfFile.getName())
+                                .setPositiveButton("OK", null)
+                                .show();
+
+                    } catch (Exception e2) {
+                        // Method 3: Fallback to share picker
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("application/pdf");
+                        shareIntent.setPackage("com.whatsapp");
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, messageText);
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(shareIntent, "Share to WhatsApp Contact"));
+                    }
                 }
+
             } else {
-                startActivity(intent);
+                // No phone number, use standard share
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("application/pdf");
+                shareIntent.setPackage("com.whatsapp");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, messageText);
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(shareIntent, "Share to WhatsApp Contact"));
             }
-        } catch (Exception e) {
+
+        } catch (android.content.ActivityNotFoundException e) {
             Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "WhatsApp not found", e);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error sharing to WhatsApp: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "WhatsApp share error", e);
         }
     }
