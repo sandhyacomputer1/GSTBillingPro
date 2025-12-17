@@ -489,148 +489,360 @@ public class PaymentActivity extends AppCompatActivity {
             PdfDocument.Page page = pdf.startPage(pageInfo);
             Canvas canvas = page.getCanvas();
 
-            Paint titlePaint = new Paint();
-            titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            titlePaint.setTextSize(18);
+            // Paint objects
+            Paint headerPaint = new Paint();
+            headerPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            headerPaint.setTextSize(22);
+            headerPaint.setColor(0xFF1565C0); // Blue color
+
+            Paint subHeaderPaint = new Paint();
+            subHeaderPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            subHeaderPaint.setTextSize(14);
+            subHeaderPaint.setColor(0xFF263238);
 
             Paint boldPaint = new Paint();
             boldPaint.setTypeface(Typeface.DEFAULT_BOLD);
-            boldPaint.setTextSize(12);
+            boldPaint.setTextSize(11);
+            boldPaint.setColor(0xFF37474F);
 
             Paint regularPaint = new Paint();
-            regularPaint.setTextSize(11);
+            regularPaint.setTextSize(10);
+            regularPaint.setColor(0xFF546E7A);
+
+            Paint smallPaint = new Paint();
+            smallPaint.setTextSize(9);
+            smallPaint.setColor(0xFF78909C);
+
+            Paint tableBorderPaint = new Paint();
+            tableBorderPaint.setStyle(Paint.Style.STROKE);
+            tableBorderPaint.setStrokeWidth(1);
+            tableBorderPaint.setColor(0xFFCFD8DC);
+
+            Paint tableHeaderBg = new Paint();
+            tableHeaderBg.setStyle(Paint.Style.FILL);
+            tableHeaderBg.setColor(0xFFE3F2FD);
 
             int yPos = 40;
             int margin = 40;
             int pageWidth = pageInfo.getPageWidth();
+            int contentWidth = pageWidth - (2 * margin);
 
-            // Header
-            canvas.drawText(businessName, margin, yPos, titlePaint);
-            canvas.drawText("TAX INVOICE", pageWidth - margin - 120, yPos, titlePaint);
-            yPos += 20;
+            // ==================== HEADER SECTION ====================
+            // Business Name (Large)
+            canvas.drawText(businessName, margin, yPos, headerPaint);
+            yPos += 25;
 
+            // Business Address
             if (businessAddress != null && !businessAddress.isEmpty()) {
                 canvas.drawText(businessAddress, margin, yPos, regularPaint);
-                yPos += 15;
+                yPos += 14;
             }
+
+            // Business GSTIN
             if (businessGstin != null && !businessGstin.isEmpty()) {
                 canvas.drawText("GSTIN: " + businessGstin, margin, yPos, regularPaint);
-                yPos += 15;
+                yPos += 14;
             }
-            yPos += 15;
 
-            canvas.drawLine(margin, yPos, pageWidth - margin, yPos, regularPaint);
-            yPos += 20;
-
-            // Invoice details
-            canvas.drawText("Invoice No: " + invoice.invoiceNumber, margin, yPos, boldPaint);
-            canvas.drawText("Date: " + invoice.invoiceDate, pageWidth - margin - 150, yPos, boldPaint);
+            // Add contact details if available
+            canvas.drawText("Phone: " + (userMobile != null ? userMobile : ""), margin, yPos, regularPaint);
             yPos += 25;
 
-            // Customer details
-            canvas.drawText("Bill To:", margin, yPos, boldPaint);
-            yPos += 15;
-            canvas.drawText(invoice.customerName, margin, yPos, regularPaint);
-            yPos += 15;
-            if (customerAddress != null && !customerAddress.isEmpty()) {
-                canvas.drawText(customerAddress, margin, yPos, regularPaint);
-                yPos += 15;
-            }
-            canvas.drawText("Phone: " + customerPhone, margin, yPos, regularPaint);
-            yPos += 30;
-
-            // Table header
-            canvas.drawText("Item", margin, yPos, boldPaint);
-            canvas.drawText("Qty", margin + 250, yPos, boldPaint);
-            canvas.drawText("Rate", margin + 310, yPos, boldPaint);
-            canvas.drawText("Amount", pageWidth - margin - 70, yPos, boldPaint);
-            yPos += 5;
-            canvas.drawLine(margin, yPos, pageWidth - margin, yPos, regularPaint);
+            // Horizontal line separator
+            Paint thickLine = new Paint();
+            thickLine.setStrokeWidth(2);
+            thickLine.setColor(0xFF1565C0);
+            canvas.drawLine(margin, yPos, pageWidth - margin, yPos, thickLine);
             yPos += 20;
+
+            // ==================== INVOICE TITLE & INFO ====================
+            // "TAX INVOICE" or "INVOICE" title
+            String invoiceTitle = isGstEnabled ? "TAX INVOICE" : "INVOICE";
+            subHeaderPaint.setTextSize(16);
+            canvas.drawText(invoiceTitle, margin, yPos, subHeaderPaint);
+
+            // Invoice Number (right aligned)
+            String invNoText = "Invoice #: " + invoice.invoiceNumber;
+            subHeaderPaint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(invNoText, pageWidth - margin, yPos, subHeaderPaint);
+            subHeaderPaint.setTextAlign(Paint.Align.LEFT);
+            yPos += 18;
+
+            // Invoice Date (right aligned)
+            regularPaint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText("Date: " + invoice.invoiceDate, pageWidth - margin, yPos, regularPaint);
+            regularPaint.setTextAlign(Paint.Align.LEFT);
+            yPos += 25;
+
+            // ==================== BILLING INFO SECTION ====================
+            // Create a bordered box for billing details
+            int boxTop = yPos;
+            int boxHeight = 85;
+
+            // Draw box background
+            Paint boxBg = new Paint();
+            boxBg.setStyle(Paint.Style.FILL);
+            boxBg.setColor(0xFFFAFBFC);
+            canvas.drawRect(margin, boxTop, pageWidth - margin, boxTop + boxHeight, boxBg);
+
+            // Draw box border
+            canvas.drawRect(margin, boxTop, pageWidth - margin, boxTop + boxHeight, tableBorderPaint);
+
+            yPos = boxTop + 15;
+
+            // "Bill To:" header
+            boldPaint.setTextSize(12);
+            canvas.drawText("BILL TO:", margin + 10, yPos, boldPaint);
+            yPos += 18;
+
+            // Customer Name
+            regularPaint.setTextSize(11);
+            regularPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            canvas.drawText(invoice.customerName, margin + 10, yPos, regularPaint);
+            regularPaint.setTypeface(Typeface.DEFAULT);
+            yPos += 14;
+
+            // Customer Address
+            if (customerAddress != null && !customerAddress.isEmpty()) {
+                regularPaint.setTextSize(10);
+                canvas.drawText(customerAddress, margin + 10, yPos, regularPaint);
+                yPos += 14;
+            }
+
+            // Customer Phone
+            canvas.drawText("Phone: " + customerPhone, margin + 10, yPos, regularPaint);
+
+            yPos = boxTop + boxHeight + 25;
+
+            // ==================== ITEMS TABLE ====================
+            int tableTop = yPos;
+            int tableLeft = margin;
+            int tableWidth = contentWidth;
+
+            // Column widths
+            int col1Width = (int)(tableWidth * 0.40); // Item Name - 40%
+            int col2Width = (int)(tableWidth * 0.15); // Quantity - 15%
+            int col3Width = (int)(tableWidth * 0.20); // Rate - 20%
+            int col4Width = (int)(tableWidth * 0.25); // Amount - 25%
+
+            // Draw table header background
+            canvas.drawRect(tableLeft, yPos - 15, tableLeft + tableWidth, yPos + 5, tableHeaderBg);
+
+            // Draw table header borders
+            canvas.drawLine(tableLeft, yPos - 15, tableLeft + tableWidth, yPos - 15, tableBorderPaint);
+            canvas.drawLine(tableLeft, yPos + 5, tableLeft + tableWidth, yPos + 5, tableBorderPaint);
+            canvas.drawLine(tableLeft, yPos - 15, tableLeft, yPos + 5, tableBorderPaint);
+            canvas.drawLine(tableLeft + tableWidth, yPos - 15, tableLeft + tableWidth, yPos + 5, tableBorderPaint);
+
+            // Table headers
+            boldPaint.setTextSize(11);
+            canvas.drawText("ITEM DESCRIPTION", tableLeft + 10, yPos, boldPaint);
+
+            boldPaint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText("QTY", tableLeft + col1Width + (col2Width / 2), yPos, boldPaint);
+            canvas.drawText("RATE", tableLeft + col1Width + col2Width + (col3Width / 2), yPos, boldPaint);
+
+            boldPaint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText("AMOUNT", tableLeft + tableWidth - 10, yPos, boldPaint);
+            boldPaint.setTextAlign(Paint.Align.LEFT);
+
+            yPos += 5;
+            int tableContentStart = yPos;
+
+            // Vertical lines for table header
+            canvas.drawLine(tableLeft + col1Width, yPos - 20, tableLeft + col1Width, yPos, tableBorderPaint);
+            canvas.drawLine(tableLeft + col1Width + col2Width, yPos - 20, tableLeft + col1Width + col2Width, yPos, tableBorderPaint);
+            canvas.drawLine(tableLeft + col1Width + col2Width + col3Width, yPos - 20, tableLeft + col1Width + col2Width + col3Width, yPos, tableBorderPaint);
+
+            yPos += 15;
 
             // Table items
+            int itemStartY = yPos;
+            regularPaint.setTextSize(10);
+
             for (InvoiceItem item : invoice.items) {
-                canvas.drawText(trimText(item.productName, 30), margin, yPos, regularPaint);
+                int rowTop = yPos - 10;
+                int rowHeight = 25;
+
+                // Draw row borders
+                canvas.drawLine(tableLeft, rowTop, tableLeft + tableWidth, rowTop, tableBorderPaint);
+                canvas.drawLine(tableLeft, rowTop, tableLeft, rowTop + rowHeight, tableBorderPaint);
+                canvas.drawLine(tableLeft + tableWidth, rowTop, tableLeft + tableWidth, rowTop + rowHeight, tableBorderPaint);
+
+                // Vertical separators
+                canvas.drawLine(tableLeft + col1Width, rowTop, tableLeft + col1Width, rowTop + rowHeight, tableBorderPaint);
+                canvas.drawLine(tableLeft + col1Width + col2Width, rowTop, tableLeft + col1Width + col2Width, rowTop + rowHeight, tableBorderPaint);
+                canvas.drawLine(tableLeft + col1Width + col2Width + col3Width, rowTop, tableLeft + col1Width + col2Width + col3Width, rowTop + rowHeight, tableBorderPaint);
+
+                // Item name
+                canvas.drawText(trimText(item.productName, 35), tableLeft + 10, yPos, regularPaint);
+
+                // Quantity (centered)
+                regularPaint.setTextAlign(Paint.Align.CENTER);
                 canvas.drawText(String.format(Locale.getDefault(), "%.2f", item.quantity),
-                        margin + 250, yPos, regularPaint);
-                canvas.drawText(String.format(Locale.getDefault(), "%.2f", item.rate),
-                        margin + 310, yPos, regularPaint);
-                canvas.drawText(String.format(Locale.getDefault(), "%.2f", item.getTaxableValue()),
-                        pageWidth - margin - 70, yPos, regularPaint);
-                yPos += 18;
+                        tableLeft + col1Width + (col2Width / 2), yPos, regularPaint);
+
+                // Rate (centered)
+                canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", item.rate),
+                        tableLeft + col1Width + col2Width + (col3Width / 2), yPos, regularPaint);
+
+                // Amount (right aligned)
+                regularPaint.setTextAlign(Paint.Align.RIGHT);
+                canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", item.getTaxableValue()),
+                        tableLeft + tableWidth - 10, yPos, regularPaint);
+                regularPaint.setTextAlign(Paint.Align.LEFT);
+
+                yPos += rowHeight;
             }
 
-            yPos += 10;
-            canvas.drawLine(margin, yPos, pageWidth - margin, yPos, regularPaint);
+            // Bottom border of last row
+            canvas.drawLine(tableLeft, yPos - 10, tableLeft + tableWidth, yPos - 10, tableBorderPaint);
+
             yPos += 20;
 
-            // Totals
-            int totalsX = pageWidth - margin - 200;
-            canvas.drawText("Taxable Amount:", totalsX, yPos, regularPaint);
-            canvas.drawText("₹" + invoice.totalTaxableValue,
-                    pageWidth - margin - 70, yPos, regularPaint);
+            // ==================== TOTALS SECTION ====================
+            int totalsBoxWidth = 250;
+            int totalsLeft = pageWidth - margin - totalsBoxWidth;
+            int totalsTop = yPos;
+
+            // Subtotal
+            regularPaint.setTextSize(11);
+            canvas.drawText("Subtotal:", totalsLeft, yPos, regularPaint);
+            regularPaint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.totalTaxableValue),
+                    pageWidth - margin - 10, yPos, regularPaint);
+            regularPaint.setTextAlign(Paint.Align.LEFT);
             yPos += 18;
 
+            // GST Details (if enabled)
             if (isGstEnabled) {
+                smallPaint.setTextSize(10);
 
-                canvas.drawText("CGST:", totalsX, yPos, regularPaint);
-                canvas.drawText("₹" + invoice.totalCGST,
-                        pageWidth - margin - 70, yPos, regularPaint);
-                yPos += 18;
+                if (invoice.totalCGST > 0) {
+                    canvas.drawText("CGST:", totalsLeft, yPos, smallPaint);
+                    smallPaint.setTextAlign(Paint.Align.RIGHT);
+                    canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.totalCGST),
+                            pageWidth - margin - 10, yPos, smallPaint);
+                    smallPaint.setTextAlign(Paint.Align.LEFT);
+                    yPos += 16;
+                }
 
-                canvas.drawText("SGST:", totalsX, yPos, regularPaint);
-                canvas.drawText("₹" + invoice.totalSGST,
-                        pageWidth - margin - 70, yPos, regularPaint);
-                yPos += 18;
+                if (invoice.totalSGST > 0) {
+                    canvas.drawText("SGST:", totalsLeft, yPos, smallPaint);
+                    smallPaint.setTextAlign(Paint.Align.RIGHT);
+                    canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.totalSGST),
+                            pageWidth - margin - 10, yPos, smallPaint);
+                    smallPaint.setTextAlign(Paint.Align.LEFT);
+                    yPos += 16;
+                }
 
                 if (invoice.totalIGST > 0) {
-                    canvas.drawText("IGST:", totalsX, yPos, regularPaint);
-                    canvas.drawText("₹" + invoice.totalIGST,
-                            pageWidth - margin - 70, yPos, regularPaint);
-                    yPos += 18;
+                    canvas.drawText("IGST:", totalsLeft, yPos, smallPaint);
+                    smallPaint.setTextAlign(Paint.Align.RIGHT);
+                    canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.totalIGST),
+                            pageWidth - margin - 10, yPos, smallPaint);
+                    smallPaint.setTextAlign(Paint.Align.LEFT);
+                    yPos += 16;
                 }
+                yPos += 5;
             }
-            canvas.drawText(
-                    isGstEnabled ? "TAX INVOICE" : "INVOICE",
-                    pageWidth - margin - 120,
-                    yPos,
-                    titlePaint
-            );
 
-
-            canvas.drawLine(totalsX - 10, yPos, pageWidth - margin, yPos, boldPaint);
+            // Separator line
+            canvas.drawLine(totalsLeft, yPos, pageWidth - margin, yPos, tableBorderPaint);
             yPos += 18;
 
-            boldPaint.setTextSize(14);
-            canvas.drawText("Grand Total:", totalsX, yPos, boldPaint);
+            // Grand Total (highlighted)
+            Paint grandTotalBg = new Paint();
+            grandTotalBg.setStyle(Paint.Style.FILL);
+            grandTotalBg.setColor(0xFFE3F2FD);
+            canvas.drawRect(totalsLeft - 10, yPos - 15, pageWidth - margin, yPos + 8, grandTotalBg);
+
+            boldPaint.setTextSize(13);
+            boldPaint.setColor(0xFF1565C0);
+            canvas.drawText("GRAND TOTAL:", totalsLeft, yPos, boldPaint);
+            boldPaint.setTextAlign(Paint.Align.RIGHT);
             canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.grandTotal),
-                    pageWidth - margin - 70, yPos, boldPaint);
-            yPos += 25;
+                    pageWidth - margin - 10, yPos, boldPaint);
+            boldPaint.setTextAlign(Paint.Align.LEFT);
+            boldPaint.setColor(0xFF37474F);
+            yPos += 30;
 
-            boldPaint.setTextSize(12);
-            canvas.drawText("Paid Amount:", totalsX, yPos, regularPaint);
+            // ==================== PAYMENT DETAILS ====================
+            regularPaint.setTextSize(11);
+
+            canvas.drawText("Paid Amount:", totalsLeft, yPos, regularPaint);
+            regularPaint.setTextAlign(Paint.Align.RIGHT);
             canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.paidAmount),
-                    pageWidth - margin - 70, yPos, regularPaint);
-            yPos += 18;
+                    pageWidth - margin - 10, yPos, regularPaint);
+            regularPaint.setTextAlign(Paint.Align.LEFT);
+            yPos += 16;
 
-            // 🔥 NEW: Show payment mode in PDF
-            canvas.drawText("Payment Mode:", totalsX, yPos, regularPaint);
-            canvas.drawText(paymentMode, pageWidth - margin - 70, yPos, regularPaint);
-            yPos += 18;
+            canvas.drawText("Payment Mode:", totalsLeft, yPos, regularPaint);
+            regularPaint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(paymentMode, pageWidth - margin - 10, yPos, regularPaint);
+            regularPaint.setTextAlign(Paint.Align.LEFT);
+            yPos += 16;
 
-            canvas.drawText("Pending Amount:", totalsX, yPos, regularPaint);
+            canvas.drawText("Balance Due:", totalsLeft, yPos, regularPaint);
+            regularPaint.setTextAlign(Paint.Align.RIGHT);
+            Paint balancePaint = new Paint(regularPaint);
+            balancePaint.setColor(invoice.pendingAmount > 0 ? 0xFFE53935 : 0xFF43A047);
+            balancePaint.setTypeface(Typeface.DEFAULT_BOLD);
             canvas.drawText(String.format(Locale.getDefault(), "₹%.2f", invoice.pendingAmount),
-                    pageWidth - margin - 70, yPos, regularPaint);
-            yPos += 18;
+                    pageWidth - margin - 10, yPos, balancePaint);
+            regularPaint.setTextAlign(Paint.Align.LEFT);
+            yPos += 16;
 
-            canvas.drawText("Status:", totalsX, yPos, regularPaint);
-            canvas.drawText(invoice.paymentStatus, pageWidth - margin - 70, yPos, regularPaint);
+            // Payment Status Badge
+            canvas.drawText("Status:", totalsLeft, yPos, regularPaint);
+
+            Paint statusPaint = new Paint();
+            statusPaint.setTextSize(10);
+            statusPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            statusPaint.setTextAlign(Paint.Align.RIGHT);
+
+            if ("Paid".equals(invoice.paymentStatus)) {
+                statusPaint.setColor(0xFF43A047);
+            } else if ("Partial".equals(invoice.paymentStatus)) {
+                statusPaint.setColor(0xFFFB8C00);
+            } else {
+                statusPaint.setColor(0xFFE53935);
+            }
+
+            canvas.drawText(invoice.paymentStatus.toUpperCase(), pageWidth - margin - 10, yPos, statusPaint);
+
             yPos += 40;
 
-            // Footer
-            regularPaint.setTextAlign(Paint.Align.CENTER);
-            regularPaint.setTextSize(10);
-            canvas.drawText("Thank you for your business!", pageWidth / 2, yPos, regularPaint);
+            // ==================== TERMS & CONDITIONS ====================
+//            if (yPos < 720) {
+//                smallPaint.setTextSize(9);
+//                smallPaint.setColor(0xFF78909C);
+//                canvas.drawText("Terms & Conditions:", margin, yPos, smallPaint);
+//                yPos += 14;
+//
+//                smallPaint.setTextSize(8);
+//                canvas.drawText("1. Payment is due within 30 days of invoice date.", margin, yPos, smallPaint);
+//                yPos += 12;
+//                canvas.drawText("2. Please make payment to the account details provided.", margin, yPos, smallPaint);
+//                yPos += 12;
+//                canvas.drawText("3. For any queries, please contact us.", margin, yPos, smallPaint);
+//            }
+
+            // ==================== FOOTER ====================
+            yPos = 800; // Fixed footer position
+
+            // Footer separator line
+            canvas.drawLine(margin, yPos - 10, pageWidth - margin, yPos - 10, tableBorderPaint);
+
+            smallPaint.setTextSize(9);
+            smallPaint.setColor(0xFF90A4AE);
+            smallPaint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText("Thank you for your business!", pageWidth / 2, yPos, smallPaint);
+            yPos += 12;
+
+            smallPaint.setTextSize(8);
+            canvas.drawText("This is a computer generated invoice and does not require a signature.",
+                    pageWidth / 2, yPos, smallPaint);
 
             pdf.finishPage(page);
             pdf.writeTo(new FileOutputStream(file));
@@ -639,11 +851,10 @@ public class PaymentActivity extends AppCompatActivity {
             return file;
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "PDF generation failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "PDF generation failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             return null;
         }
     }
-
     private String trimText(String text, int maxLen) {
         return text.length() > maxLen ? text.substring(0, maxLen - 3) + "..." : text;
     }

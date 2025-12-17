@@ -4,98 +4,185 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="5dp"
-    android:layout_marginVertical="4dp"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="3dp"
     android:foreground="?attr/selectableItemBackground"
-    app:cardCornerRadius="10dp"
+    app:cardCornerRadius="8dp"
     app:cardElevation="1dp"
-    app:strokeWidth="0dp"
+    app:strokeWidth="0.5dp"
+    app:strokeColor="#E0E0E0"
     android:backgroundTint="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="8dp">
 
-        <!-- LEFT SECTION: CUSTOMER INFO & AMOUNTS -->
+        <!-- HEADER ROW: CUSTOMER NAME + REMIND BUTTON -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <!-- CUSTOMER NAME -->
             <TextView
                 android:id="@+id/tvCustomerName"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:text="Customer Name"
                 android:textSize="14sp"
-                android:textColor="#474747"
+                android:textColor="#212121"
+                android:textStyle="bold"
                 android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:ellipsize="end"/>
 
-            <!-- INVOICE NO & DATE -->
-            <LinearLayout
+            <!-- REMIND BUTTON -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tvRemind"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="Remind"
+                android:textSize="12sp"
+                android:textColor="#F44336"
+                android:textStyle="bold"
+                android:minWidth="70dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="0dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="6dp"
+                app:strokeColor="#F44336"
+                app:strokeWidth="1dp"
+                app:iconSize="0dp"/>
+        </LinearLayout>
+
+        <!-- INVOICE INFO ROW: NUMBER + DATE -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical">
+
+            <!-- INVOICE NUMBER WITH ICON -->
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_receipt"
+                app:tint="#757575"/>
+
+            <TextView
+                android:id="@+id/tvInvoiceNo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="2dp">
+                android:text="INV-001"
+                android:textSize="12sp"
+                android:textColor="#1976D2"
+                android:textStyle="bold"
+                android:layout_marginStart="4dp"/>
 
-                <TextView
-                    android:id="@+id/tvInvoiceNo"
-                    android:text="INV-001"
-                    android:textSize="11sp"
-                    android:textColor="#1976D2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="12dp"
+                android:background="#E0E0E0"
+                android:layout_marginHorizontal="10dp"/>
 
-                <TextView
-                    android:text="•"
-                    android:textSize="11sp"
-                    android:textColor="#BDBDBD"
-                    android:paddingHorizontal="6dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+            <!-- DATE WITH ICON -->
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_calendar"
+                app:tint="#757575"/>
 
-                <TextView
-                    android:id="@+id/tvDate"
-                    android:text="Dec 15"
-                    android:textSize="11sp"
-                    android:textColor="#757575"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <!-- AMOUNTS - SIMPLIFIED PENDING DISPLAY -->
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="6dp">
+                android:text="15 Dec 2024"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <!-- DIVIDER -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#F0F0F0"
+            android:layout_marginVertical="8dp"/>
+
+        <!-- AMOUNT ROW: TOTAL + PENDING -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- TOTAL AMOUNT -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Amount"
+                    android:textSize="10sp"
+                    android:textColor="#9E9E9E"
+                    android:letterSpacing="0.02"/>
 
                 <TextView
                     android:id="@+id/tvTotalAmount"
-                    android:text="₹15,850"
-                    android:textSize="14sp"
-                    android:textColor="#474747"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <!-- PENDING AMOUNT TEXT ONLY -->
-                <TextView
-                    android:id="@+id/tvPendingAmount"
-                    android:text="Pending ₹5,250"
-                    android:textSize="12sp"
-                    android:textColor="#D32F2F"
-                    android:layout_marginStart="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:text="₹15,850"
+                    android:textSize="14sp"
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:layout_marginTop="2dp"/>
             </LinearLayout>
 
+            <!-- VERTICAL DIVIDER -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#E0E0E0"
+                android:layout_marginHorizontal="12dp"/>
+
+            <!-- PENDING AMOUNT -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pending"
+                    android:textSize="10sp"
+                    android:visibility="gone"
+                    android:textColor="#9E9E9E"
+                    android:letterSpacing="0.02"/>
+
+                <TextView
+                    android:id="@+id/tvPendingAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₹5,250"
+                    android:textSize="14sp"
+                    android:textColor="#F44336"
+                    android:textStyle="bold"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
         </LinearLayout>
 
         <!-- HIDDEN FIELDS -->
@@ -105,40 +192,11 @@
             android:layout_width="0dp"
             android:layout_height="0dp"/>
 
-        <!-- RIGHT SECTION: REMIND BUTTON (END POSITION) -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginStart="12dp">
-
-            <ImageView
-                android:id="@+id/tvViewDetails"
-                android:layout_width="wrap_content"
-                android:visibility="gone"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_arrow_forward"
-                android:padding="6dp"
-                app:tint="#1976D2"/>
-
-            <!-- REMIND BUTTON - SAME POSITION AS OLD SHARE -->
-            <TextView
-                android:id="@+id/tvRemind"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Remind"
-                android:textSize="12sp"
-                android:textColor="#F44336"
-                android:textStyle="bold"
-                android:layout_marginStart="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp"
-                android:minWidth="60dp"
-                android:gravity="center"/>
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/tvViewDetails"
+            android:visibility="gone"
+            android:layout_width="0dp"
+            android:layout_height="0dp"/>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
