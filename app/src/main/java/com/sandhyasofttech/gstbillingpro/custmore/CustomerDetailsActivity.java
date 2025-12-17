@@ -341,53 +341,265 @@ public class CustomerDetailsActivity extends AppCompatActivity {
             }
 
             // ═══════════════════════════════════════════════════════════
-            // SECTION 4: INVOICE DETAILS
+            // SECTION 4: INVOICE DETAILS - FIXED TABLE FORMAT
             // ═══════════════════════════════════════════════════════════
             if (!invoiceList.isEmpty()) {
                 addSectionHeader(doc, "INVOICE DETAILS", fontBold);
 
-                Table invTable = new Table(UnitValue.createPercentArray(new float[]{8, 22, 20, 20, 15, 15}))
-                        .useAllAvailableWidth();
+                // Create table with proper column widths
+                float[] columnWidths = {10f, 20f, 18f, 17f, 17f, 18f};
+                Table invTable = new Table(UnitValue.createPercentArray(columnWidths))
+                        .useAllAvailableWidth()
+                        .setMarginBottom(20);
 
-                // Table Headers
-                invTable.addHeaderCell(createInvoiceHeaderCell("Sr.", fontBold));
-                invTable.addHeaderCell(createInvoiceHeaderCell("Invoice No.", fontBold));
-                invTable.addHeaderCell(createInvoiceHeaderCell("Date", fontBold));
-                invTable.addHeaderCell(createInvoiceHeaderCell("Amount", fontBold));
-                invTable.addHeaderCell(createInvoiceHeaderCell("Paid", fontBold));
-                invTable.addHeaderCell(createInvoiceHeaderCell("Balance", fontBold));
+                // Add Table Headers with proper border
+                Cell headerSr = new Cell()
+                        .add(new Paragraph("Sr."))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(ColorConstants.WHITE)
+                        .setBackgroundColor(COLOR_PRIMARY)
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+                        .setPadding(10);
+                invTable.addHeaderCell(headerSr);
 
-                // Table Data - get complete invoice data
-                int srNo = 1;
+                Cell headerInvoice = new Cell()
+                        .add(new Paragraph("Invoice No."))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(ColorConstants.WHITE)
+                        .setBackgroundColor(COLOR_PRIMARY)
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+                        .setPadding(10);
+                invTable.addHeaderCell(headerInvoice);
+
+                Cell headerDate = new Cell()
+                        .add(new Paragraph("Date"))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(ColorConstants.WHITE)
+                        .setBackgroundColor(COLOR_PRIMARY)
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+                        .setPadding(10);
+                invTable.addHeaderCell(headerDate);
+
+                Cell headerAmount = new Cell()
+                        .add(new Paragraph("Amount"))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(ColorConstants.WHITE)
+                        .setBackgroundColor(COLOR_PRIMARY)
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+                        .setPadding(10);
+                invTable.addHeaderCell(headerAmount);
+
+                Cell headerPaid = new Cell()
+                        .add(new Paragraph("Paid"))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(ColorConstants.WHITE)
+                        .setBackgroundColor(COLOR_PRIMARY)
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+                        .setPadding(10);
+                invTable.addHeaderCell(headerPaid);
+
+                Cell headerBalance = new Cell()
+                        .add(new Paragraph("Balance"))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(ColorConstants.WHITE)
+                        .setBackgroundColor(COLOR_PRIMARY)
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+                        .setPadding(10);
+                invTable.addHeaderCell(headerBalance);
+
+                // Initialize totals
                 double tableTotalAmount = 0;
                 double tableTotalPaid = 0;
                 double tableTotalBalance = 0;
+                int srNo = 1;
 
+                // Add data rows with consistent styling
                 for (InvoiceSummary invoice : invoiceList) {
-                    // Get additional data from Firebase for each invoice
                     double invoiceTotal = invoice.total;
                     double invoicePaid = invoice.paidAmount;
                     double invoiceBalance = invoice.pendingAmount;
 
+                    // Accumulate totals
                     tableTotalAmount += invoiceTotal;
                     tableTotalPaid += invoicePaid;
                     tableTotalBalance += invoiceBalance;
 
-                    invTable.addCell(createInvoiceDataCell(String.valueOf(srNo++), fontRegular, TextAlignment.CENTER));
-                    invTable.addCell(createInvoiceDataCell(invoice.number, fontRegular, TextAlignment.LEFT));
-                    invTable.addCell(createInvoiceDataCell(invoice.date, fontRegular, TextAlignment.LEFT));
-                    invTable.addCell(createInvoiceDataCell("₹" + formatAmount(invoiceTotal), fontRegular, TextAlignment.RIGHT));
-                    invTable.addCell(createInvoiceDataCell("₹" + formatAmount(invoicePaid), fontRegular, TextAlignment.RIGHT));
-                    invTable.addCell(createInvoiceDataCell("₹" + formatAmount(invoiceBalance), fontRegular, TextAlignment.RIGHT));
+                    // Sr. No Cell
+                    Cell cellSr = new Cell()
+                            .add(new Paragraph(String.valueOf(srNo++)))
+                            .setFont(fontRegular)
+                            .setFontSize(9)
+                            .setFontColor(COLOR_TEXT)
+                            .setTextAlignment(TextAlignment.CENTER)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+                            .setPadding(8);
+                    invTable.addCell(cellSr);
+
+                    // Invoice Number Cell
+                    Cell cellInvoice = new Cell()
+                            .add(new Paragraph(invoice.number != null ? invoice.number : "N/A"))
+                            .setFont(fontRegular)
+                            .setFontSize(9)
+                            .setFontColor(COLOR_TEXT)
+                            .setTextAlignment(TextAlignment.LEFT)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+                            .setPaddingLeft(8)
+                            .setPaddingRight(5)
+                            .setPaddingTop(8)
+                            .setPaddingBottom(8);
+                    invTable.addCell(cellInvoice);
+
+                    // Date Cell
+                    Cell cellDate = new Cell()
+                            .add(new Paragraph(invoice.date != null ? invoice.date : "N/A"))
+                            .setFont(fontRegular)
+                            .setFontSize(9)
+                            .setFontColor(COLOR_TEXT)
+                            .setTextAlignment(TextAlignment.LEFT)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+                            .setPaddingLeft(8)
+                            .setPaddingRight(5)
+                            .setPaddingTop(8)
+                            .setPaddingBottom(8);
+                    invTable.addCell(cellDate);
+
+                    // Amount Cell
+                    Cell cellAmount = new Cell()
+                            .add(new Paragraph("₹" + formatAmount(invoiceTotal)))
+                            .setFont(fontRegular)
+                            .setFontSize(9)
+                            .setFontColor(COLOR_TEXT)
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+                            .setPaddingLeft(5)
+                            .setPaddingRight(8)
+                            .setPaddingTop(8)
+                            .setPaddingBottom(8);
+                    invTable.addCell(cellAmount);
+
+                    // Paid Cell
+                    Cell cellPaid = new Cell()
+                            .add(new Paragraph("₹" + formatAmount(invoicePaid)))
+                            .setFont(fontRegular)
+                            .setFontSize(9)
+                            .setFontColor(COLOR_TEXT)
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+                            .setPaddingLeft(5)
+                            .setPaddingRight(8)
+                            .setPaddingTop(8)
+                            .setPaddingBottom(8);
+                    invTable.addCell(cellPaid);
+
+                    // Balance Cell
+                    Cell cellBalance = new Cell()
+                            .add(new Paragraph("₹" + formatAmount(invoiceBalance)))
+                            .setFont(fontRegular)
+                            .setFontSize(9)
+                            .setFontColor(COLOR_TEXT)
+                            .setTextAlignment(TextAlignment.RIGHT)
+                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+                            .setPaddingLeft(5)
+                            .setPaddingRight(8)
+                            .setPaddingTop(8)
+                            .setPaddingBottom(8);
+                    invTable.addCell(cellBalance);
                 }
 
-                // Total Row
-                invTable.addCell(createInvoiceTotalCell("", fontBold, TextAlignment.CENTER));
-                invTable.addCell(createInvoiceTotalCell("", fontBold, TextAlignment.CENTER));
-                invTable.addCell(createInvoiceTotalCell("TOTAL", fontBold, TextAlignment.RIGHT));
-                invTable.addCell(createInvoiceTotalCell("₹" + formatAmount(tableTotalAmount), fontBold, TextAlignment.RIGHT));
-                invTable.addCell(createInvoiceTotalCell("₹" + formatAmount(tableTotalPaid), fontBold, TextAlignment.RIGHT));
-                invTable.addCell(createInvoiceTotalCell("₹" + formatAmount(tableTotalBalance), fontBold, TextAlignment.RIGHT));
+                // Add Total Row with proper styling
+                Cell totalSr = new Cell()
+                        .add(new Paragraph(""))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+//                        .setBackgroundColor(COLOR_LIGHT_BG)
+//                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setPadding(10);
+                invTable.addCell(totalSr);
+
+                Cell totalInvoice = new Cell()
+                        .add(new Paragraph(""))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+//                        .setBackgroundColor(COLOR_LIGHT_BG)
+//                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setPadding(10);
+                invTable.addCell(totalInvoice);
+
+                Cell totalLabel = new Cell()
+                        .add(new Paragraph("TOTAL"))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(COLOR_PRIMARY)
+                        .setBackgroundColor(COLOR_LIGHT_BG)
+                        .setTextAlignment(TextAlignment.RIGHT)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setPaddingRight(8)
+                        .setPadding(10);
+                invTable.addCell(totalLabel);
+
+                Cell totalAmount = new Cell()
+                        .add(new Paragraph("₹" + formatAmount(tableTotalAmount)))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(COLOR_PRIMARY)
+                        .setBackgroundColor(COLOR_LIGHT_BG)
+                        .setTextAlignment(TextAlignment.RIGHT)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setPaddingRight(8)
+                        .setPadding(10);
+                invTable.addCell(totalAmount);
+
+                Cell totalPaid = new Cell()
+                        .add(new Paragraph("₹" + formatAmount(tableTotalPaid)))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(COLOR_PRIMARY)
+                        .setBackgroundColor(COLOR_LIGHT_BG)
+                        .setTextAlignment(TextAlignment.RIGHT)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setPaddingRight(8)
+                        .setPadding(10);
+                invTable.addCell(totalPaid);
+
+                Cell totalBalance = new Cell()
+                        .add(new Paragraph("₹" + formatAmount(tableTotalBalance)))
+                        .setFont(fontBold)
+                        .setFontSize(10)
+                        .setFontColor(COLOR_PRIMARY)
+                        .setBackgroundColor(COLOR_LIGHT_BG)
+                        .setTextAlignment(TextAlignment.RIGHT)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setPaddingRight(8)
+                        .setPadding(10);
+                invTable.addCell(totalBalance);
 
                 doc.add(invTable);
             }
@@ -422,7 +634,6 @@ public class CustomerDetailsActivity extends AppCompatActivity {
             Log.e(TAG, "PDF Generation Error", e);
         }
     }
-
     // ═══════════════════════════════════════════════════════════════════
     // HELPER METHODS FOR PDF STYLING
     // ═══════════════════════════════════════════════════════════════════
