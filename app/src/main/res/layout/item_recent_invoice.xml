@@ -4,10 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
+    android:layout_marginHorizontal="5dp"
     android:layout_marginVertical="4dp"
     android:foreground="?attr/selectableItemBackground"
-    app:cardCornerRadius="12dp"
+    app:cardCornerRadius="10dp"
     app:cardElevation="1dp"
     app:strokeWidth="0dp"
     android:backgroundTint="@color/white">
@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp"
+        android:padding="8dp"
         android:gravity="center_vertical">
 
         <!-- LEFT SECTION: CUSTOMER INFO & AMOUNTS -->
@@ -30,9 +30,8 @@
             <TextView
                 android:id="@+id/tvCustomerName"
                 android:text="Customer Name"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
+                android:textSize="14sp"
+                android:textColor="#474747"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:layout_width="match_parent"
@@ -80,9 +79,8 @@
                 <TextView
                     android:id="@+id/tvTotalAmount"
                     android:text="₹15,850"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#212121"
+                    android:textSize="14sp"
+                    android:textColor="#474747"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
@@ -92,10 +90,10 @@
                     android:text="Pending ₹5,250"
                     android:textSize="12sp"
                     android:textColor="#D32F2F"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"/>
+                    />
             </LinearLayout>
 
         </LinearLayout>
