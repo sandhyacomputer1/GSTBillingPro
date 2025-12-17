@@ -221,7 +221,434 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                 .show();
     }
 
+//    private void exportToPdf() {
+//        try {
+//            String businessName = getBusinessName();
+//            String fileName = customerName.replaceAll("[^a-zA-Z0-9]", "_") + "_Portfolio.pdf";
+//
+//            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
+//            PdfWriter writer = new PdfWriter(file);
+//            PdfDocument pdf = new PdfDocument(writer);
+//            pdf.setDefaultPageSize(PageSize.A4);
+//
+//            // Add header and footer event handler
+//            pdf.addEventHandler(PdfDocumentEvent.END_PAGE, new HeaderFooterEventHandler(businessName));
+//
+//            Document doc = new Document(pdf);
+//            doc.setMargins(80, 40, 70, 40); // top, right, bottom, left
+//
+//            PdfFont fontRegular = PdfFontFactory.createFont("Helvetica");
+//            PdfFont fontBold = PdfFontFactory.createFont("Helvetica-Bold");
+//
+//            String nowDate = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(new Date());
+//            String nowTime = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
+//
+//            // ═══════════════════════════════════════════════════════════
+//            // DOCUMENT TITLE
+//            // ═══════════════════════════════════════════════════════════
+//            doc.add(new Paragraph("CUSTOMER PORTFOLIO REPORT")
+//                    .setFont(fontBold)
+//                    .setFontSize(20)
+//                    .setFontColor(COLOR_PRIMARY)
+//                    .setTextAlignment(TextAlignment.CENTER)
+//                    .setMarginBottom(5));
+//
+//            doc.add(new Paragraph("Generated on " + nowDate + " at " + nowTime)
+//                    .setFont(fontRegular)
+//                    .setFontSize(9)
+//                    .setFontColor(COLOR_TEXT_LIGHT)
+//                    .setTextAlignment(TextAlignment.CENTER)
+//                    .setMarginBottom(20));
+//
+//            // Divider line
+//            SolidLine line = new SolidLine(1f);
+//            line.setColor(COLOR_BORDER);
+//            doc.add(new LineSeparator(line).setMarginBottom(20));
+//
+//            // ═══════════════════════════════════════════════════════════
+//            // SECTION 1: CUSTOMER INFORMATION
+//            // ═══════════════════════════════════════════════════════════
+//            addSectionHeader(doc, "CUSTOMER INFORMATION", fontBold);
+//
+//            Table custTable = new Table(UnitValue.createPercentArray(new float[]{30, 70}))
+//                    .useAllAvailableWidth()
+//                    .setMarginBottom(20);
+//
+//            addInfoRow(custTable, "Customer Name", customerName != null ? customerName : "N/A", fontBold, fontRegular);
+//            addInfoRow(custTable, "Phone Number", customerPhone != null ? customerPhone : "N/A", fontBold, fontRegular);
+//            addInfoRow(custTable, "Email Address", tvEmail.getText().toString(), fontBold, fontRegular);
+//            addInfoRow(custTable, "GSTIN", tvGstin.getText().toString().replace("GSTIN: ", ""), fontBold, fontRegular);
+//            addInfoRow(custTable, "Address", tvAddress.getText().toString(), fontBold, fontRegular);
+//
+//            doc.add(custTable);
+//
+//            // ═══════════════════════════════════════════════════════════
+//            // SECTION 2: PORTFOLIO SUMMARY
+//            // ═══════════════════════════════════════════════════════════
+//            addSectionHeader(doc, "PORTFOLIO SUMMARY", fontBold);
+//
+//            Table summaryTable = new Table(UnitValue.createPercentArray(new float[]{25, 25, 25, 25}))
+//                    .useAllAvailableWidth()
+//                    .setMarginBottom(15);
+//
+//            // Header Row
+//            summaryTable.addCell(createHeaderCell("Total Invoices", fontBold));
+//            summaryTable.addCell(createHeaderCell("Paid Invoices", fontBold));
+//            summaryTable.addCell(createHeaderCell("Pending Invoices", fontBold));
+//            summaryTable.addCell(createHeaderCell("Total Amount", fontBold));
+//
+//            // Data Row 1
+//            summaryTable.addCell(createDataCell(String.valueOf(totalInvoices), fontRegular));
+//            summaryTable.addCell(createDataCell(String.valueOf(paidCount), fontRegular));
+//            summaryTable.addCell(createDataCell(String.valueOf(unpaidCount), fontRegular));
+//            summaryTable.addCell(createDataCell("₹" + formatAmount(totalAmount), fontRegular));
+//
+//            // Header Row 2
+//            summaryTable.addCell(createHeaderCell("Total Paid", fontBold));
+//            summaryTable.addCell(createHeaderCell("Total Pending", fontBold));
+//            summaryTable.addCell(createHeaderCell("Average Invoice", fontBold));
+//            summaryTable.addCell(createHeaderCell("Collection Rate", fontBold));
+//
+//            // Data Row 2
+//            summaryTable.addCell(createDataCell("₹" + formatAmount(totalPaid), fontRegular));
+//            summaryTable.addCell(createDataCell("₹" + formatAmount(totalPending), fontRegular));
+//
+//            double avgInvoice = totalInvoices > 0 ? totalAmount / totalInvoices : 0;
+//            summaryTable.addCell(createDataCell("₹" + formatAmount(avgInvoice), fontRegular));
+//
+//            double collectionRate = totalAmount > 0 ? (totalPaid / totalAmount * 100) : 0;
+//            summaryTable.addCell(createDataCell(String.format("%.1f%%", collectionRate), fontRegular));
+//
+//            doc.add(summaryTable);
+//
+//            // ═══════════════════════════════════════════════════════════
+//            // SECTION 3: PRODUCTS PURCHASED
+//            // ═══════════════════════════════════════════════════════════
+//            if (!productNames.isEmpty()) {
+//                addSectionHeader(doc, "PRODUCTS PURCHASED", fontBold);
+//
+//                Table prodTable = new Table(UnitValue.createPercentArray(new float[]{5, 95}))
+//                        .useAllAvailableWidth()
+//                        .setMarginBottom(20);
+//
+//                int counter = 1;
+//                for (String productName : productNames) {
+//                    prodTable.addCell(createProductNumberCell(String.valueOf(counter++), fontRegular));
+//                    prodTable.addCell(createProductNameCell(productName, fontRegular));
+//                }
+//
+//                doc.add(prodTable);
+//            }
+//
+//            // ═══════════════════════════════════════════════════════════
+//            // SECTION 4: INVOICE DETAILS - FIXED TABLE FORMAT
+//            // ═══════════════════════════════════════════════════════════
+//            if (!invoiceList.isEmpty()) {
+//                addSectionHeader(doc, "INVOICE DETAILS", fontBold);
+//
+//                // Create table with proper column widths
+//                float[] columnWidths = {10f, 20f, 18f, 17f, 17f, 18f};
+//                Table invTable = new Table(UnitValue.createPercentArray(columnWidths))
+//                        .useAllAvailableWidth()
+//                        .setMarginBottom(20);
+//
+//                // Add Table Headers with proper border
+//                Cell headerSr = new Cell()
+//                        .add(new Paragraph("Sr."))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(ColorConstants.WHITE)
+//                        .setBackgroundColor(COLOR_PRIMARY)
+//                        .setTextAlignment(TextAlignment.CENTER)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+//                        .setPadding(10);
+//                invTable.addHeaderCell(headerSr);
+//
+//                Cell headerInvoice = new Cell()
+//                        .add(new Paragraph("Invoice No."))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(ColorConstants.WHITE)
+//                        .setBackgroundColor(COLOR_PRIMARY)
+//                        .setTextAlignment(TextAlignment.CENTER)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+//                        .setPadding(10);
+//                invTable.addHeaderCell(headerInvoice);
+//
+//                Cell headerDate = new Cell()
+//                        .add(new Paragraph("Date"))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(ColorConstants.WHITE)
+//                        .setBackgroundColor(COLOR_PRIMARY)
+//                        .setTextAlignment(TextAlignment.CENTER)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+//                        .setPadding(10);
+//                invTable.addHeaderCell(headerDate);
+//
+//                Cell headerAmount = new Cell()
+//                        .add(new Paragraph("Amount"))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(ColorConstants.WHITE)
+//                        .setBackgroundColor(COLOR_PRIMARY)
+//                        .setTextAlignment(TextAlignment.CENTER)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+//                        .setPadding(10);
+//                invTable.addHeaderCell(headerAmount);
+//
+//                Cell headerPaid = new Cell()
+//                        .add(new Paragraph("Paid"))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(ColorConstants.WHITE)
+//                        .setBackgroundColor(COLOR_PRIMARY)
+//                        .setTextAlignment(TextAlignment.CENTER)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+//                        .setPadding(10);
+//                invTable.addHeaderCell(headerPaid);
+//
+//                Cell headerBalance = new Cell()
+//                        .add(new Paragraph("Balance"))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(ColorConstants.WHITE)
+//                        .setBackgroundColor(COLOR_PRIMARY)
+//                        .setTextAlignment(TextAlignment.CENTER)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(ColorConstants.WHITE, 1f))
+//                        .setPadding(10);
+//                invTable.addHeaderCell(headerBalance);
+//
+//                // Initialize totals
+//                double tableTotalAmount = 0;
+//                double tableTotalPaid = 0;
+//                double tableTotalBalance = 0;
+//                int srNo = 1;
+//
+//                // Add data rows with consistent styling
+//                for (InvoiceSummary invoice : invoiceList) {
+//                    double invoiceTotal = invoice.total;
+//                    double invoicePaid = invoice.paidAmount;
+//                    double invoiceBalance = invoice.pendingAmount;
+//
+//                    // Accumulate totals
+//                    tableTotalAmount += invoiceTotal;
+//                    tableTotalPaid += invoicePaid;
+//                    tableTotalBalance += invoiceBalance;
+//
+//                    // Sr. No Cell
+//                    Cell cellSr = new Cell()
+//                            .add(new Paragraph(String.valueOf(srNo++)))
+//                            .setFont(fontRegular)
+//                            .setFontSize(9)
+//                            .setFontColor(COLOR_TEXT)
+//                            .setTextAlignment(TextAlignment.CENTER)
+//                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+//                            .setPadding(8);
+//                    invTable.addCell(cellSr);
+//
+//                    // Invoice Number Cell
+//                    Cell cellInvoice = new Cell()
+//                            .add(new Paragraph(invoice.number != null ? invoice.number : "N/A"))
+//                            .setFont(fontRegular)
+//                            .setFontSize(9)
+//                            .setFontColor(COLOR_TEXT)
+//                            .setTextAlignment(TextAlignment.LEFT)
+//                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+//                            .setPaddingLeft(8)
+//                            .setPaddingRight(5)
+//                            .setPaddingTop(8)
+//                            .setPaddingBottom(8);
+//                    invTable.addCell(cellInvoice);
+//
+//                    // Date Cell
+//                    Cell cellDate = new Cell()
+//                            .add(new Paragraph(invoice.date != null ? invoice.date : "N/A"))
+//                            .setFont(fontRegular)
+//                            .setFontSize(9)
+//                            .setFontColor(COLOR_TEXT)
+//                            .setTextAlignment(TextAlignment.LEFT)
+//                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+//                            .setPaddingLeft(8)
+//                            .setPaddingRight(5)
+//                            .setPaddingTop(8)
+//                            .setPaddingBottom(8);
+//                    invTable.addCell(cellDate);
+//
+//                    // Amount Cell
+//                    Cell cellAmount = new Cell()
+//                            .add(new Paragraph("₹" + formatAmount(invoiceTotal)))
+//                            .setFont(fontRegular)
+//                            .setFontSize(9)
+//                            .setFontColor(COLOR_TEXT)
+//                            .setTextAlignment(TextAlignment.RIGHT)
+//                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+//                            .setPaddingLeft(5)
+//                            .setPaddingRight(8)
+//                            .setPaddingTop(8)
+//                            .setPaddingBottom(8);
+//                    invTable.addCell(cellAmount);
+//
+//                    // Paid Cell
+//                    Cell cellPaid = new Cell()
+//                            .add(new Paragraph("₹" + formatAmount(invoicePaid)))
+//                            .setFont(fontRegular)
+//                            .setFontSize(9)
+//                            .setFontColor(COLOR_TEXT)
+//                            .setTextAlignment(TextAlignment.RIGHT)
+//                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+//                            .setPaddingLeft(5)
+//                            .setPaddingRight(8)
+//                            .setPaddingTop(8)
+//                            .setPaddingBottom(8);
+//                    invTable.addCell(cellPaid);
+//
+//                    // Balance Cell
+//                    Cell cellBalance = new Cell()
+//                            .add(new Paragraph("₹" + formatAmount(invoiceBalance)))
+//                            .setFont(fontRegular)
+//                            .setFontSize(9)
+//                            .setFontColor(COLOR_TEXT)
+//                            .setTextAlignment(TextAlignment.RIGHT)
+//                            .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                            .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
+//                            .setPaddingLeft(5)
+//                            .setPaddingRight(8)
+//                            .setPaddingTop(8)
+//                            .setPaddingBottom(8);
+//                    invTable.addCell(cellBalance);
+//                }
+//
+//                // Add Total Row with proper styling
+//                Cell totalSr = new Cell()
+//                        .add(new Paragraph(""))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+////                        .setBackgroundColor(COLOR_LIGHT_BG)
+////                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+//                        .setPadding(10);
+//                invTable.addCell(totalSr);
+//
+//                Cell totalInvoice = new Cell()
+//                        .add(new Paragraph(""))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+////                        .setBackgroundColor(COLOR_LIGHT_BG)
+////                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+//                        .setPadding(10);
+//                invTable.addCell(totalInvoice);
+//
+//                Cell totalLabel = new Cell()
+//                        .add(new Paragraph("TOTAL"))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(COLOR_PRIMARY)
+//                        .setBackgroundColor(COLOR_LIGHT_BG)
+//                        .setTextAlignment(TextAlignment.RIGHT)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+//                        .setPaddingRight(8)
+//                        .setPadding(10);
+//                invTable.addCell(totalLabel);
+//
+//                Cell totalAmount = new Cell()
+//                        .add(new Paragraph("₹" + formatAmount(tableTotalAmount)))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(COLOR_PRIMARY)
+//                        .setBackgroundColor(COLOR_LIGHT_BG)
+//                        .setTextAlignment(TextAlignment.RIGHT)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+//                        .setPaddingRight(8)
+//                        .setPadding(10);
+//                invTable.addCell(totalAmount);
+//
+//                Cell totalPaid = new Cell()
+//                        .add(new Paragraph("₹" + formatAmount(tableTotalPaid)))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(COLOR_PRIMARY)
+//                        .setBackgroundColor(COLOR_LIGHT_BG)
+//                        .setTextAlignment(TextAlignment.RIGHT)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+//                        .setPaddingRight(8)
+//                        .setPadding(10);
+//                invTable.addCell(totalPaid);
+//
+//                Cell totalBalance = new Cell()
+//                        .add(new Paragraph("₹" + formatAmount(tableTotalBalance)))
+//                        .setFont(fontBold)
+//                        .setFontSize(10)
+//                        .setFontColor(COLOR_PRIMARY)
+//                        .setBackgroundColor(COLOR_LIGHT_BG)
+//                        .setTextAlignment(TextAlignment.RIGHT)
+//                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+//                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+//                        .setPaddingRight(8)
+//                        .setPadding(10);
+//                invTable.addCell(totalBalance);
+//
+//                doc.add(invTable);
+//            }
+//
+//            // Add end note
+//            doc.add(new Paragraph("\n"));
+//            SolidLine endLine = new SolidLine(0.5f);
+//            endLine.setColor(COLOR_BORDER);
+//            doc.add(new LineSeparator(endLine).setMarginTop(10).setMarginBottom(10));
+//            doc.add(new Paragraph("This is a computer-generated document and does not require a signature.")
+//                    .setFont(fontRegular)
+//                    .setFontSize(8)
+//                    .setFontColor(COLOR_TEXT_LIGHT)
+//                    .setTextAlignment(TextAlignment.CENTER)
+//                    .setItalic());
+//
+//            doc.close();
+//
+//            // Share PDF
+//            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+//            Intent share = new Intent(Intent.ACTION_SEND);
+//            share.setType("application/pdf");
+//            share.putExtra(Intent.EXTRA_STREAM, uri);
+//            share.putExtra(Intent.EXTRA_SUBJECT, "Customer Portfolio - " + customerName);
+//            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//            startActivity(Intent.createChooser(share, "Share Customer Portfolio"));
+//
+//            Toast.makeText(this, "PDF generated successfully!", Toast.LENGTH_SHORT).show();
+//
+//        } catch (Exception e) {
+//            Toast.makeText(this, "Error generating PDF: " + e.getMessage(), Toast.LENGTH_LONG).show();
+//            Log.e(TAG, "PDF Generation Error", e);
+//        }
+//    }
+    // ═══════════════════════════════════════════════════════════════════
+    // HELPER METHODS FOR PDF STYLING
+    // ═══════════════════════════════════════════════════════════════════
+
+
+
+
+// ═══════════════════════════════════════════════════════════════════
+// UPDATED PDF EXPORT METHOD WITH BOTTOM SHEET
+// ═══════════════════════════════════════════════════════════════════
+
+private File generatedPdfFile = null;
+
     private void exportToPdf() {
+        // Generate PDF first
         try {
             String businessName = getBusinessName();
             String fileName = customerName.replaceAll("[^a-zA-Z0-9]", "_") + "_Portfolio.pdf";
@@ -341,7 +768,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
             }
 
             // ═══════════════════════════════════════════════════════════
-            // SECTION 4: INVOICE DETAILS - FIXED TABLE FORMAT
+            // SECTION 4: INVOICE DETAILS
             // ═══════════════════════════════════════════════════════════
             if (!invoiceList.isEmpty()) {
                 addSectionHeader(doc, "INVOICE DETAILS", fontBold);
@@ -352,7 +779,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                         .useAllAvailableWidth()
                         .setMarginBottom(20);
 
-                // Add Table Headers with proper border
+                // Add Table Headers
                 Cell headerSr = new Cell()
                         .add(new Paragraph("Sr."))
                         .setFont(fontBold)
@@ -431,13 +858,12 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                 double tableTotalBalance = 0;
                 int srNo = 1;
 
-                // Add data rows with consistent styling
+                // Add data rows
                 for (InvoiceSummary invoice : invoiceList) {
                     double invoiceTotal = invoice.total;
                     double invoicePaid = invoice.paidAmount;
                     double invoiceBalance = invoice.pendingAmount;
 
-                    // Accumulate totals
                     tableTotalAmount += invoiceTotal;
                     tableTotalPaid += invoicePaid;
                     tableTotalBalance += invoiceBalance;
@@ -530,22 +956,22 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                     invTable.addCell(cellBalance);
                 }
 
-                // Add Total Row with proper styling
+                // Add Total Row
                 Cell totalSr = new Cell()
                         .add(new Paragraph(""))
-                        .setFont(fontBold)
+                        .setFont(fontRegular)
                         .setFontSize(10)
-//                        .setBackgroundColor(COLOR_LIGHT_BG)
-//                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setBackgroundColor(COLOR_LIGHT_BG)
+                        .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
                         .setPadding(10);
                 invTable.addCell(totalSr);
 
                 Cell totalInvoice = new Cell()
                         .add(new Paragraph(""))
-                        .setFont(fontBold)
+                        .setFont(fontRegular)
                         .setFontSize(10)
-//                        .setBackgroundColor(COLOR_LIGHT_BG)
-//                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setBackgroundColor(COLOR_LIGHT_BG)
+                        .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
                         .setPadding(10);
                 invTable.addCell(totalInvoice);
 
@@ -557,7 +983,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                         .setBackgroundColor(COLOR_LIGHT_BG)
                         .setTextAlignment(TextAlignment.RIGHT)
                         .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
                         .setPaddingRight(8)
                         .setPadding(10);
                 invTable.addCell(totalLabel);
@@ -570,7 +996,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                         .setBackgroundColor(COLOR_LIGHT_BG)
                         .setTextAlignment(TextAlignment.RIGHT)
                         .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
                         .setPaddingRight(8)
                         .setPadding(10);
                 invTable.addCell(totalAmount);
@@ -583,7 +1009,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                         .setBackgroundColor(COLOR_LIGHT_BG)
                         .setTextAlignment(TextAlignment.RIGHT)
                         .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
                         .setPaddingRight(8)
                         .setPadding(10);
                 invTable.addCell(totalPaid);
@@ -596,7 +1022,7 @@ public class CustomerDetailsActivity extends AppCompatActivity {
                         .setBackgroundColor(COLOR_LIGHT_BG)
                         .setTextAlignment(TextAlignment.RIGHT)
                         .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .setBorder(new SolidBorder(COLOR_PRIMARY, 1.5f))
+                        .setBorder(new SolidBorder(COLOR_BORDER, 0.5f))
                         .setPaddingRight(8)
                         .setPadding(10);
                 invTable.addCell(totalBalance);
@@ -618,25 +1044,192 @@ public class CustomerDetailsActivity extends AppCompatActivity {
 
             doc.close();
 
-            // Share PDF
-            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
-            Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("application/pdf");
-            share.putExtra(Intent.EXTRA_STREAM, uri);
-            share.putExtra(Intent.EXTRA_SUBJECT, "Customer Portfolio - " + customerName);
-            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(share, "Share Customer Portfolio"));
+            // Store the generated file
+            generatedPdfFile = file;
 
             Toast.makeText(this, "PDF generated successfully!", Toast.LENGTH_SHORT).show();
+
+            // Show bottom sheet with sharing options
+            showPdfShareBottomSheet();
 
         } catch (Exception e) {
             Toast.makeText(this, "Error generating PDF: " + e.getMessage(), Toast.LENGTH_LONG).show();
             Log.e(TAG, "PDF Generation Error", e);
         }
     }
-    // ═══════════════════════════════════════════════════════════════════
-    // HELPER METHODS FOR PDF STYLING
-    // ═══════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════
+// BOTTOM SHEET FOR PDF SHARING OPTIONS
+// ═══════════════════════════════════════════════════════════════════
+
+    private void showPdfShareBottomSheet() {
+        if (generatedPdfFile == null || !generatedPdfFile.exists()) {
+            Toast.makeText(this, "PDF file not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create bottom sheet dialog
+        com.google.android.material.bottomsheet.BottomSheetDialog bottomSheet =
+                new com.google.android.material.bottomsheet.BottomSheetDialog(this);
+
+        android.view.View view = getLayoutInflater().inflate(R.layout.bottom_sheet_pdf_share, null);
+        bottomSheet.setContentView(view);
+
+        // Get views from bottom sheet
+        TextView tvTitle = view.findViewById(R.id.tvBottomSheetTitle);
+        MaterialButton btnWhatsApp = view.findViewById(R.id.btnShareWhatsApp);
+        MaterialButton btnEmail = view.findViewById(R.id.btnShareEmail);
+        MaterialButton btnOthers = view.findViewById(R.id.btnShareOthers);
+        MaterialButton btnView = view.findViewById(R.id.btnViewPdf);
+        MaterialButton btnCancel = view.findViewById(R.id.btnCancel);
+
+        tvTitle.setText("Share Customer Portfolio");
+
+        // WhatsApp Share
+        btnWhatsApp.setOnClickListener(v -> {
+            shareViaWhatsApp();
+            bottomSheet.dismiss();
+        });
+
+        // Email Share
+        btnEmail.setOnClickListener(v -> {
+            shareViaEmail();
+            bottomSheet.dismiss();
+        });
+
+        // Other Apps Share
+        btnOthers.setOnClickListener(v -> {
+            shareViaOtherApps();
+            bottomSheet.dismiss();
+        });
+
+        // View PDF
+        btnView.setOnClickListener(v -> {
+            viewPdf();
+            bottomSheet.dismiss();
+        });
+
+        // Cancel
+        btnCancel.setOnClickListener(v -> bottomSheet.dismiss());
+
+        bottomSheet.show();
+    }
+
+// ═══════════════════════════════════════════════════════════════════
+// SHARING METHODS
+// ═══════════════════════════════════════════════════════════════════
+
+    private void shareViaWhatsApp() {
+        if (generatedPdfFile == null) return;
+
+        try {
+            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", generatedPdfFile);
+
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("application/pdf");
+            intent.setPackage("com.whatsapp");
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.putExtra(Intent.EXTRA_TEXT, "Customer Portfolio Report - " + customerName);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // If customer has phone number, try WhatsApp Business API
+            if (customerPhone != null && !customerPhone.isEmpty()) {
+                String phone = customerPhone.replaceAll("[^0-9]", "");
+                // Try to open chat with customer directly
+                Intent chatIntent = new Intent(Intent.ACTION_VIEW);
+                chatIntent.setData(Uri.parse("https://api.whatsapp.com/send?phone=91" + phone));
+                chatIntent.setPackage("com.whatsapp");
+
+                try {
+                    startActivity(chatIntent);
+                    // After opening chat, user can manually share the file
+                    Toast.makeText(this, "Please share the PDF from your device", Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    // If chat doesn't open, fall back to regular share
+                    startActivity(intent);
+                }
+            } else {
+                startActivity(intent);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "WhatsApp share error", e);
+        }
+    }
+
+    private void shareViaEmail() {
+        if (generatedPdfFile == null) return;
+
+        try {
+            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", generatedPdfFile);
+
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("application/pdf");
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Customer Portfolio - " + customerName);
+
+            String emailBody = "Dear " + customerName + ",\n\n" +
+                    "Please find attached your portfolio report.\n\n" +
+                    "Summary:\n" +
+                    "• Total Invoices: " + totalInvoices + "\n" +
+                    "• Total Amount: ₹" + String.format("%,.2f", totalAmount) + "\n" +
+                    "• Paid Amount: ₹" + String.format("%,.2f", totalPaid) + "\n" +
+                    "• Pending Amount: ₹" + String.format("%,.2f", totalPending) + "\n\n" +
+                    "Best regards";
+
+            intent.putExtra(Intent.EXTRA_TEXT, emailBody);
+
+            // Pre-fill customer email if available
+            String customerEmail = tvEmail.getText().toString();
+            if (customerEmail != null && !customerEmail.isEmpty() && !customerEmail.equals("Not provided")) {
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{customerEmail});
+            }
+
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(intent, "Send Email"));
+        } catch (Exception e) {
+            Toast.makeText(this, "Error sharing via email", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Email share error", e);
+        }
+    }
+
+    private void shareViaOtherApps() {
+        if (generatedPdfFile == null) return;
+
+        try {
+            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", generatedPdfFile);
+
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("application/pdf");
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Customer Portfolio - " + customerName);
+            intent.putExtra(Intent.EXTRA_TEXT, "Customer Portfolio Report for " + customerName);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            startActivity(Intent.createChooser(intent, "Share PDF via"));
+        } catch (Exception e) {
+            Toast.makeText(this, "Error sharing PDF", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Share error", e);
+        }
+    }
+
+    private void viewPdf() {
+        if (generatedPdfFile == null) return;
+
+        try {
+            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", generatedPdfFile);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "application/pdf");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "No PDF viewer found. Please install a PDF reader app.", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "View PDF error", e);
+        }
+    }
 
     private void addSectionHeader(Document doc, String title, PdfFont font) {
         doc.add(new Paragraph(title)

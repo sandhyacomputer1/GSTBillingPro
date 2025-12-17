@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/bottom_sheet_pdf_share.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/tvBottomSheetTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Share Customer Portfolio"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="16dp" />
+
+    <!-- WhatsApp Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnShareWhatsApp"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="Share via WhatsApp"
+        android:textSize="13sp"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_whatsapp"
+        app:iconGravity="start"
+        app:iconTint="@android:color/white"
+        app:iconPadding="12dp"
+        android:backgroundTint="#33BF68"
+        android:textColor="@android:color/white"
+        app:cornerRadius="8dp"
+        android:layout_marginBottom="12dp"
+        android:elevation="2dp" />
+
+    <!-- Email Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnShareEmail"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="Share via Email"
+        android:textSize="13sp"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_email"
+        app:iconGravity="start"
+        app:iconTint="@android:color/white"
+        app:iconPadding="12dp"
+        android:backgroundTint="#DB6A60"
+        android:textColor="@android:color/white"
+        app:cornerRadius="8dp"
+        android:layout_marginBottom="12dp"
+        android:elevation="2dp" />
+
+    <!-- Other Apps Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnShareOthers"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="Share via Other Apps"
+        android:textSize="13sp"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_share"
+        app:iconGravity="start"
+        app:iconTint="@android:color/white"
+        app:iconPadding="12dp"
+        android:backgroundTint="#468AC3"
+        android:textColor="@android:color/white"
+        app:cornerRadius="8dp"
+        android:layout_marginBottom="12dp"
+        android:elevation="2dp" />
+
+    <!-- View PDF Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnViewPdf"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="View PDF"
+        android:textSize="16sp"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_pdf"
+        app:iconGravity="start"
+        app:iconTint="#FF6B6B"
+        app:iconPadding="12dp"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        app:strokeColor="#F08B8B"
+        app:strokeWidth="1dp"
+        android:textColor="#FF6B6B"
+        app:cornerRadius="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Cancel Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Cancel"
+        android:textSize="15sp"
+        android:textAllCaps="false"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:textColor="#757575"
+        app:cornerRadius="8dp" />
+
+</LinearLayout>
