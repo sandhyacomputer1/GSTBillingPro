@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 🔹 Blue toolbar with back button -->
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarAllInvoices"
         android:layout_width="match_parent"
@@ -18,28 +18,51 @@
         app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_arrow_back" />
 
-    <!-- Keep your existing EditText and RecyclerView below -->
-    <!-- Correct androidx.appcompat.widget.SearchView -->
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/etSearchInvoice"
+    <!-- Search + Filter Container -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:iconifiedByDefault="false"
-        android:queryHint="Search by Customer or Invoice No"
-        android:background="@drawable/edittext_bg"
-        android:padding="5dp"
-        android:textColor="#000"
-        android:textSize="14sp"
-        android:layout_marginBottom="8dp"
-        android:layout_margin="5dp" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="8dp"
+        android:gravity="center_vertical">
 
+        <!-- Search View -->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/etSearchInvoice"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search by Customer or Invoice No"
+            android:background="@drawable/edittext_bg"
+            android:padding="5dp"
+            android:textColor="#000"
+            android:textSize="14sp" />
 
+        <!-- Filter Text -->
+        <TextView
+            android:id="@+id/tvFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Filter"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#1976D2"
+            android:paddingHorizontal="16dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_reminder_button"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAllInvoices"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="5dp"
-        android:clipToPadding="false"
-         />
+        android:clipToPadding="false" />
 
 </LinearLayout>

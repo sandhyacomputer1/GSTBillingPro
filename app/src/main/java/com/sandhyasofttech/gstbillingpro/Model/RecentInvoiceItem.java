@@ -56,4 +56,16 @@ public class RecentInvoiceItem {
     public double getGrandTotal() {
         return grandTotal;
     }
+
+    public String getInvoiceNo() {
+        return invoiceNo;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
 }

@@ -8,11 +8,11 @@
         <item
             android:id="@+id/nav_home"
             android:title="Home"
-            android:icon="@drawable/ic_home" />
+            android:icon="@drawable/home" />
 
         <item
             android:id="@+id/nav_invoice"
-            android:icon="@drawable/ic_invoice"
+            android:icon="@drawable/inovice"
             android:title="Invoice" />
     </group>
 
@@ -23,24 +23,24 @@
 
         <item
             android:id="@+id/nav_customer"
-            android:icon="@drawable/ic_customer"
+            android:icon="@drawable/customer"
             android:title="Customer" />
 
         <item
             android:id="@+id/nav_product"
             android:title="Product"
-            android:icon="@drawable/img" />
+            android:icon="@drawable/product" />
 
         <item
             android:id="@+id/nav_soldproduct"
             android:title="Sold Products"
-            android:icon="@drawable/img_1" />
+            android:icon="@drawable/sold" />
 
         <!-- ✅ NEW: Pending Amount -->
         <item
             android:id="@+id/nav_pending_amount"
             android:title="Pending Amount"
-            android:icon="@drawable/ic_pending" />
+            android:icon="@drawable/img_5" />
     </group>
 
     <!-- Section 3: Settings -->
@@ -49,17 +49,17 @@
         android:title="Settings">
         <item
             android:id="@+id/nav_TodaysOverview"
-            android:title="TodaysOverview"
-            android:icon="@drawable/ic_settings" />
+            android:title="Todays Overview"
+            android:icon="@drawable/overview" />
         <item
             android:id="@+id/nav_settings"
             android:title="Settings"
-            android:icon="@drawable/ic_settings" />
+            android:icon="@drawable/setting" />
 
         <item
             android:id="@+id/nav_logout"
             android:title="Logout"
-            android:icon="@drawable/ic_logout" />
+            android:icon="@drawable/logout" />
     </group>
 
 </menu>
