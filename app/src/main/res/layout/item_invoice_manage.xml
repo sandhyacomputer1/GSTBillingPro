@@ -5,8 +5,6 @@
     android:id="@+id/cardInvoice"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="5dp"
-    android:layout_marginVertical="5dp"
     app:cardCornerRadius="10dp"
     app:cardElevation="3dp"
     app:cardUseCompatPadding="true"
@@ -61,8 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-
-            >
+            android:gravity="center_vertical">
 
             <!-- Total Amount -->
             <TextView
@@ -81,12 +78,35 @@
                 android:layout_height="wrap_content"
                 android:text="Pending ₹500"
                 android:textSize="12sp"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="12dp"
                 android:textStyle="bold"
                 android:textColor="#C62828"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:visibility="gone" />
+
+            <!-- Spacer -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"/>
+
+            <!-- Reminder Text -->
+            <TextView
+                android:id="@+id/tvReminder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reminder"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#1976D2"
                 android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
-               />
+                android:paddingVertical="5dp"
+                android:background="@drawable/bg_reminder_small"
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true" />
+
         </LinearLayout>
 
     </LinearLayout>
