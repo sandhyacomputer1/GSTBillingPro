@@ -15,8 +15,8 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbarTodayOverview"
             android:layout_width="match_parent"
+            android:background="@drawable/bg_header_gradient"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
             app:navigationIcon="@drawable/ic_arrow_back" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -47,6 +47,8 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="16dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/colorSuccess"
                     app:cardElevation="4dp"
                     android:clickable="true"
                     android:focusable="true">
@@ -55,6 +57,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
+                        android:background="@color/white"
                         android:padding="20dp">
 
                         <TextView
@@ -95,12 +98,15 @@
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/blue"
                     android:clickable="true"
                     android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@color/white"
                         android:orientation="vertical"
                         android:padding="20dp">
 
@@ -143,7 +149,7 @@
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="16dp"
                     app:strokeColor="@color/colorError"
-                    app:strokeWidth="2dp"
+                    app:strokeWidth="1dp"
                     android:clickable="true"
                     android:focusable="true">
 
@@ -151,6 +157,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
+                        android:background="@color/white"
                         android:padding="20dp">
 
                         <TextView
@@ -176,6 +183,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0 invoices"
+                            android:visibility="gone"
                             android:textColor="@color/grayDark"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -188,6 +196,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/colorPrimary"
+
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp">
@@ -196,6 +207,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
+                        android:background="@color/white"
                         android:padding="20dp">
 
                         <TextView
@@ -221,6 +233,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0 Products"
+                            android:visibility="gone"
                             android:textColor="@color/grayDark"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -240,6 +253,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/white"
+
                     android:orientation="vertical"
                     android:padding="16dp">
 
