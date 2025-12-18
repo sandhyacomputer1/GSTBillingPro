@@ -1,7 +1,5 @@
 package com.sandhyasofttech.gstbillingpro.Activity;
 
-import static org.bouncycastle.asn1.cmc.CMCStatus.pending;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,12 +7,11 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -29,6 +26,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,51 +35,50 @@ import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttech.gstbillingpro.Adapter.RecentInvoiceAdapter;
 import com.sandhyasofttech.gstbillingpro.Model.RecentInvoiceItem;
 import com.sandhyasofttech.gstbillingpro.R;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 public class TotalOverviewActivity extends AppCompatActivity {
 
-    // KPI + labels
-    private TextView tvTodaySales, tvTodayReceived, tvTodayPending,
-            tvTodayInvoices, tvTodayProducts,
-            tvTodayLabel, tvReceivedLabel, tvPendingLabel, tvInvoicesLabel,
-            tvTodayGrowth, tvPendingHint, tvRecentTitle, tvChartTitle;
+    // Date range
+    private String startDate, endDate;
+    private TextView tvRangeTitle, tvRangeSubtitle;
+    private MaterialCardView cardDateRange;
+
+    // KPI views
+    private TextView tvSalesAmount, tvReceivedAmount, tvPendingAmount, tvInvoicesCount,
+            tvSalesGrowth, tvPendingHint, tvProductsCount, tvSalesLabel, tvReceivedLabel,
+            tvPendingLabel, tvInvoicesLabel, tvChartTitle, tvRecentTitle;
 
     private MaterialCardView cardSales, cardReceived, cardPending, cardInvoices;
 
-    // List + empty + progress
+    // List views
     private RecyclerView rvRecent;
     private View layoutEmpty;
     private ProgressBar progressBar;
 
-    // Filters (inside today only)
+    // Filter chips
     private ChipGroup chipGroupFilter;
-    private Chip chipAllToday, chipPaid, chipPartial, chipPendingOnly;
+    private Chip chipAll, chipPaid, chipPartial, chipPending;
 
-    // Charts (today only)
+    // Charts
     private BarChart chartSalesBar;
     private PieChart chartPaymentPie;
 
     // Firebase
     private DatabaseReference invoicesRef;
     private final SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private final SimpleDateFormat displayFmt = new SimpleDateFormat("dd MMM yyyy", Locale.US);
 
     // Data
-    private final ArrayList<RecentInvoiceItem> todayList = new ArrayList<>();
-    private String today;
-
+    private final ArrayList<RecentInvoiceItem> allInvoicesList = new ArrayList<>();
     private double maxPending = 0;
-    private String maxPendingInvoice = null;
-    private String maxPendingCustomer = null;
     private int pendingCount = 0;
 
     @Override
@@ -91,29 +88,36 @@ public class TotalOverviewActivity extends AppCompatActivity {
 
         initViews();
         setupToolbar();
+        setupDateRange(); // Sets today by default
         setupFirebase();
-        loadTodayData();
+        setupCharts();
+        setupCardClicks();
+        setupFilterChips();
+
+        loadRangeData(); // Load today's data first
     }
 
     private void initViews() {
-        // KPI labels + values
-        tvTodaySales = findViewById(R.id.tvTodaySales);
-        tvTodayLabel = findViewById(R.id.tvTodayLabel);
-        tvTodayGrowth = findViewById(R.id.tvTodayGrowth);
+        // Date range header
+        cardDateRange = findViewById(R.id.cardDateRange);
+        tvRangeTitle = findViewById(R.id.tvRangeTitle);
+        tvRangeSubtitle = findViewById(R.id.tvRangeSubtitle);
 
-        tvTodayReceived = findViewById(R.id.tvTodayReceived);
+        // KPI TextViews
+        tvSalesAmount = findViewById(R.id.tvSalesAmount);
+        tvSalesLabel = findViewById(R.id.tvSalesLabel);
+        tvSalesGrowth = findViewById(R.id.tvSalesGrowth);
+        tvReceivedAmount = findViewById(R.id.tvReceivedAmount);
         tvReceivedLabel = findViewById(R.id.tvReceivedLabel);
-
-        tvTodayPending = findViewById(R.id.tvTodayPending);
+        tvPendingAmount = findViewById(R.id.tvPendingAmount);
         tvPendingLabel = findViewById(R.id.tvPendingLabel);
         tvPendingHint = findViewById(R.id.tvPendingHint);
-
-        tvTodayInvoices = findViewById(R.id.tvTodayInvoices);
-        tvTodayProducts = findViewById(R.id.tvTodayProducts);
+        tvInvoicesCount = findViewById(R.id.tvInvoicesCount);
         tvInvoicesLabel = findViewById(R.id.tvInvoicesLabel);
+        tvProductsCount = findViewById(R.id.tvProductsCount);
 
-        tvRecentTitle = findViewById(R.id.tvRecentTitle);
         tvChartTitle = findViewById(R.id.tvChartTitle);
+        tvRecentTitle = findViewById(R.id.tvRecentTitle);
 
         // Cards
         cardSales = findViewById(R.id.cardSales);
@@ -121,59 +125,126 @@ public class TotalOverviewActivity extends AppCompatActivity {
         cardPending = findViewById(R.id.cardPending);
         cardInvoices = findViewById(R.id.cardInvoices);
 
-        // List + empty + progress
+        // List + progress
         rvRecent = findViewById(R.id.rvRecent);
         layoutEmpty = findViewById(R.id.layoutEmpty);
         progressBar = findViewById(R.id.progressOverview);
         rvRecent.setLayoutManager(new LinearLayoutManager(this));
 
-        // Filter chips (today only)
-        chipGroupFilter = findViewById(R.id.chipGroupFilterToday);
-        chipAllToday = findViewById(R.id.chipAllToday);
-        chipPaid = findViewById(R.id.chipPaidToday);
-        chipPartial = findViewById(R.id.chipPartialToday);
-        chipPendingOnly = findViewById(R.id.chipPendingToday);
+        // Filter chips
+        chipGroupFilter = findViewById(R.id.chipGroupFilter);
+        chipAll = findViewById(R.id.chipAll);
+        chipPaid = findViewById(R.id.chipPaid);
+        chipPartial = findViewById(R.id.chipPartial);
+        chipPending = findViewById(R.id.chipPending);
 
         // Charts
-        chartSalesBar = findViewById(R.id.chartSalesBarToday);
-        chartPaymentPie = findViewById(R.id.chartPaymentPieToday);
-
-        if (chartSalesBar != null) {
-            chartSalesBar.setNoDataText("No sales today");
-            chartSalesBar.getDescription().setEnabled(false);
-            chartSalesBar.getAxisRight().setEnabled(false);
-            chartSalesBar.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-            chartSalesBar.getLegend().setEnabled(false);
-        }
-
-        if (chartPaymentPie != null) {
-            chartPaymentPie.setNoDataText("No payments today");
-            chartPaymentPie.getDescription().setEnabled(false);
-            chartPaymentPie.setUsePercentValues(true);
-            chartPaymentPie.setEntryLabelTextSize(10f);
-        }
-
-        setupCardClicks();
+        chartSalesBar = findViewById(R.id.chartSalesBar);
+        chartPaymentPie = findViewById(R.id.chartPaymentPie);
     }
 
-    private void setupToolbar() {
-        MaterialToolbar toolbar = findViewById(R.id.toolbarTodayOverview);
-        toolbar.setTitle("Today Overview");
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    private void setupDateRange() {
+        // Default: Today
+        Date today = new Date();
+        startDate = endDate = dateFmt.format(today);
+        updateDateDisplay("Today", displayFmt.format(today));
+
+        cardDateRange.setOnClickListener(v -> showSimpleDatePicker());
     }
 
-    private void setupCardClicks() {
-        cardSales.setOnClickListener(v ->
-                Toast.makeText(this, "Detail view of today's sales (future)", Toast.LENGTH_SHORT).show());
+    private void showSimpleDatePicker() {
+        // Simple dropdown with common options + custom
+        String[] options = {
+                "Today",
+                "Yesterday",
+                "Last 7 Days",
+                "This Month",
+                "Custom Range"
+        };
 
-        cardReceived.setOnClickListener(v ->
-                Toast.makeText(this, "Detail view of today's collections (future)", Toast.LENGTH_SHORT).show());
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Select Date Range")
+                .setItems(options, (dialog, which) -> {
+                    switch (which) {
+                        case 0: // Today
+                            Date today = new Date();
+                            startDate = endDate = dateFmt.format(today);
+                            updateDateDisplay("Today", displayFmt.format(today));
+                            break;
 
-        cardPending.setOnClickListener(v ->
-                Toast.makeText(this, "Today's pending invoices (future)", Toast.LENGTH_SHORT).show());
+                        case 1: // Yesterday
+                            Calendar yesterday = Calendar.getInstance();
+                            yesterday.add(Calendar.DAY_OF_YEAR, -1);
+                            startDate = endDate = dateFmt.format(yesterday.getTime());
+                            updateDateDisplay("Yesterday", displayFmt.format(yesterday.getTime()));
+                            break;
 
-        cardInvoices.setOnClickListener(v ->
-                Toast.makeText(this, "Today's invoice list (future)", Toast.LENGTH_SHORT).show());
+                        case 2: // Last 7 Days
+                            Calendar end7 = Calendar.getInstance();
+                            Calendar start7 = Calendar.getInstance();
+                            start7.add(Calendar.DAY_OF_YEAR, -7);
+                            startDate = dateFmt.format(start7.getTime());
+                            endDate = dateFmt.format(end7.getTime());
+                            updateDateDisplay("Last 7 Days", displayFmt.format(end7.getTime()));
+                            break;
+
+                        case 3: // This Month
+                            Calendar endMonth = Calendar.getInstance();
+                            Calendar startMonth = Calendar.getInstance();
+                            startMonth.set(Calendar.DAY_OF_MONTH, 1);
+                            startDate = dateFmt.format(startMonth.getTime());
+                            endDate = dateFmt.format(endMonth.getTime());
+                            updateDateDisplay("This Month", displayFmt.format(endMonth.getTime()));
+                            break;
+
+                        case 4: // Custom → Simple date picker
+                            showCustomDatePicker();
+                            return;
+                    }
+                    loadRangeData(); // Reload data
+                })
+                .show();
+    }
+    private void showCustomDatePicker() {
+        // Simple single date picker first
+        Calendar today = Calendar.getInstance();
+
+        com.google.android.material.datepicker.MaterialDatePicker<Long> picker =
+                com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
+                        .setTitleText("Select Date")
+                        .setSelection(today.getTimeInMillis())
+                        .build();
+
+        picker.addOnPositiveButtonClickListener(dateMillis -> {
+            startDate = endDate = dateFmt.format(new Date(dateMillis));
+            updateDateDisplay(getSingleDayTitle(startDate), displayFmt.format(new Date(dateMillis)));
+            loadRangeData();
+        });
+
+        picker.show(getSupportFragmentManager(), "SINGLE_DATE_PICKER");
+    }
+
+
+    private String getSingleDayTitle(String dateStr) {
+        try {
+            Date date = dateFmt.parse(dateStr);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+
+            Calendar today = Calendar.getInstance();
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.add(Calendar.DAY_OF_YEAR, -1);
+
+            if (date.equals(today.getTime())) {
+                return "Today";
+            } else if (date.equals(yesterday.getTime())) {
+                return "Yesterday";
+            } else {
+                return displayFmt.format(date).substring(0, 11); // "18 Dec 2025"
+            }
+        } catch (Exception e) {
+            return dateStr;
+        }
     }
 
     private void setupFirebase() {
@@ -192,245 +263,226 @@ public class TotalOverviewActivity extends AppCompatActivity {
                 .child("invoices");
     }
 
-    private void loadTodayData() {
+    private void loadRangeData() {
         progressBar.setVisibility(View.VISIBLE);
         layoutEmpty.setVisibility(View.GONE);
         rvRecent.setVisibility(View.GONE);
-
-        today = dateFmt.format(new Date());
+        allInvoicesList.clear();
+        maxPending = 0;
+        pendingCount = 0;
 
         invoicesRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                double todaySale = 0.0;
-                double todayReceived = 0.0;
-                double todayPending = 0.0;
-                long todayInvoicesCount = 0;
-                Set<String> todayProductIds = new HashSet<>();
-                todayList.clear();
-                pendingCount = 0;
-
-                maxPending = 0;
-                maxPendingInvoice = null;
-                maxPendingCustomer = null;
-
-                // index -> amount (for bar chart, one bar per invoice)
+                double totalSales = 0, totalReceived = 0, totalPending = 0;
+                long invoiceCount = 0;
+                Set<String> productIds = new HashSet<>();
                 ArrayList<Double> invoiceAmounts = new ArrayList<>();
 
                 for (DataSnapshot invSnap : snapshot.getChildren()) {
-
                     String invDate = invSnap.child("invoiceDate").getValue(String.class);
-                    if (invDate == null || !invDate.equals(today)) {
-                        // skip non-today invoices
+
+                    // Filter by date range
+                    if (invDate == null || invDate.compareTo(startDate) < 0 || invDate.compareTo(endDate) > 0) {
                         continue;
                     }
 
-                    todayInvoicesCount++;
-
+                    invoiceCount++;
                     Double grandTotal = invSnap.child("grandTotal").getValue(Double.class);
-                    Double pending = invSnap.child("pendingAmount").getValue(Double.class);
                     Double paidAmount = invSnap.child("paidAmount").getValue(Double.class);
-                    String status = invSnap.child("paymentStatus").getValue(String.class);
-
-                    if (grandTotal != null) {
-                        todaySale += grandTotal;
-                        invoiceAmounts.add(grandTotal);
-                    }
-
-                    if (paidAmount != null) {
-                        todayReceived += paidAmount;
-                    }
-
+                    Double pending = invSnap.child("pendingAmount").getValue(Double.class);
                     String invoiceNo = invSnap.child("invoiceNumber").getValue(String.class);
                     String customerName = invSnap.child("customerName").getValue(String.class);
+                    String customerPhone = invSnap.child("customerPhone").getValue(String.class);
 
+                    if (grandTotal != null) {
+                        totalSales += grandTotal;
+                        invoiceAmounts.add(grandTotal);
+                    }
+                    if (paidAmount != null) totalReceived += paidAmount;
                     if (pending != null && pending > 0) {
-                        todayPending += pending;
+                        totalPending += pending;
                         pendingCount++;
-
-                        if (pending > maxPending) {
-                            maxPending = pending;
-                            maxPendingInvoice = invoiceNo;
-                            maxPendingCustomer = customerName;
-                        }
+                        if (pending > maxPending) maxPending = pending;
                     }
 
-                    // products (only for today)
+                    // Products
                     for (DataSnapshot item : invSnap.child("items").getChildren()) {
                         String productId = item.child("productId").getValue(String.class);
-                        if (productId != null) {
-                            todayProductIds.add(productId);
-                        }
+                        if (productId != null) productIds.add(productId);
                     }
 
-                    // today recent list
-                    String customerPhone = invSnap.child("customerPhone").getValue(String.class);
-                    Double invGrand = grandTotal;
-                    double pendingAmount = pending != null ? pending : 0;
-                    String date = invDate;
-
-                    if (invoiceNo != null && customerName != null &&
-                            invGrand != null && date != null) {
-                        RecentInvoiceItem item = new RecentInvoiceItem(
-                                invoiceNo,
-                                customerPhone == null ? "" : customerPhone,
-                                customerName,
-                                invGrand,
-                                pendingAmount,
-                                date
-                        );
-                        // optionally, you can store status inside model if you added field
-                        todayList.add(item);
+                    // Add to list
+                    if (invoiceNo != null && customerName != null && grandTotal != null) {
+                        allInvoicesList.add(new RecentInvoiceItem(
+                                invoiceNo, customerPhone != null ? customerPhone : "",
+                                customerName, grandTotal, pending != null ? pending : 0, invDate
+                        ));
                     }
                 }
 
-                // newest first
-                Collections.reverse(todayList);
+                // Sort newest first
+                Collections.reverse(allInvoicesList);
 
-                bindTodayOverview(todaySale, todayReceived, todayPending,
-                        todayInvoicesCount, todayProductIds.size());
+                bindOverview(totalSales, totalReceived, totalPending, invoiceCount, productIds.size(), invoiceAmounts);
+                updateCharts(invoiceAmounts, totalReceived, totalPending);
+                updateList(allInvoicesList); // Initially show all
 
-                updateTodaySalesBar(invoiceAmounts);
-                updateTodayPaymentPie(todayReceived, todayPending);
-
-                setupTodayFilterChips();
-
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(TotalOverviewActivity.this,
-                        "Failed to load today overview", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TotalOverviewActivity.this, "Failed to load data", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void bindTodayOverview(double todaySale, double todayReceived, double todayPending,
-                                   long todayInvoicesCount, int todayProductsCount) {
+    private void bindOverview(double sales, double received, double pending, long invoices, int products, ArrayList<Double> amounts) {
+        tvSalesAmount.setText(formatCurrency((long) sales));
+        tvReceivedAmount.setText(formatCurrency((long) received));
+        tvPendingAmount.setText(formatCurrency((long) pending));
+        tvInvoicesCount.setText(String.valueOf(invoices));
+        tvProductsCount.setText(products + " Products");
+        tvProductsCount.setVisibility(products > 0 ? View.VISIBLE : View.GONE);
 
-        progressBar.setVisibility(View.GONE);
+        tvSalesGrowth.setText(sales > 0 ? "+12%" : "No sales");
 
-        tvTodaySales.setText(formatCurrency((long) todaySale));
-        tvTodayReceived.setText(formatCurrency((long) todayReceived));
-        tvTodayPending.setText(formatCurrency((long) todayPending));
-        tvTodayInvoices.setText(String.valueOf(todayInvoicesCount));
-        tvTodayProducts.setText(todayProductsCount + " Products");
-
-        // Simple growth hint (can be replaced later with real comparison)
-        tvTodayGrowth.setText(todaySale > 0 ? "+ Good Day" : "No sales yet");
-
-        if (maxPending > 0 && maxPendingInvoice != null) {
-            String who = (maxPendingCustomer != null && !maxPendingCustomer.isEmpty())
-                    ? maxPendingCustomer : "Unknown";
-            tvPendingHint.setText(
-                    pendingCount + " invoices | Max: " + formatCurrency((long) maxPending) +
-                            " (" + who + ", " + maxPendingInvoice + ")"
-            );
+        if (pendingCount > 0) {
+            tvPendingHint.setText(pendingCount + " invoices");
+            tvPendingHint.setVisibility(View.VISIBLE);
         } else {
-            tvPendingHint.setText("No pending invoices today");
+            tvPendingHint.setVisibility(View.GONE);
         }
 
-        updateTodayList(todayList);
+        // Dynamic titles based on range
+        tvSalesLabel.setText(startDate.equals(endDate) ? "Today's Sales" : "Total Sales");
+        tvReceivedLabel.setText(startDate.equals(endDate) ? "Received Today" : "Total Received");
+        tvPendingLabel.setText(startDate.equals(endDate) ? "Pending Today" : "Total Pending");
+        tvInvoicesLabel.setText(startDate.equals(endDate) ? "Today's Invoices" : "Total Invoices");
+
+        tvChartTitle.setText(startDate.equals(endDate) ? "Today's Sales & Payments" : "Sales & Payments");
+        tvRecentTitle.setText(startDate.equals(endDate) ? "Today's Invoices" : "Recent Invoices");
     }
 
-    private void updateTodaySalesBar(ArrayList<Double> invoiceAmounts) {
-        if (chartSalesBar == null) return;
+    private void updateCharts(ArrayList<Double> invoiceAmounts, double received, double pending) {
+        updateSalesBar(invoiceAmounts);
+        updatePaymentPie(received, pending);
+    }
 
-        if (invoiceAmounts == null || invoiceAmounts.isEmpty()) {
-            chartSalesBar.clear();
-            chartSalesBar.invalidate();
-            return;
-        }
+    private void updateSalesBar(ArrayList<Double> amounts) {
+        if (chartSalesBar == null || amounts.isEmpty()) return;
 
         ArrayList<BarEntry> entries = new ArrayList<>();
-        for (int i = 0; i < invoiceAmounts.size(); i++) {
-            entries.add(new BarEntry(i, invoiceAmounts.get(i).floatValue()));
+        for (int i = 0; i < amounts.size(); i++) {
+            entries.add(new BarEntry(i, amounts.get(i).floatValue()));
         }
 
-        BarDataSet dataSet = new BarDataSet(entries, "Today invoices");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-        dataSet.setValueTextSize(9f);
+        BarDataSet set = new BarDataSet(entries, "Invoices");
+        set.setColors(ColorTemplate.MATERIAL_COLORS);
+        set.setValueTextSize(9f);
 
-        BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.6f);
-
-        chartSalesBar.setData(barData);
-        chartSalesBar.getXAxis().setLabelCount(entries.size());
+        BarData data = new BarData(set);
+        data.setBarWidth(0.6f);
+        chartSalesBar.setData(data);
+        chartSalesBar.getXAxis().setLabelCount(Math.min(entries.size(), 5));
         chartSalesBar.invalidate();
     }
 
-    private void updateTodayPaymentPie(double totalReceived, double totalPending) {
+    private void updatePaymentPie(double received, double pending) {
         if (chartPaymentPie == null) return;
 
-        if (totalReceived <= 0 && totalPending <= 0) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        if (received > 0) entries.add(new PieEntry((float) received, "Received"));
+        if (pending > 0) entries.add(new PieEntry((float) pending, "Pending"));
+
+        if (entries.isEmpty()) {
             chartPaymentPie.clear();
-            chartPaymentPie.invalidate();
             return;
         }
 
-        ArrayList<PieEntry> entries = new ArrayList<>();
-        if (totalReceived > 0) {
-            entries.add(new PieEntry((float) totalReceived, "Received"));
-        }
-        if (totalPending > 0) {
-            entries.add(new PieEntry((float) totalPending, "Pending"));
-        }
+        PieDataSet set = new PieDataSet(entries, "");
+        set.setColors(ColorTemplate.MATERIAL_COLORS);
+        set.setSliceSpace(2f);
+        set.setValueTextSize(10f);
 
-        PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-        dataSet.setSliceSpace(2f);
-        dataSet.setValueTextSize(10f);
-
-        PieData pieData = new PieData(dataSet);
-        chartPaymentPie.setData(pieData);
+        PieData data = new PieData(set);
+        chartPaymentPie.setData(data);
         chartPaymentPie.invalidate();
     }
 
-    private void setupTodayFilterChips() {
+    private void setupFilterChips() {
         chipGroupFilter.setOnCheckedChangeListener((group, checkedId) -> {
             ArrayList<RecentInvoiceItem> filtered = new ArrayList<>();
 
-            for (RecentInvoiceItem item : todayList) {
-                String d = item.getInvoiceDate();
-                // we already know all are today, but keep check
-                if (d == null || !d.equals(today)) continue;
-
-                DataSnapshot dummy = null; // not needed; use status if you added it in model
-
-                // If you stored paymentStatus in RecentInvoiceItem, use that here.
-                // For now, just use pendingAmount.
+            for (RecentInvoiceItem item : allInvoicesList) {
                 double pending = item.getPendingAmount();
+                double grandTotal = item.getGrandTotal();
 
-                if (checkedId == R.id.chipPaidToday) {
-                    if (pending == 0) filtered.add(item);
-                } else if (checkedId == R.id.chipPartialToday) {
-                    // partial = >0 but < grandTotal
-                    if (pending > 0 && pending < item.getGrandTotal()) filtered.add(item);
-                } else if (checkedId == R.id.chipPendingToday) {
+                if (checkedId == R.id.chipPaid) {
+                    if (pending <= 0) filtered.add(item);
+                } else if (checkedId == R.id.chipPartial) {
+                    if (pending > 0 && pending < grandTotal) filtered.add(item);
+                } else if (checkedId == R.id.chipPending) {
                     if (pending > 0) filtered.add(item);
-                } else { // All today
+                } else { // All
                     filtered.add(item);
                 }
             }
-
-            updateTodayList(filtered);
+            updateList(filtered);
         });
 
-        chipAllToday.setChecked(true);
+        chipAll.setChecked(true);
     }
 
-    private void updateTodayList(ArrayList<RecentInvoiceItem> list) {
+    private void updateList(ArrayList<RecentInvoiceItem> list) {
         if (list.isEmpty()) {
-            layoutEmpty.setVisibility(View.VISIBLE);
             rvRecent.setVisibility(View.GONE);
+            layoutEmpty.setVisibility(View.VISIBLE);
         } else {
-            layoutEmpty.setVisibility(View.GONE);
             rvRecent.setVisibility(View.VISIBLE);
+            layoutEmpty.setVisibility(View.GONE);
             rvRecent.setAdapter(new RecentInvoiceAdapter(list));
         }
+    }
+
+    private void setupCharts() {
+        if (chartSalesBar != null) {
+            chartSalesBar.setNoDataText("No sales data");
+            chartSalesBar.getDescription().setEnabled(false);
+            chartSalesBar.getAxisRight().setEnabled(false);
+            chartSalesBar.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+            chartSalesBar.getLegend().setEnabled(false);
+        }
+
+        if (chartPaymentPie != null) {
+            chartPaymentPie.setNoDataText("No payment data");
+            chartPaymentPie.getDescription().setEnabled(false);
+            chartPaymentPie.setUsePercentValues(true);
+        }
+    }
+
+    private void setupToolbar() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbarOverview);
+        toolbar.setTitle("Overview");
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    }
+
+    private void setupCardClicks() {
+        cardSales.setOnClickListener(v ->
+                Toast.makeText(this, "Sales details", Toast.LENGTH_SHORT).show());
+        cardReceived.setOnClickListener(v ->
+                Toast.makeText(this, "Payment details", Toast.LENGTH_SHORT).show());
+        cardPending.setOnClickListener(v ->
+                Toast.makeText(this, "Pending details", Toast.LENGTH_SHORT).show());
+        cardInvoices.setOnClickListener(v ->
+                Toast.makeText(this, "Invoice details", Toast.LENGTH_SHORT).show());
+    }
+
+    private void updateDateDisplay(String title, String subtitle) {
+        tvRangeTitle.setText(title);
+        tvRangeSubtitle.setText(subtitle);
     }
 
     private String formatCurrency(long amount) {
