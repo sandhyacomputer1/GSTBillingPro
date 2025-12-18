@@ -7,7 +7,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="select_customer">Select Customer</string>
 
-        <string name="import_instructions">
+    <string name="import_instructions">
             <b>How to Import:</b>\n
             Your file (PDF, Excel, CSV) must have columns in this exact order:\n
             <b>1. Product Name</b>\n
@@ -50,7 +50,7 @@
 
     <string name="btn_import">आयात करा</string>
 
-<!--    <string name="desc_add_product">नवीन उत्पादन जोडा</string>-->
+    <!--    <string name="desc_add_product">नवीन उत्पादन जोडा</string>-->
 
     <string name="label_in_stock">स्टॉक मध्ये:</string>
     <!-- Product Item (List) -->
@@ -131,7 +131,6 @@
     <string name="sort_oldest">Sort: Oldest First</string>
     <string name="sort_highest">Sort: Highest Amount</string>
     <string name="sort_lowest">Sort: Lowest Amount</string>
-
 
 
 </resources>

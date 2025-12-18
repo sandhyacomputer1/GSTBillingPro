@@ -181,31 +181,55 @@ public class NewProductActivity extends AppCompatActivity {
     private void saveProduct() {
 
         String name = etProductName.getText().toString().trim();
-        String hsn = etHSNCode.getText().toString().trim();
+        String hsn = etHSNCode.getText().toString().trim();      // optional
         String priceStr = etPrice.getText().toString().trim();
-        String gstStr = etGSTRate.getText().toString().trim();
+        String gstStr = etGSTRate.getText().toString().trim();   // optional
         String stockStr = etStockQuantity.getText().toString().trim();
         String unit = etUnit.getText().toString().trim();
 
+        // ✅ Required validations
         if (TextUtils.isEmpty(name)) { tilProductName.setError("Required"); return; }
+        tilProductName.setError(null);
+
         if (TextUtils.isEmpty(priceStr)) { tilPrice.setError("Required"); return; }
-        if (TextUtils.isEmpty(gstStr)) { tilGSTRate.setError("Required"); return; }
+        tilPrice.setError(null);
+
         if (TextUtils.isEmpty(stockStr)) { tilStockQuantity.setError("Required"); return; }
+        tilStockQuantity.setError(null);
+
         if (TextUtils.isEmpty(unit)) { tilUnit.setError("Select unit"); return; }
+        tilUnit.setError(null);
+
+        // ❌ REMOVE these lines (HSN + GST not compulsory)
+        // if (TextUtils.isEmpty(gstStr)) { tilGSTRate.setError("Required"); return; }
+        // if (TextUtils.isEmpty(hsn)) { tilHSNCode.setError("Required"); return; }
+
+        // ✅ Optional: clear errors
+        tilGSTRate.setError(null);
+        tilHSNCode.setError(null);
 
         double price = Double.parseDouble(priceStr);
-        double gst = Double.parseDouble(gstStr);
-        int stock = Integer.parseInt(stockStr);
 
+        // ✅ GST optional: default 0 if empty
+        double gst = 0;
+        if (!TextUtils.isEmpty(gstStr)) {
+            try {
+                gst = Double.parseDouble(gstStr);
+            } catch (NumberFormatException e) {
+                tilGSTRate.setError("Invalid GST");
+                return;
+            }
+        }
+
+        int stock = Integer.parseInt(stockStr);
         String productId = UUID.randomUUID().toString();
 
-        // ✅ FIXED: unit is now saved
         Product product = new Product(
                 productId,
                 name,
-                hsn,
+                hsn,     // can be empty string
                 price,
-                gst,
+                gst,     // 0 if user left blank
                 stock,
                 unit
         );

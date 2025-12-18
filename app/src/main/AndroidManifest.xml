@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -14,6 +15,10 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.GSTBIllingPro">
+        <activity
+            android:name=".Activity.TotalOverviewActivity"
+            android:exported="false" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -28,42 +33,36 @@
         <activity
             android:name=".custmore.CustomerDetailsActivity"
             android:exported="false" />
-
         <activity
             android:name=".custmore.InvoiceDetailsActivity"
             android:exported="false" />
-
-
         <activity
             android:name=".soldproduct.SoldProductsActivity"
             android:exported="false" />
         <activity
             android:name=".Activity.InvDetailsActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".Activity.PendingPaymentsActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".Activity.ProductSelectionActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".Activity.PaymentActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".Activity.CustomerSelectionActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".Activity.ProductDetailsActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".Activity.FieldMappingActivity"
             android:exported="false" />
-
         <activity
             android:name=".Activity.ShareExportActivity"
             android:exported="false" />
-
         <activity
             android:name=".custmore.AddCustomerActivity"
             android:exported="false" />

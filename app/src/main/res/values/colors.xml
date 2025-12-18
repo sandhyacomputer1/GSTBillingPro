@@ -13,7 +13,9 @@
     <!-- Primary colors -->
     <color name="colorPrimaryDark">#3700B3</color>          <!-- Deep Purple 700 -->
     <color name="colorAccent">#C1E6F6</color>               <!-- Teal 200 -->
-
+     <color name="grayDark">#666666</color>
+    <color name="grayLight">#DDDDDD</color>
+    <color name="colorError">#D32F2F</color>
     <!-- Text Colors -->
 
     <color name="gray_700">#616161</color>                  <!-- Medium Dark Gray -->
@@ -31,5 +33,8 @@
     <color name="tab_unselected">#757575</color>
     <color name="tab_icon_selected">#1565C0</color>
     <color name="tab_icon_unselected">#9E9E9E</color>
+
+
+    <color name="colorSuccess">#4CAF50</color>
 
 </resources>

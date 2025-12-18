@@ -26,7 +26,8 @@ import com.sandhyasofttech.gstbillingpro.Registration.LoginActivity;
 import com.sandhyasofttech.gstbillingpro.soldproduct.SoldProductsActivity;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map;import com.sandhyasofttech.gstbillingpro.Activity.TotalOverviewActivity;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         titleMap.put(R.id.nav_customer, "Customer");
         titleMap.put(R.id.nav_product, "Product");
         titleMap.put(R.id.nav_soldproduct, "Sold Products");
+        titleMap.put(R.id.nav_TodaysOverview, "TodaysOverview");
         titleMap.put(R.id.nav_pending_amount, "Pending Amount");
         titleMap.put(R.id.nav_settings, "Settings");
 
@@ -116,6 +118,10 @@ public class MainActivity extends AppCompatActivity {
         // 🔥 SOLD PRODUCTS (Activity)
         if (itemId == R.id.nav_soldproduct) {
             startActivity(new Intent(this, SoldProductsActivity.class));
+            return;
+        }
+        if (itemId == R.id.nav_TodaysOverview) {
+            startActivity(new Intent(this, TotalOverviewActivity.class));
             return;
         }
 

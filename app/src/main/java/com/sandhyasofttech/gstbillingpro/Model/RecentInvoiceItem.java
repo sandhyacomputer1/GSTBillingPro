@@ -2,19 +2,18 @@ package com.sandhyasofttech.gstbillingpro.Model;
 
 public class RecentInvoiceItem {
 
-    // EXISTING
+    // Fields
     public String invoiceNo;
     public String customerId;     // mobile number
     public String customerName;
     public double grandTotal;
-    public String date;
-
-    // 🔥 NEW
+    public String date;           // this already stores invoice date
     public double pendingAmount;
 
-    public RecentInvoiceItem() {}
+    public RecentInvoiceItem() {
+    }
 
-    // EXISTING CONSTRUCTOR (KEEP)
+    // OLD constructor (without pending)
     public RecentInvoiceItem(String invoiceNo,
                              String customerId,
                              String customerName,
@@ -29,7 +28,7 @@ public class RecentInvoiceItem {
         this.pendingAmount = 0;
     }
 
-    // 🔥 NEW CONSTRUCTOR (HOME / RECENT)
+    // NEW constructor (with pending)
     public RecentInvoiceItem(String invoiceNo,
                              String customerId,
                              String customerName,
@@ -43,5 +42,18 @@ public class RecentInvoiceItem {
         this.grandTotal = grandTotal;
         this.pendingAmount = pendingAmount;
         this.date = date;
+    }
+
+    // Use the existing 'date' field as invoice date
+    public String getInvoiceDate() {
+        return date;
+    }
+
+    public double getPendingAmount() {
+        return pendingAmount;
+    }
+
+    public double getGrandTotal() {
+        return grandTotal;
     }
 }
