@@ -480,6 +480,8 @@ public class TotalOverviewActivity extends AppCompatActivity {
                 Toast.makeText(this, "Invoice details", Toast.LENGTH_SHORT).show());
     }
 
+
+
     private void updateDateDisplay(String title, String subtitle) {
         tvRangeTitle.setText(title);
         tvRangeSubtitle.setText(subtitle);
