@@ -134,7 +134,6 @@ public class HomeFragment extends Fragment {
             fabNewInvoice.setOnClickListener(v -> openInvoiceFragment());
         }
 
-        // === VYAPAR STYLE SMOOTH SCROLL BEHAVIOR ===
         if (scrollView != null && fabNewInvoice != null) {
             final Handler handler = new Handler(Looper.getMainLooper());
             final long DELAY_SHOW = 1300L; // 1.3 seconds
