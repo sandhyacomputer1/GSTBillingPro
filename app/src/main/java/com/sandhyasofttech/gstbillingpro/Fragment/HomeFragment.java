@@ -29,6 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.sandhyasofttech.gstbillingpro.Activity.AllInvoicesActivity;
 import com.sandhyasofttech.gstbillingpro.Activity.PendingPaymentsActivity;
 import com.sandhyasofttech.gstbillingpro.Activity.ShareExportActivity;
+import com.sandhyasofttech.gstbillingpro.Activity.TotalOverviewActivity;
 import com.sandhyasofttech.gstbillingpro.Adapter.RecentInvoiceAdapter;
 import com.sandhyasofttech.gstbillingpro.MainActivity;
 import com.sandhyasofttech.gstbillingpro.Model.RecentInvoiceItem;
@@ -50,7 +51,7 @@ public class HomeFragment extends Fragment {
     private TextView tvTotalCustomers, tvTotalProducts, tvLastBackup,tvPendingAmount;
     private ExtendedFloatingActionButton fabNewInvoice;
     private NestedScrollView scrollView;
-    private View layoutPending;
+    private View layoutPending,layoutTodaySales;
 
 
     private String userMobile;
@@ -87,6 +88,8 @@ public class HomeFragment extends Fragment {
 
         tvPendingAmount = view.findViewById(R.id.tvPendingAmount);
         layoutPending = view.findViewById(R.id.layoutPending);
+        layoutTodaySales = view.findViewById(R.id.layoutTodaySales);
+
 
 
 
@@ -126,6 +129,12 @@ public class HomeFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
+        layoutTodaySales.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), TotalOverviewActivity.class);
+            intent.putExtra("FILTER_TYPE", "TODAY"); // optional, useful later
+            startActivity(intent);
+        });
+
         btnShareExport.setOnClickListener(v -> startActivity(new Intent(getContext(), ShareExportActivity.class)));
         btnViewAllInvoices.setOnClickListener(v -> startActivity(new Intent(getContext(), AllInvoicesActivity.class)));
 
@@ -174,6 +183,7 @@ public class HomeFragment extends Fragment {
             fabNewInvoice.postDelayed(() -> fabNewInvoice.show(), 400);
         }
     }
+
 
     // === OPEN INVOICE FRAGMENT ===
     private void openInvoiceFragment() {
